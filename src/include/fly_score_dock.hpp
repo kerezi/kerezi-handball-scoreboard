@@ -121,6 +121,7 @@ private:
 	FlyState st_;
 	QCheckBox *swapSides_ = nullptr;
 	QCheckBox *showScoreboard_ = nullptr;
+	QPushButton *matchInfoBtn_ = nullptr;
 	QPushButton *teamsBtn_ = nullptr;
 	QPushButton *editFieldsBtn_ = nullptr;
 	QPushButton *editTimersBtn_ = nullptr;

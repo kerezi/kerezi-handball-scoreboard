@@ -325,6 +325,11 @@ bool FlyScoreDock::init()
 		headerRow->setContentsMargins(0, 0, 0, 0);
 		headerRow->setSpacing(6);
 
+		matchInfoBtn_ = new QPushButton(fly_i18n("Dock.MatchInfo"), configTab);
+		matchInfoBtn_->setMinimumWidth(110);
+		matchInfoBtn_->setMaximumWidth(130);
+		matchInfoBtn_->setCursor(Qt::PointingHandCursor);
+
 		teamsBtn_ = new QPushButton(fly_i18n("Dock.Teams"), configTab);
 		teamsBtn_->setMinimumWidth(110);
 		teamsBtn_->setMaximumWidth(130);
@@ -342,6 +347,7 @@ bool FlyScoreDock::init()
 		editTimersBtn_->setCursor(Qt::PointingHandCursor);
 		editTimersBtn_->setToolTip(fly_i18n("Dock.ConfigureTimers"));
 
+		headerRow->addWidget(matchInfoBtn_);
 		headerRow->addWidget(teamsBtn_);
 		headerRow->addWidget(editFieldsBtn_);
 		headerRow->addWidget(editTimersBtn_);
