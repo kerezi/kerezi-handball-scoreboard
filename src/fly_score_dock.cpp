@@ -385,6 +385,7 @@ bool FlyScoreDock::init()
 
 	{
 		auto *tabs = new QTabWidget(mainBox);
+		tabs->setTabPosition(QTabWidget::West);
 		tabs->setObjectName(QStringLiteral("flyScoreTabs"));
 		tabs->setDocumentMode(true);
 		tabs->setMovable(false);
