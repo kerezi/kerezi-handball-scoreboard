@@ -391,6 +391,13 @@ bool FlyScoreDock::init()
 		tabs->setMovable(false);
 		tabs->setUsesScrollButtons(true);
 
+		auto *configTab = new QWidget(tabs);
+		auto *configVBox = new QVBoxLayout(configTab);
+		configVBox->setContentsMargins(0, 0, 0, 0);
+		configVBox->setSpacing(4);
+		configVBox->setAlignment(Qt::AlignTop);
+		configLayout_ = configVBox;
+
 		auto *teamTab = new QWidget(tabs);
 		auto *teamVBox = new QVBoxLayout(teamTab);
 		teamVBox->setContentsMargins(0, 0, 0, 0);
@@ -455,6 +462,7 @@ bool FlyScoreDock::init()
 		eventsVBox->addWidget(eventsHint);
 		eventsVBox->addStretch(1);
 
+		tabs->addTab(configTab, fly_i18n("Common.Configuration"));
 		tabs->addTab(teamTab, fly_i18n("Common.TeamStats"));
 		tabs->addTab(singleTab, fly_i18n("Common.SingleStats"));
 		tabs->addTab(timersTab, fly_i18n("Common.Timers"));

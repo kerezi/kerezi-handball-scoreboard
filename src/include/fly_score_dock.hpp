@@ -124,6 +124,7 @@ private:
 	QPushButton *teamsBtn_ = nullptr;
 	QPushButton *editFieldsBtn_ = nullptr;
 	QPushButton *editTimersBtn_ = nullptr;
+	QVBoxLayout *configLayout_ = nullptr;
 	QVBoxLayout *customFieldsLayout_ = nullptr;
 	QList<FlyCustomFieldUi> customFields_;
 	QVBoxLayout *singleStatsLayout_ = nullptr;
