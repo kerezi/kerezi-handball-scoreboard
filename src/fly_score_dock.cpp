@@ -304,47 +304,14 @@ bool FlyScoreDock::init()
 	setAttribute(Qt::WA_StyledBackground, true);
 	setStyleSheet(QStringLiteral("FlyScoreDock { background: rgba(39, 42, 51, 1.0)}"));
 
-	auto *outer = new QVBoxLayout(this);
-	outer->setContentsMargins(0, 0, 0, 0);
-	outer->setSpacing(0);
-
-	auto *content = new QWidget(this);
-	content->setObjectName(QStringLiteral("flyScoreContent"));
-	content->setAttribute(Qt::WA_StyledBackground, true);
-
-	auto *root = new QVBoxLayout(content);
-	root->setContentsMargins(8, 8, 8, 8);
-	root->setSpacing(8);
-
-	outer->addWidget(content);
-
-	const QString cardStyle = QStringLiteral("QGroupBox {"
-						 "  background-color: rgba(255, 255, 255, 0.06);"
-						 "  border: 1px solid rgba(255, 255, 255, 0.10);"
-						 "  border-radius: 6px;"
-						 "  margin-top: 10px;"
-						 "}"
-						 "QGroupBox::title {"
-						 "  subcontrol-origin: margin;"
-						 "  left: 8px;"
-						 "  top: -2px;"
-						 "  padding: 0 6px;"
-						 "}");
-
-	auto *mainBox = new QGroupBox(fly_i18n("Common.Scoreboard"), content);
-	mainBox->setStyleSheet(cardStyle);
-
-	auto *mainVBox = new QVBoxLayout(mainBox);
-	mainVBox->setContentsMargins(8, 8, 8, 8);
-	mainVBox->setSpacing(6);
-
 	{
-		auto *tabs = new QTabWidget(mainBox);
+		auto *tabs = new QTabWidget(this);
 		tabs->setTabPosition(QTabWidget::West);
 		tabs->setObjectName(QStringLiteral("flyScoreTabs"));
 		tabs->setDocumentMode(true);
 		tabs->setMovable(false);
-		tabs->setUsesScrollButtons(true);
+		tabs->setUsesScrollButtons(false);
+		tabs->setWindowTitle(fly_i18n("Common.Scoreboard"));
 
 		auto *configTab = new QWidget(tabs);
 		auto *configVBox = new QVBoxLayout(configTab);
@@ -520,8 +487,6 @@ bool FlyScoreDock::init()
 		tabs->addTab(timersTab, fly_i18n("Common.Timers"));
 		tabs->addTab(eventsTab, fly_i18n("Common.Events"));
 
-		mainVBox->addWidget(tabs);
-
 		connect(clearBtn, &QPushButton::clicked, this, &FlyScoreDock::onClearTeamsAndReset);
 		connect(openOverlayFolderBtn, &QPushButton::clicked, this, [this]() {
 			const QString path = selectedTemplatePath();
@@ -530,9 +495,6 @@ bool FlyScoreDock::init()
 		});
 		connect(hotkeysBtn, &QPushButton::clicked, this, &FlyScoreDock::openHotkeysDialog);
 	}
-
-	mainBox->setLayout(mainVBox);
-	root->addWidget(mainBox);
 
 	refreshActiveTemplateLabel();
 
