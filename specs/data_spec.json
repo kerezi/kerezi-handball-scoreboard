@@ -1,0 +1,82 @@
+{
+	home: {
+		clubName: "String",
+		clubShortName: "String",
+		players: [{
+			playerTshirtNumber: "int",
+			playerTshirtName: "String",
+			playerName: "String",
+			warning_ms: "long long",
+			fst2minSusp_ms: "long long",
+			snd2minSusp_ms: "long long",
+			trd2minSusp_ms: "long long",
+			disqualification_ms: "long long",
+			goals: [ {
+				moment_ms: "long long",
+				type: "string"
+			}]
+		}],
+		official: [{
+			officialLetter: "char",
+			officialName: "String",
+			officialRole: "String",
+			warning_ms: "long long",
+			fst2minSusp_ms: "long long",
+			disqualification_ms: "long long"
+		}],
+		fstTimeout: "long long",
+		sndTimeout: "long long",
+		trdTimeout: "long long"
+	},
+	guest: {
+		clubName: "String",
+		clubShortName: "String",
+		players: [{
+			playerTshirtNumber: "int",
+			playerTshirtName: "String",
+			playerName: "String",
+			warning_ms: "long long",
+			fst2minSusp_ms: "long long",
+			snd2minSusp_ms: "long long",
+			trd2minSusp_ms: "long long",
+			disqualification_ms: "long long",
+			goals: [ {
+				moment_ms: "long long",
+				type: "string"
+			}]
+		}],
+		official: [{
+			officialLetter: "char",
+			officialName: "String",
+			officialRole: "String",
+			warning_ms: "long long",
+			fst2minSusp_ms: "long long",
+			disqualification_ms: "long long"
+		}],
+		fstTimeout: "long long",
+		sndTimeout: "long long",
+		trdTimeout: "long long"
+	},
+	timers: [{
+		timerName: "Half time timer",
+		current_half: "int",
+		duration_ms: 30 * 60 * 1000,
+		current_moment_ms: "long long",
+		initial_ms: 0 * 0 * 1000,
+		delta_ms: 1 * rand(0, 500),
+	}, {
+		timerName: "Timeout timer",
+		current_timeout: "int",
+		duration_ms: 1 * 60 * 1000,
+		current_moment_ms: "long long",
+		initial_ms: 1 * 60 * 1000,
+		delta_ms: (-1) * rand(0, 500),
+	}, {
+		timerName: "Extra time timer",
+		current_extratime: "int",
+		duration_ms: 5 * 60 * 1000,
+		current_moment_ms: "long long",
+		initial_ms: 0 * 00 * 1000,
+		delta_ms: 1 * rand(0, 500),
+	}]
+}
