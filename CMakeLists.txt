@@ -46,6 +46,7 @@ endif()
 # ---------------------------------------------------------------------------
 # Paths
 # ---------------------------------------------------------------------------
+set(FS_HLP_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/help")
 set(FS_INC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/include")
 set(FS_3P_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/thirdparty")
 set(FS_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
@@ -98,7 +99,7 @@ target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE ENABLE_QT=1)
 # ---------------------------------------------------------------------------
 # Includes
 # ---------------------------------------------------------------------------
-target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${FS_INC_DIR} ${FS_SRC_DIR} ${FS_GEN_DIR} ${FS_3P_DIR})
+target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${FS_HLP_DIR} ${FS_INC_DIR} ${FS_SRC_DIR} ${FS_GEN_DIR} ${FS_3P_DIR})
 
 # ---------------------------------------------------------------------------
 # Sources
@@ -120,6 +121,7 @@ set(
 list(
   APPEND
   OBS_FLY_SCORE_SRC
+  ${FS_HLP_DIR}/fly_score_horizontal_tab_bar.hpp
   ${FS_SRC_DIR}/fly_score_dock.cpp
   ${FS_INC_DIR}/fly_score_dock.hpp
   ${FS_SRC_DIR}/widget.cpp

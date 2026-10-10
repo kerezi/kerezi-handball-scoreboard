@@ -4,6 +4,7 @@
 #include "fly_score_log.hpp"
 #include "widget.hpp"
 
+#include "fly_score_horizontal_tab_bar.hpp"
 #include "fly_score_dock.hpp"
 #include "fly_score_state.hpp"
 #include "fly_score_const.hpp"
@@ -304,14 +305,15 @@ bool FlyScoreDock::init()
 	setAttribute(Qt::WA_StyledBackground, true);
 	setStyleSheet(QStringLiteral("FlyScoreDock { background: rgba(39, 42, 51, 1.0)}"));
 
-	auto *tabs = new QTabWidget(this);
+	auto *tabs = new FlyHorizontalTabWidget(this);
 	tabs->setTabPosition(QTabWidget::West);
 	tabs->setObjectName(QStringLiteral("flyScoreTabs"));
 	tabs->setDocumentMode(true);
 	tabs->setMovable(false);
 	tabs->setUsesScrollButtons(false);
 	tabs->setWindowTitle(fly_i18n("Common.Scoreboard"));
-	tabs->tabBar()->setStyleSheet("QTabBar::tab {font-size:22pt;}");
+	tabs->tabBar()->setStyleSheet("QTabBar {font-size:22pt;}");
+	tabs->tabBar()->setAutoHide(true);
 
 	auto *configTab = new QWidget(tabs);
 	auto *configVBox = new QVBoxLayout(configTab);
