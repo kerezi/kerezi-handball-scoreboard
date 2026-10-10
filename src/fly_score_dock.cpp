@@ -339,51 +339,6 @@ bool FlyScoreDock::init()
 	mainVBox->setSpacing(6);
 
 	{
-		auto *headerRow = new QHBoxLayout();
-		headerRow->setContentsMargins(0, 0, 0, 0);
-		headerRow->setSpacing(6);
-
-		teamsBtn_ = new QPushButton(fly_i18n("Dock.Teams"), mainBox);
-		teamsBtn_->setMinimumWidth(110);
-		teamsBtn_->setMaximumWidth(130);
-		teamsBtn_->setCursor(Qt::PointingHandCursor);
-
-		editFieldsBtn_ = new QPushButton(fly_i18n("Dock.StatsButton"), mainBox);
-		editFieldsBtn_->setMinimumWidth(110);
-		editFieldsBtn_->setMaximumWidth(130);
-		editFieldsBtn_->setCursor(Qt::PointingHandCursor);
-		editFieldsBtn_->setToolTip(fly_i18n("Dock.ConfigureMatchStats"));
-
-		editTimersBtn_ = new QPushButton(fly_i18n("Dock.TimersButton"), mainBox);
-		editTimersBtn_->setMinimumWidth(110);
-		editTimersBtn_->setMaximumWidth(130);
-		editTimersBtn_->setCursor(Qt::PointingHandCursor);
-		editTimersBtn_->setToolTip(fly_i18n("Dock.ConfigureTimers"));
-
-		headerRow->addWidget(teamsBtn_);
-		headerRow->addWidget(editFieldsBtn_);
-		headerRow->addWidget(editTimersBtn_);
-		headerRow->addStretch(1);
-
-		mainVBox->addLayout(headerRow);
-	}
-
-	{
-		auto *togglesRow = new QHBoxLayout();
-		togglesRow->setContentsMargins(0, 0, 0, 0);
-		togglesRow->setSpacing(10);
-
-		swapSides_ = new QCheckBox(fly_i18n("Hotkey.SwapSides"), mainBox);
-		showScoreboard_ = new QCheckBox(fly_i18n("Dock.ShowScoreboard"), mainBox);
-
-		togglesRow->addWidget(swapSides_);
-		togglesRow->addWidget(showScoreboard_);
-		togglesRow->addStretch(1);
-
-		mainVBox->addLayout(togglesRow);
-	}
-
-	{
 		auto *tabs = new QTabWidget(mainBox);
 		tabs->setTabPosition(QTabWidget::West);
 		tabs->setObjectName(QStringLiteral("flyScoreTabs"));
@@ -396,7 +351,104 @@ bool FlyScoreDock::init()
 		configVBox->setContentsMargins(0, 0, 0, 0);
 		configVBox->setSpacing(4);
 		configVBox->setAlignment(Qt::AlignTop);
+		{
+			auto *headerRow = new QHBoxLayout();
+			headerRow->setContentsMargins(0, 0, 0, 0);
+			headerRow->setSpacing(6);
+
+			teamsBtn_ = new QPushButton(fly_i18n("Dock.Teams"), configTab);
+			teamsBtn_->setMinimumWidth(110);
+			teamsBtn_->setMaximumWidth(130);
+			teamsBtn_->setCursor(Qt::PointingHandCursor);
+
+			editFieldsBtn_ = new QPushButton(fly_i18n("Dock.StatsButton"), configTab);
+			editFieldsBtn_->setMinimumWidth(110);
+			editFieldsBtn_->setMaximumWidth(130);
+			editFieldsBtn_->setCursor(Qt::PointingHandCursor);
+			editFieldsBtn_->setToolTip(fly_i18n("Dock.ConfigureMatchStats"));
+
+			editTimersBtn_ = new QPushButton(fly_i18n("Dock.TimersButton"), configTab);
+			editTimersBtn_->setMinimumWidth(110);
+			editTimersBtn_->setMaximumWidth(130);
+			editTimersBtn_->setCursor(Qt::PointingHandCursor);
+			editTimersBtn_->setToolTip(fly_i18n("Dock.ConfigureTimers"));
+
+			headerRow->addWidget(teamsBtn_);
+			headerRow->addWidget(editFieldsBtn_);
+			headerRow->addWidget(editTimersBtn_);
+			headerRow->addStretch(1);
+
+			configVBox->addLayout(headerRow);
+		}
+		{
+			auto *togglesRow = new QHBoxLayout();
+			togglesRow->setContentsMargins(0, 0, 0, 0);
+			togglesRow->setSpacing(10);
+
+			swapSides_ = new QCheckBox(fly_i18n("Hotkey.SwapSides"), configTab);
+			showScoreboard_ = new QCheckBox(fly_i18n("Dock.ShowScoreboard"), configTab);
+
+			togglesRow->addWidget(swapSides_);
+			togglesRow->addWidget(showScoreboard_);
+			togglesRow->addStretch(1);
+
+			configVBox->addLayout(togglesRow);
+		}
+		auto *openOverlayFolderBtn = new QPushButton(fly_i18n("Dock.OpenOverlayFolder"), configTab);
+		openOverlayFolderBtn->setCursor(Qt::PointingHandCursor);
+		openOverlayFolderBtn->setToolTip(fly_i18n("Dock.OpenOverlayFolderTooltip"));
+
+		auto *clearBtn = new QPushButton(QStringLiteral("🧹"), configTab);
+		clearBtn->setCursor(Qt::PointingHandCursor);
+		clearBtn->setToolTip(fly_i18n("Dock.ResetTooltip"));
+
+		auto *hotkeysBtn = new QPushButton(QStringLiteral("⌨️"), configTab);
+		hotkeysBtn->setCursor(Qt::PointingHandCursor);
+		hotkeysBtn->setToolTip(fly_i18n("Dock.ConfigureHotkeys"));
+		{
+			auto *templateRow = new QHBoxLayout();
+			templateRow->setContentsMargins(0, 0, 0, 0);
+			templateRow->setSpacing(6);
+
+			selectTemplateFolderBtn_ = new QPushButton(fly_i18n("Dock.SelectTemplateFolder"), configTab);
+			selectTemplateFolderBtn_->setCursor(Qt::PointingHandCursor);
+			selectTemplateFolderBtn_->setToolTip(fly_i18n("Dock.SelectTemplateFolderTooltip"));
+			activeTemplateLabel_ = new QLabel(configTab);
+			activeTemplateLabel_->setTextInteractionFlags(Qt::TextSelectableByMouse);
+			activeTemplateLabel_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+
+			webSocketStatus_ = new QLabel(configTab);
+			webSocketStatus_->setTextInteractionFlags(Qt::TextSelectableByMouse);
+			webSocketStatus_->setToolTip(fly_i18n("Dock.WebSocketTooltip"));
+
+			templateRow->addWidget(selectTemplateFolderBtn_);
+			templateRow->addWidget(activeTemplateLabel_, 1);
+			templateRow->addWidget(openOverlayFolderBtn);
+			templateRow->addWidget(webSocketStatus_);
+			configVBox->addLayout(templateRow);
+
+			auto *bottomRow = new QHBoxLayout();
+			bottomRow->setContentsMargins(0, 0, 0, 0);
+			bottomRow->setSpacing(6);
+
+
+			toggleCarouselBtn_ = new QPushButton(configTab);
+			toggleCarouselBtn_->setCheckable(true);
+			toggleCarouselBtn_->setCursor(Qt::PointingHandCursor);
+
+			bottomRow->addWidget(clearBtn);
+			bottomRow->addStretch(1);
+			bottomRow->addWidget(toggleCarouselBtn_);
+			bottomRow->addWidget(hotkeysBtn);
+
+			configVBox->addLayout(bottomRow);
+			configVBox->addStretch(1);
+
+			widgetCarousel_ = create_widget_carousel(this);
+			configVBox->addWidget(widgetCarousel_);
+		}
 		configLayout_ = configVBox;
+
 
 		auto *teamTab = new QWidget(tabs);
 		auto *teamVBox = new QVBoxLayout(teamTab);
@@ -469,61 +521,18 @@ bool FlyScoreDock::init()
 		tabs->addTab(eventsTab, fly_i18n("Common.Events"));
 
 		mainVBox->addWidget(tabs);
+
+		connect(clearBtn, &QPushButton::clicked, this, &FlyScoreDock::onClearTeamsAndReset);
+		connect(openOverlayFolderBtn, &QPushButton::clicked, this, [this]() {
+			const QString path = selectedTemplatePath();
+			if (!path.isEmpty() && QDir(path).exists())
+				QDesktopServices::openUrl(QUrl::fromLocalFile(path));
+		});
+		connect(hotkeysBtn, &QPushButton::clicked, this, &FlyScoreDock::openHotkeysDialog);
 	}
 
 	mainBox->setLayout(mainVBox);
 	root->addWidget(mainBox);
-
-	auto *templateRow = new QHBoxLayout();
-	templateRow->setContentsMargins(0, 0, 0, 0);
-	templateRow->setSpacing(6);
-
-	selectTemplateFolderBtn_ = new QPushButton(fly_i18n("Dock.SelectTemplateFolder"), content);
-	selectTemplateFolderBtn_->setCursor(Qt::PointingHandCursor);
-	selectTemplateFolderBtn_->setToolTip(fly_i18n("Dock.SelectTemplateFolderTooltip"));
-	activeTemplateLabel_ = new QLabel(content);
-	activeTemplateLabel_->setTextInteractionFlags(Qt::TextSelectableByMouse);
-	activeTemplateLabel_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-	auto *openOverlayFolderBtn = new QPushButton(fly_i18n("Dock.OpenOverlayFolder"), content);
-	openOverlayFolderBtn->setCursor(Qt::PointingHandCursor);
-	openOverlayFolderBtn->setToolTip(fly_i18n("Dock.OpenOverlayFolderTooltip"));
-
-	webSocketStatus_ = new QLabel(content);
-	webSocketStatus_->setTextInteractionFlags(Qt::TextSelectableByMouse);
-	webSocketStatus_->setToolTip(fly_i18n("Dock.WebSocketTooltip"));
-
-	templateRow->addWidget(selectTemplateFolderBtn_);
-	templateRow->addWidget(activeTemplateLabel_, 1);
-	templateRow->addWidget(openOverlayFolderBtn);
-	templateRow->addWidget(webSocketStatus_);
-	root->addLayout(templateRow);
-
-	auto *bottomRow = new QHBoxLayout();
-	bottomRow->setContentsMargins(0, 0, 0, 0);
-	bottomRow->setSpacing(6);
-
-	auto *clearBtn = new QPushButton(QStringLiteral("🧹"), content);
-	clearBtn->setCursor(Qt::PointingHandCursor);
-	clearBtn->setToolTip(fly_i18n("Dock.ResetTooltip"));
-
-	auto *hotkeysBtn = new QPushButton(QStringLiteral("⌨️"), content);
-	hotkeysBtn->setCursor(Qt::PointingHandCursor);
-	hotkeysBtn->setToolTip(fly_i18n("Dock.ConfigureHotkeys"));
-
-	toggleCarouselBtn_ = new QPushButton(content);
-	toggleCarouselBtn_->setCheckable(true);
-	toggleCarouselBtn_->setCursor(Qt::PointingHandCursor);
-
-	bottomRow->addWidget(clearBtn);
-	bottomRow->addStretch(1);
-	bottomRow->addWidget(toggleCarouselBtn_);
-	bottomRow->addWidget(hotkeysBtn);
-
-	root->addLayout(bottomRow);
-	root->addStretch(1);
-
-	widgetCarousel_ = create_widget_carousel(this);
-	root->addWidget(widgetCarousel_);
 
 	refreshActiveTemplateLabel();
 
@@ -537,20 +546,13 @@ bool FlyScoreDock::init()
 		saveState();
 	});
 
-	connect(clearBtn, &QPushButton::clicked, this, &FlyScoreDock::onClearTeamsAndReset);
 
 	connect(selectTemplateFolderBtn_, &QPushButton::clicked, this, &FlyScoreDock::onSelectTemplateFolder);
-	connect(openOverlayFolderBtn, &QPushButton::clicked, this, [this]() {
-		const QString path = selectedTemplatePath();
-		if (!path.isEmpty() && QDir(path).exists())
-			QDesktopServices::openUrl(QUrl::fromLocalFile(path));
-	});
 
 	connect(editFieldsBtn_, &QPushButton::clicked, this, &FlyScoreDock::onOpenCustomFieldsDialog);
 	connect(editTimersBtn_, &QPushButton::clicked, this, &FlyScoreDock::onOpenTimersDialog);
 	connect(teamsBtn_, &QPushButton::clicked, this, &FlyScoreDock::onOpenTeamsDialog);
 
-	connect(hotkeysBtn, &QPushButton::clicked, this, &FlyScoreDock::openHotkeysDialog);
 	connect(toggleCarouselBtn_, &QPushButton::clicked, this, &FlyScoreDock::toggleWidgetCarouselVisible);
 	connect(eventLogToggle_, &QPushButton::clicked, this, [this]() {
 		if (eventLog_.isActive())
