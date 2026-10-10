@@ -312,6 +312,8 @@ bool FlyScoreDock::init()
 		tabs->setMovable(false);
 		tabs->setUsesScrollButtons(false);
 		tabs->setWindowTitle(fly_i18n("Common.Scoreboard"));
+		tabs->tabBar()->setStyleSheet("QTabBar::tab:selected {font-size:20pt;}");
+		tabs->tabBar()->setStyleSheet("QTabBar::tab:!selected {font-size:22pt;}");
 
 		auto *configTab = new QWidget(tabs);
 		auto *configVBox = new QVBoxLayout(configTab);
