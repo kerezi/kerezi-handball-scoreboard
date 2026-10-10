@@ -126,6 +126,8 @@ list(
   ${FS_INC_DIR}/fly_score_dock.hpp
   ${FS_SRC_DIR}/widget.cpp
   ${FS_INC_DIR}/widget.hpp
+  ${FS_SRC_DIR}/fly_score_match_info_dialog.cpp
+  ${FS_INC_DIR}/fly_score_match_info_dialog.hpp
   ${FS_SRC_DIR}/fly_score_teams_dialog.cpp
   ${FS_INC_DIR}/fly_score_teams_dialog.hpp
   ${FS_SRC_DIR}/fly_score_fields_dialog.cpp

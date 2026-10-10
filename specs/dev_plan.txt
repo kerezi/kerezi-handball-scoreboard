@@ -7,5 +7,5 @@
 7. Extend state to cover:
 	7.1. Match Info
 		7.1.1 New struct about Match Info (Struct, Serilize, Deserilize)
-		7.1.2 New dialog about Match Info
+		7.1.2 New dialog about Match Info (Button, Dialog)
 		

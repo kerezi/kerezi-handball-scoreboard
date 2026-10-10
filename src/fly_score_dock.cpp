@@ -534,6 +534,7 @@ bool FlyScoreDock::init()
 
 	connect(editFieldsBtn_, &QPushButton::clicked, this, &FlyScoreDock::onOpenCustomFieldsDialog);
 	connect(editTimersBtn_, &QPushButton::clicked, this, &FlyScoreDock::onOpenTimersDialog);
+	connect(matchInfoBtn_, &QPushButton::clicked, this, &FlyScoreDock::onOpenMatchInfoDialog);
 	connect(teamsBtn_, &QPushButton::clicked, this, &FlyScoreDock::onOpenTeamsDialog);
 
 	connect(toggleCarouselBtn_, &QPushButton::clicked, this, &FlyScoreDock::toggleWidgetCarouselVisible);
@@ -2073,6 +2074,18 @@ void FlyScoreDock::onOpenTimersDialog()
 
 	hotkeyBindings_ = buildMergedHotkeyBindings();
 	applyHotkeyBindings(hotkeyBindings_);
+}
+
+void FlyScoreDock::onOpenMatchInfoDialog()
+{
+	const FlyState before = st_;
+	FlyMatchInfoDialog dlg(dataDir_, st_, this);
+	dlg.exec();
+
+	loadState();
+	logStateChanges(before, st_);
+	lastLoggedState_ = st_;
+	refreshUiFromState(false);
 }
 
 void FlyScoreDock::onOpenTeamsDialog()
