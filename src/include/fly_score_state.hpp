@@ -6,6 +6,16 @@
 #include <QByteArray>
 #include <string>
 
+struct FlyMatchInfo {
+	QString competition;
+	QString competitionRound;
+	int matchNumber;
+	QDateTime datetime;
+	QString city;
+	QString venue;
+	int spectators;
+};
+
 struct FlyTeam {
 	QString title;
 	QString subtitle;
@@ -38,6 +48,7 @@ struct FlySingleStat {
 
 
 struct FlyState {
+	FlyMatchInfo matchInfo;
 	FlyTeam home;
 	FlyTeam away;
 

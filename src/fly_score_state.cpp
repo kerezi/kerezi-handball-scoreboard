@@ -136,6 +136,20 @@ QJsonObject fly_state_to_json_object(const FlyState &stIn)
 	QJsonObject j;
 	j["version"] = 4;
 
+	auto matchInfoToJson = [](const FlyMatchInfo &mi) {
+		QJsonObject o;
+		o["competition"] = mi.competition;
+		o["competitionRound"] = mi.competitionRound;
+		o["matchNumber"] = mi.matchNumber;
+		o["datetime_ms"] = mi.datetime.toMSecsSinceEpoch();
+		o["city"] = mi.city;
+		o["venue"] = mi.venue;
+		o["spectators"] = mi.spectators;
+		return o;
+	};
+
+	j["matchInfo"] = matchInfoToJson(st.matchInfo);
+
 	auto teamToJson = [](const FlyTeam &tm) {
 		QJsonObject o;
 		o["title"] = tm.title;
@@ -202,6 +216,20 @@ bool fly_state_from_json_object(const QJsonObject &j, FlyState &st)
 
 		return def;
 	};
+
+	auto readMatchInfo = [&](const QJsonObject &o) {
+		FlyMatchInfo mi;
+		mi.competition = o.value("competition").toString();
+		mi.competitionRound = o.value("competitionRound").toString();
+		mi.matchNumber = o.value("matchNumber").toInt();
+		qint64 datetime_ms = o.value("datetime_ms").toInteger();
+		mi.datetime = (new QDateTime())->addMSecs(datetime_ms);
+		mi.city = o.value("city").toString();
+		mi.venue = o.value("venue").toString();
+		mi.spectators = o.value("spectators").toInteger();
+		return mi;
+	};
+	st.matchInfo = readMatchInfo(j.value("matchInfo").toObject());
 
 	auto readTeam = [&](const QJsonObject &o) {
 		FlyTeam tm;
@@ -360,6 +388,7 @@ QByteArray fly_state_to_json_bytes(const FlyState &st, bool compact)
 FlyState fly_state_make_defaults()
 {
 	FlyState st;
+	st.matchInfo = FlyMatchInfo{};
 	st.home = FlyTeam{};
 	st.away = FlyTeam{};
 	st.swap_sides = false;

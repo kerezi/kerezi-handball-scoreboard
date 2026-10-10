@@ -1,4 +1,14 @@
 {
+	matchInfo: {
+		competition: "String",
+		competitionRound: "String"
+		matchNumber: "String",
+		date: "(DD/MM/YYYY)",
+		time: "(HH:MM)",
+		city: "String",
+		venue: "String",
+		spectators: "int"
+	},
 	home: {
 		clubName: "String",
 		clubShortName: "String",
