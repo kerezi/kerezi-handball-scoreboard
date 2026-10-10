@@ -1,1 +1,5 @@
 1. Move tabs to be vertical
+2. Move all configs to config tabs
+3. Clear all unneeded tabs
+4. Add Handball Tab
+5. Set emojis icons instead of text to tabs

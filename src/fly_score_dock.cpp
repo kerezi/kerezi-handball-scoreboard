@@ -311,8 +311,7 @@ bool FlyScoreDock::init()
 	tabs->setMovable(false);
 	tabs->setUsesScrollButtons(false);
 	tabs->setWindowTitle(fly_i18n("Common.Scoreboard"));
-	tabs->tabBar()->setStyleSheet("QTabBar::tab:selected {font-size:20pt;}");
-	tabs->tabBar()->setStyleSheet("QTabBar::tab:!selected {font-size:22pt;}");
+	tabs->tabBar()->setStyleSheet("QTabBar::tab {font-size:22pt;}");
 
 	auto *configTab = new QWidget(tabs);
 	auto *configVBox = new QVBoxLayout(configTab);
@@ -489,12 +488,20 @@ bool FlyScoreDock::init()
 	eventsVBox->addWidget(eventsHint);
 	eventsVBox->addStretch(1);
 
-	tabs->addTab(configTab, fly_i18n("Common.Configuration"));
-	tabs->addTab(teamTab, fly_i18n("Common.TeamStats"));
-	tabs->addTab(singleTab, fly_i18n("Common.SingleStats"));
-	tabs->addTab(timersTab, fly_i18n("Common.Timers"));
-	tabs->addTab(eventsTab, fly_i18n("Common.Events"));
-	tabs->addTab(handballTab, fly_i18n("Common.Handball"));
+	//tabs->addTab(configTab, fly_i18n("Common.Configuration"));
+	//tabs->addTab(teamTab, fly_i18n("Common.TeamStats"));
+	//tabs->addTab(singleTab, fly_i18n("Common.SingleStats"));
+	//tabs->addTab(timersTab, fly_i18n("Common.Timers"));
+	//tabs->addTab(eventsTab, fly_i18n("Common.Events"));
+	//tabs->addTab(handballTab, fly_i18n("Common.Handball"));
+
+	// 👥 
+	tabs->addTab(configTab, QStringLiteral("⚙️"));
+	tabs->addTab(teamTab, QStringLiteral("📊"));
+	tabs->addTab(singleTab, QStringLiteral("📈"));
+	tabs->addTab(timersTab, QStringLiteral("⏱️"));
+	tabs->addTab(eventsTab, QStringLiteral("🎫"));
+	tabs->addTab(handballTab, QStringLiteral("🤾‍♀️"));
 
 	refreshActiveTemplateLabel();
 
