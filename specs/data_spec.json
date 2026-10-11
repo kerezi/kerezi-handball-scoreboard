@@ -23,7 +23,7 @@
 			blueCard_ms: "long long",
 			goals: [ {
 				moment_ms: "long long",
-				type: "string"
+				goalType: "string"
 			}]
 		}],
 		official: [{

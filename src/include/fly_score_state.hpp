@@ -26,12 +26,31 @@ struct FlyOfficial {
 	long long blueCard_ms = 0;
 };
 
+struct FlyGoal {
+	long long moment_ms;
+	QString goalType;	
+};
+
+struct FlyPlayer {
+	int playerTshirtNumber;
+	QString playerTshirtName;
+	QString playerName;
+	long long warning_ms = 0;
+	long long fst2minSusp_ms = 0;
+	long long snd2minSusp_ms = 0;
+	long long trd2minSusp_ms = 0;
+	long long disqualification_ms = 0;
+	long long blueCard_ms = 0;
+	QVector<FlyGoal> goals;
+};
+
 struct FlyTeam {
 	QString title;
 	QString subtitle;
 	QString logo;
 	uint32_t color = 0xFFFFFF;
 	QVector<FlyOfficial> officials;
+	QVector<FlyPlayer> players;
 	long long fstTimeout_ms = 0;
 	long long sndTimeout_ms = 0;
 	long long trdTimeout_ms = 0;

@@ -55,7 +55,7 @@ FlyTeamsDialog::FlyTeamsDialog(const QString &dataDir, FlyState &state, QWidget 
 
 	guest_ = new FlyTeamUI{};
 	guest_->officialRows = new QVector<FlyOfficialUIRow>();
-	addTeamUI(tabs, guest_, "Teams.GuestsTeam");
+	addTeamUI(tabs, guest_, "Teams.GuestTeam");
 
 	gl_->addWidget(tabs);
 

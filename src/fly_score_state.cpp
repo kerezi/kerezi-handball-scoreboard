@@ -161,19 +161,45 @@ QJsonObject fly_state_to_json_object(const FlyState &stIn)
 		o["sndTimeout_ms"] = tm.sndTimeout_ms;
 		o["trdTimeout_ms"] = tm.trdTimeout_ms;
 
-		QJsonArray ssArr;
-		for (const auto &ss : tm.officials) {
+		QJsonArray ofsArr;
+		for (const auto &of : tm.officials) {
 			QJsonObject oo;
-			oo["officialLetter"] = QString(ss.officialLetter);
-			oo["officialName"] = ss.officialName;
-			oo["officialRole"] = ss.officialRole;
-			oo["fst2minSusp_ms"] = ss.fst2minSusp_ms;
-			oo["warning_ms"] = ss.warning_ms;
-			oo["disqualification_ms"] = ss.disqualification_ms;
-			oo["blueCard_ms"] = ss.blueCard_ms;
-			ssArr.append(oo);
+			oo["officialLetter"] = QString(of.officialLetter);
+			oo["officialName"] = of.officialName;
+			oo["officialRole"] = of.officialRole;
+			oo["fst2minSusp_ms"] = of.fst2minSusp_ms;
+			oo["warning_ms"] = of.warning_ms;
+			oo["disqualification_ms"] = of.disqualification_ms;
+			oo["blueCard_ms"] = of.blueCard_ms;
+			ofsArr.append(oo);
 		}
-		o["officials"] = ssArr;
+		o["officials"] = ofsArr;
+
+		QJsonArray plrsArr;
+		for (const auto &plr : tm.players) {
+			QJsonObject oo;
+			oo["playerTshirtNumber"] = plr.playerTshirtNumber;
+			oo["playerTshirtName"] = plr.playerTshirtName;
+			oo["playerName"] = plr.playerName;
+			oo["warning_ms"] = plr.warning_ms;
+			oo["fst2minSusp_ms"] = plr.fst2minSusp_ms;
+			oo["snd2minSusp_ms"] = plr.snd2minSusp_ms;
+			oo["trd2minSusp_ms"] = plr.trd2minSusp_ms;
+			oo["disqualification_ms"] = plr.disqualification_ms;
+			oo["blueCard_ms"] = plr.blueCard_ms;
+
+			QJsonArray plrgArr;
+			for (const auto &plrg : plr.goals) {
+				QJsonObject ooo;
+				ooo["moment_ms"] = plrg.moment_ms;
+				ooo["goalType"] = plrg.goalType;
+				plrgArr.append(ooo);
+			}
+			oo["goals"] = plrgArr;
+
+			plrsArr.append(oo);
+		}
+		o["players"] = plrsArr;
 
 		return o;
 	};
@@ -263,24 +289,66 @@ bool fly_state_from_json_object(const QJsonObject &j, FlyState &st)
 		const QJsonValue ofVal = o.value("officials");
 		if (ofVal.isArray()) {
 			const QJsonArray ofArr = ofVal.toArray();
-			st.custom_fields.reserve(ofArr.size());
+			tm.officials.reserve(ofArr.size());
 
 			char ofl = 'A';
 			for (const QJsonValue v : ofArr) {
 				if (!v.isObject())
 					continue;
-				const QJsonObject o = v.toObject();
+				const QJsonObject oo = v.toObject();
 				FlyOfficial of;
 				// of.officialLetter = o.value("officialLetter").toString().at(0);
 				of.officialLetter = QString(ofl++).at(0);
-				of.officialName = o.value("officialName").toString();
-				of.officialRole = o.value("officialRole").toString();
-				of.warning_ms = o.value("warning_ms").toInteger();
-				of.fst2minSusp_ms = o.value("fst2minSusp_ms").toInteger();
-				of.disqualification_ms = o.value("disqualification_ms").toInteger();
-				of.blueCard_ms = o.value("blueCard_ms").toInteger();
+				of.officialName = oo.value("officialName").toString();
+				of.officialRole = oo.value("officialRole").toString();
+				of.warning_ms = oo.value("warning_ms").toInteger();
+				of.fst2minSusp_ms = oo.value("fst2minSusp_ms").toInteger();
+				of.disqualification_ms = oo.value("disqualification_ms").toInteger();
+				of.blueCard_ms = oo.value("blueCard_ms").toInteger();
 
 				tm.officials.push_back(of);
+			}
+		}
+
+		const QJsonValue opVal = o.value("players");
+		if (opVal.isArray()) {
+			const QJsonArray opArr = opVal.toArray();
+			tm.players.reserve(opArr.size());
+
+			for (const QJsonValue v : opArr) {
+				if (!v.isObject())
+					continue;
+				const QJsonObject oo = v.toObject();
+				FlyPlayer op;
+
+				op.playerTshirtNumber = oo.value("playerTshirtNumber").toInt();
+				op.playerTshirtName = oo.value("playerTshirtName").toString();
+				op.playerName = oo.value("playerName").toString();
+				op.warning_ms = oo.value("warning_ms").toInteger();
+				op.fst2minSusp_ms = oo.value("fst2minSusp_ms").toInteger();
+				op.snd2minSusp_ms = oo.value("snd2minSusp_ms").toInteger();
+				op.trd2minSusp_ms = oo.value("trd2minSusp_ms").toInteger();
+				op.disqualification_ms = oo.value("disqualification_ms").toInteger();
+				op.blueCard_ms = oo.value("blueCard_ms").toInteger();
+
+				const QJsonValue opgVal = oo.value("goals");
+				if (opgVal.isArray()) {
+					const QJsonArray opgArr = opgVal.toArray();
+					op.goals.reserve(opgArr.size());
+
+					for (const QJsonValue vv : opgArr) {
+						if (!vv.isObject())
+							continue;
+						const QJsonObject ooo = v.toObject();
+						FlyGoal opg;
+
+						opg.moment_ms = ooo.value("moment_ms").toInt();
+						opg.goalType = ooo.value("goalType").toString();
+						op.goals.push_back(opg);
+					}
+				}
+
+				tm.players.push_back(op);
 			}
 		}
 
