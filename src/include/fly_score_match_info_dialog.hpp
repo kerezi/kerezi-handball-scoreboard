@@ -4,6 +4,7 @@
 #include <QString>
 
 #include "fly_score_state.hpp"
+#include "fly_score_base_dialog.hpp"
 
 class QLineEdit;
 class QSpinBox;
@@ -11,7 +12,7 @@ class QDateTimeEdit;
 class QToolButton;
 class QPushButton;
 
-class FlyMatchInfoDialog : public QDialog {
+class FlyMatchInfoDialog : public FlyBaseDialog {
     Q_OBJECT
 public:
     explicit FlyMatchInfoDialog(const QString &dataDir,
@@ -19,17 +20,11 @@ public:
                             QWidget *parent = nullptr);
     ~FlyMatchInfoDialog() override;
 
-private slots:
-    void onApply();
+private:
+    void syncUiFromState() override;
+    void syncStateFromUi() override;
 
 private:
-    void syncUiFromState();
-    void syncStateFromUi();
-
-private:
-    QString  dataDir_;
-    FlyState &state_;
-
     QLineEdit   *competition_  = nullptr;
     QLineEdit   *competitionRound_ = nullptr;
 	QSpinBox *matchNumber_ = nullptr;

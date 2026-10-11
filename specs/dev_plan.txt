@@ -8,5 +8,9 @@
 	7.1. Match Info
 		7.1.1 New struct about Match Info (Struct, Serilize, Deserilize)
 		7.1.2 New dialog about Match Info (Button, Dialog)
+	7.2. Teams Officials
+		7.2.0 Modify fly dialog to extract basic features (define FlyBaseDialog)
+		7.2.1 Modify struct about Teams (Struct, Serilize, Deserilize)
+		7.2.2 Modify dialog about Teams (Dialog)
 	
 		

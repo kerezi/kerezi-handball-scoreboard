@@ -8,7 +8,7 @@
 		venue: "String",
 		spectators: "int"
 	},
-	home: {
+	home, guest: {
 		clubName: "String",
 		clubShortName: "String",
 		players: [{
@@ -33,38 +33,9 @@
 			fst2minSusp_ms: "long long",
 			disqualification_ms: "long long"
 		}],
-		fstTimeout: "long long",
-		sndTimeout: "long long",
-		trdTimeout: "long long"
-	},
-	guest: {
-		clubName: "String",
-		clubShortName: "String",
-		players: [{
-			playerTshirtNumber: "int",
-			playerTshirtName: "String",
-			playerName: "String",
-			warning_ms: "long long",
-			fst2minSusp_ms: "long long",
-			snd2minSusp_ms: "long long",
-			trd2minSusp_ms: "long long",
-			disqualification_ms: "long long",
-			goals: [ {
-				moment_ms: "long long",
-				type: "string"
-			}]
-		}],
-		official: [{
-			officialLetter: "char",
-			officialName: "String",
-			officialRole: "String",
-			warning_ms: "long long",
-			fst2minSusp_ms: "long long",
-			disqualification_ms: "long long"
-		}],
-		fstTimeout: "long long",
-		sndTimeout: "long long",
-		trdTimeout: "long long"
+		fstTimeout_ms: "long long",
+		sndTimeout_ms: "long long",
+		trdTimeout_ms: "long long"
 	},
 	timers: [{
 		timerName: "Half time timer",
