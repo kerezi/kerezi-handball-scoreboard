@@ -336,6 +336,11 @@ bool FlyScoreDock::init()
 		teamsBtn_->setMaximumWidth(130);
 		teamsBtn_->setCursor(Qt::PointingHandCursor);
 
+		playersBtn_ = new QPushButton(fly_i18n("Dock.Players"), configTab);
+		playersBtn_->setMinimumWidth(110);
+		playersBtn_->setMaximumWidth(130);
+		playersBtn_->setCursor(Qt::PointingHandCursor);
+
 		editFieldsBtn_ = new QPushButton(fly_i18n("Dock.StatsButton"), configTab);
 		editFieldsBtn_->setMinimumWidth(110);
 		editFieldsBtn_->setMaximumWidth(130);
@@ -350,6 +355,7 @@ bool FlyScoreDock::init()
 
 		headerRow->addWidget(matchInfoBtn_);
 		headerRow->addWidget(teamsBtn_);
+		headerRow->addWidget(playersBtn_);
 		headerRow->addWidget(editFieldsBtn_);
 		headerRow->addWidget(editTimersBtn_);
 		headerRow->addStretch(1);
@@ -537,6 +543,7 @@ bool FlyScoreDock::init()
 	connect(editTimersBtn_, &QPushButton::clicked, this, &FlyScoreDock::onOpenTimersDialog);
 	connect(matchInfoBtn_, &QPushButton::clicked, this, &FlyScoreDock::onOpenMatchInfoDialog);
 	connect(teamsBtn_, &QPushButton::clicked, this, &FlyScoreDock::onOpenTeamsDialog);
+	connect(playersBtn_, &QPushButton::clicked, this, &FlyScoreDock::onOpenTeamsDialog);
 
 	connect(toggleCarouselBtn_, &QPushButton::clicked, this, &FlyScoreDock::toggleWidgetCarouselVisible);
 	connect(eventLogToggle_, &QPushButton::clicked, this, [this]() {

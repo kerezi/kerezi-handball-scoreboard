@@ -124,6 +124,7 @@ private:
 	QCheckBox *showScoreboard_ = nullptr;
 	QPushButton *matchInfoBtn_ = nullptr;
 	QPushButton *teamsBtn_ = nullptr;
+	QPushButton *playersBtn_ = nullptr;
 	QPushButton *editFieldsBtn_ = nullptr;
 	QPushButton *editTimersBtn_ = nullptr;
 	QVBoxLayout *configLayout_ = nullptr;
