@@ -3,8 +3,7 @@
 		competition: "String",
 		competitionRound: "String"
 		matchNumber: "String",
-		date: "(DD/MM/YYYY)",
-		time: "(HH:MM)",
+		datetime_ms: "(DD/MM/YYYY (HH:MM))",
 		city: "String",
 		venue: "String",
 		spectators: "int"

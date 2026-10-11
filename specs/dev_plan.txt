@@ -4,8 +4,9 @@
 4. Add Handball Tab
 5. Set emojis icons instead of text to tabs
 6. Set text tabs to be horizontal
-7. Extend state to cover:
+7. Extend state to cover data_spec.json:
 	7.1. Match Info
 		7.1.1 New struct about Match Info (Struct, Serilize, Deserilize)
 		7.1.2 New dialog about Match Info (Button, Dialog)
+	
 		

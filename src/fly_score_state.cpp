@@ -223,7 +223,7 @@ bool fly_state_from_json_object(const QJsonObject &j, FlyState &st)
 		mi.competitionRound = o.value("competitionRound").toString();
 		mi.matchNumber = o.value("matchNumber").toInt();
 		qint64 datetime_ms = o.value("datetime_ms").toInteger();
-		mi.datetime = (new QDateTime())->addMSecs(datetime_ms);
+		mi.datetime = QDateTime::fromMSecsSinceEpoch(datetime_ms);
 		mi.city = o.value("city").toString();
 		mi.venue = o.value("venue").toString();
 		mi.spectators = o.value("spectators").toInteger();

@@ -12,6 +12,7 @@
 #include "fly_score_paths.hpp"
 #include "fly_score_qt_helpers.hpp"
 #include "fly_score_logo_helpers.hpp"
+#include "fly_score_match_info_dialog.hpp"
 #include "fly_score_teams_dialog.hpp"
 #include "fly_score_fields_dialog.hpp"
 #include "fly_score_timers_dialog.hpp"

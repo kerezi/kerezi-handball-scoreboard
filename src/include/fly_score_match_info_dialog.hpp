@@ -6,6 +6,8 @@
 #include "fly_score_state.hpp"
 
 class QLineEdit;
+class QSpinBox;
+class QDateTimeEdit;
 class QToolButton;
 class QPushButton;
 
@@ -18,29 +20,22 @@ public:
     ~FlyMatchInfoDialog() override;
 
 private slots:
-    void onBrowseHomeLogo();
-    void onBrowseAwayLogo();
-    void onPickHomeColor();
-    void onPickAwayColor();
     void onApply();
 
 private:
     void syncUiFromState();
     void syncStateFromUi();
-    void updateColorButton(QToolButton *btn, uint32_t color);
 
 private:
     QString  dataDir_;
     FlyState &state_;
-    QLineEdit   *homeTitle_  = nullptr;
-    QLineEdit   *homeSub_    = nullptr;
-    QLineEdit   *homeLogo_   = nullptr;
-    QToolButton *homeBrowse_ = nullptr;
-    QToolButton *homeColor_ = nullptr;
-    QLineEdit   *awayTitle_  = nullptr;
-    QLineEdit   *awaySub_    = nullptr;
-    QLineEdit   *awayLogo_   = nullptr;
-    QToolButton *awayBrowse_ = nullptr;
-    QToolButton *awayColor_ = nullptr;
-    QPushButton *applyBtn_   = nullptr;
+
+    QLineEdit   *competition_  = nullptr;
+    QLineEdit   *competitionRound_ = nullptr;
+	QSpinBox *matchNumber_ = nullptr;
+	QDateTimeEdit *datetime_ = nullptr;
+    QLineEdit   *city_ = nullptr;
+	QLineEdit *venue_ = nullptr;
+	QSpinBox *spectators_ = nullptr;
+    QPushButton *applyBtn_ = nullptr;
 };

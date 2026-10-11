@@ -4,7 +4,6 @@
 #define LOG_TAG "[" PLUGIN_NAME "][teams-dialog]"
 #include "fly_score_log.hpp"
 
-#include "fly_score_logo_helpers.hpp"
 #include "fly_score_i18n.hpp"
 #include "fly_score_qt_helpers.hpp"
 #include "fly_score_state.hpp"
@@ -15,29 +14,14 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
+#include <QSpinBox>
+#include <QDateTimeEdit>
 #include <QToolButton>
 #include <QPushButton>
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QMessageBox>
 #include <QStyle>
-#include <QColorDialog>
-
-static QColor colorFromU32(uint32_t c)
-{
-	int r = (c >> 16) & 0xFF;
-	int g = (c >> 8) & 0xFF;
-	int b = (c >> 0) & 0xFF;
-	return QColor(r, g, b);
-}
-
-static uint32_t u32FromColor(const QColor &qc)
-{
-    uint32_t r = (uint32_t)qc.red()   & 0xFF;
-    uint32_t g = (uint32_t)qc.green() & 0xFF;
-    uint32_t b = (uint32_t)qc.blue()  & 0xFF;
-    return (r << 16) | (g << 8) | b;
-}
 
 FlyMatchInfoDialog::FlyMatchInfoDialog(const QString &dataDir, FlyState &state, QWidget *parent)
 	: QDialog(parent),
@@ -45,7 +29,7 @@ FlyMatchInfoDialog::FlyMatchInfoDialog(const QString &dataDir, FlyState &state, 
 	  state_(state)
 {
 	setObjectName(QStringLiteral("FlyMatchInfoDialog"));
-	setWindowTitle(fly_i18n("Teams.Title"));
+	setWindowTitle(fly_i18n("MatchInfo.Title"));
 	setModal(false);
 
 	setMinimumWidth(480);
@@ -56,97 +40,59 @@ FlyMatchInfoDialog::FlyMatchInfoDialog(const QString &dataDir, FlyState &state, 
 	root->setContentsMargins(14, 14, 14, 14);
 	root->setSpacing(10);
 
-	auto *hint = new QLabel(fly_i18n("Teams.Hint"),
+	// --->
+	auto *hint = new QLabel(fly_i18n("MatchInfo.Hint"),
 		this);
-	hint->setObjectName(QStringLiteral("teamsHint"));
+	hint->setObjectName(QStringLiteral("matchInfoHint"));
 	hint->setWordWrap(true);
 	root->addWidget(hint);
 
-	auto *gbHome = new QGroupBox(fly_i18n("Teams.HomeTeam"), this);
-	gbHome->setObjectName(QStringLiteral("homeGroup"));
+	auto *gbMatch = new QGroupBox(fly_i18n("MatchInfo.Match"), this);
+	gbMatch->setObjectName(QStringLiteral("matchGroup"));
 
-	auto *hb = new QGridLayout(gbHome);
-	hb->setContentsMargins(10, 10, 10, 10);
-	hb->setHorizontalSpacing(8);
-	hb->setVerticalSpacing(6);
+	auto *mi = new QGridLayout(gbMatch);
+	mi->setContentsMargins(10, 10, 10, 10);
+	mi->setHorizontalSpacing(8);
+	mi->setVerticalSpacing(6);
 
-	homeTitle_ = new QLineEdit(gbHome);
-	homeSub_   = new QLineEdit(gbHome);
-	homeLogo_  = new QLineEdit(gbHome);
-	homeBrowse_= new QToolButton(gbHome);
-	homeColor_ = new QToolButton(gbHome);
-	{
-		const QIcon openIcon = fly_themed_icon(this, "folder-open", QStyle::SP_DirOpenIcon);
-		homeBrowse_->setText(QString());
-		homeBrowse_->setIcon(openIcon);
-		homeBrowse_->setToolTip(fly_i18n("Teams.BrowseLogo"));
-		homeBrowse_->setAutoRaise(false);
-		homeBrowse_->setCursor(Qt::PointingHandCursor);
+	competition_ = new QLineEdit(gbMatch);
+	competitionRound_   = new QLineEdit(gbMatch);
+	matchNumber_ = new QSpinBox(gbMatch);
+	matchNumber_->setRange(1000, 9999);
+	matchNumber_->setMinimumWidth(70);
+	matchNumber_->setMaximumWidth(90);
 
-		homeColor_->setText(QStringLiteral("#FFFFFF"));
-		homeColor_->setToolTip(fly_i18n("Teams.PickTeamColor"));
-		homeColor_->setAutoRaise(false);
-		homeColor_->setCursor(Qt::PointingHandCursor);
-		homeColor_->setMinimumWidth(90);
-	}
+	datetime_ = new QDateTimeEdit(gbMatch);
+	city_  = new QLineEdit(gbMatch);
+	venue_  = new QLineEdit(gbMatch);
+	spectators_ =  new QSpinBox(gbMatch);
+	spectators_->setRange(0, 99999);
+	spectators_->setMinimumWidth(70);
+	spectators_->setMaximumWidth(150);
 
-	hb->addWidget(new QLabel(fly_i18n("Common.TitleColon"), gbHome), 0, 0);
-	hb->addWidget(homeTitle_, 0, 1, 1, 2);
+	mi->addWidget(new QLabel(fly_i18n("MatchInfo.Competition"), gbMatch), 0, 0);
+	mi->addWidget(competition_, 0, 1, 1, 2);
 
-	hb->addWidget(new QLabel(fly_i18n("Common.SubtitleColon"), gbHome), 1, 0);
-	hb->addWidget(homeSub_, 1, 1, 1, 2);
+	mi->addWidget(new QLabel(fly_i18n("MatchInfo.CompetitionRound"), gbMatch), 1, 0);
+	mi->addWidget(competitionRound_, 1, 1);
 
-	hb->addWidget(new QLabel(fly_i18n("Common.LogoColon"), gbHome), 2, 0);
-	hb->addWidget(homeLogo_, 2, 1);
-	hb->addWidget(homeBrowse_, 2, 2);
+	mi->addWidget(new QLabel(fly_i18n("MatchInfo.MatchNumber"), gbMatch), 2, 0);
+	mi->addWidget(matchNumber_, 2, 1);
 
-    hb->addWidget(new QLabel(fly_i18n("Common.ColorColon"), gbHome), 3, 0);
-    hb->addWidget(homeColor_, 3, 1, 1, 2);
+	mi->addWidget(new QLabel(fly_i18n("MatchInfo.DateAndTime"), gbMatch), 3, 0);
+	mi->addWidget(datetime_, 3, 1);
 
-	gbHome->setLayout(hb);
+	mi->addWidget(new QLabel(fly_i18n("MatchInfo.City"), gbMatch), 4, 0);
+	mi->addWidget(city_, 4, 1);
 
-	auto *gbAway = new QGroupBox(fly_i18n("Teams.GuestsTeam"), this);
-	gbAway->setObjectName(QStringLiteral("awayGroup"));
+	mi->addWidget(new QLabel(fly_i18n("MatchInfo.Venue"), gbMatch), 5, 0);
+	mi->addWidget(venue_, 5, 1);
 
-	auto *ab = new QGridLayout(gbAway);
-	ab->setContentsMargins(10, 10, 10, 10);
-	ab->setHorizontalSpacing(8);
-	ab->setVerticalSpacing(6);
+    mi->addWidget(new QLabel(fly_i18n("MatchInfo.Spectators"), gbMatch), 6, 0);
+    mi->addWidget(spectators_, 6, 1);
 
-	awayTitle_ = new QLineEdit(gbAway);
-	awaySub_   = new QLineEdit(gbAway);
-	awayLogo_  = new QLineEdit(gbAway);
-	awayBrowse_= new QToolButton(gbAway);
-	awayColor_ = new QToolButton(gbAway);
-	{
-		const QIcon openIcon = fly_themed_icon(this, "folder-open", QStyle::SP_DirOpenIcon);
-		awayBrowse_->setText(QString());
-		awayBrowse_->setIcon(openIcon);
-		awayBrowse_->setToolTip(fly_i18n("Teams.BrowseLogo"));
-		awayBrowse_->setAutoRaise(false);
-		awayBrowse_->setCursor(Qt::PointingHandCursor);
+	gbMatch->setLayout(mi);
 
-		awayColor_->setText(QStringLiteral("#FFFFFF"));
-		awayColor_->setToolTip(fly_i18n("Teams.PickTeamColor"));
-		awayColor_->setAutoRaise(false);
-		awayColor_->setCursor(Qt::PointingHandCursor);
-		awayColor_->setMinimumWidth(90);
-	}
-
-	ab->addWidget(new QLabel(fly_i18n("Common.TitleColon"), gbAway), 0, 0);
-	ab->addWidget(awayTitle_, 0, 1, 1, 2);
-
-	ab->addWidget(new QLabel(fly_i18n("Common.SubtitleColon"), gbAway), 1, 0);
-	ab->addWidget(awaySub_, 1, 1, 1, 2);
-
-	ab->addWidget(new QLabel(fly_i18n("Common.LogoColon"), gbAway), 2, 0);
-	ab->addWidget(awayLogo_, 2, 1);
-	ab->addWidget(awayBrowse_, 2, 2);
-
-    ab->addWidget(new QLabel(fly_i18n("Common.ColorColon"), gbAway), 3, 0);
-    ab->addWidget(awayColor_, 3, 1, 1, 2);
-
-	gbAway->setLayout(ab);
 
 	auto *buttonsRow = new QHBoxLayout();
 	buttonsRow->setContentsMargins(0, 0, 0, 0);
@@ -163,18 +109,11 @@ FlyMatchInfoDialog::FlyMatchInfoDialog(const QString &dataDir, FlyState &state, 
 	buttonsRow->addWidget(applyBtn_);
 	buttonsRow->addWidget(closeBtn);
 
-	root->addWidget(gbHome);
-	root->addWidget(gbAway);
+	root->addWidget(gbMatch);
 	root->addLayout(buttonsRow);
 	setLayout(root);
 
 	syncUiFromState();
-
-	connect(homeBrowse_, &QToolButton::clicked, this, &FlyMatchInfoDialog::onBrowseHomeLogo);
-	connect(awayBrowse_, &QToolButton::clicked, this, &FlyMatchInfoDialog::onBrowseAwayLogo);
-
-    connect(homeColor_, &QToolButton::clicked, this, &FlyMatchInfoDialog::onPickHomeColor);
-    connect(awayColor_, &QToolButton::clicked, this, &FlyMatchInfoDialog::onPickAwayColor);
 
 	connect(applyBtn_, &QPushButton::clicked, this, &FlyMatchInfoDialog::onApply);
 	connect(closeBtn, &QPushButton::clicked, this, &FlyMatchInfoDialog::close);
@@ -182,146 +121,46 @@ FlyMatchInfoDialog::FlyMatchInfoDialog(const QString &dataDir, FlyState &state, 
 
 FlyMatchInfoDialog::~FlyMatchInfoDialog() = default;
 
-void FlyMatchInfoDialog::updateColorButton(QToolButton *btn, uint32_t color)
-{
-    if (!btn) return;
-
-    QColor qc = colorFromU32(color);
-    const QString hex = qc.name(QColor::HexRgb).toUpper();
-
-    btn->setText(hex);
-
-    btn->setStyleSheet(QString(
-        "QToolButton {"
-        "  padding: 6px 8px;"
-        "  border: 1px solid rgba(255,255,255,0.15);"
-        "  border-radius: 4px;"
-        "  background: %1;"
-        "  color: %2;"
-        "}"
-    ).arg(hex)
-     .arg(qc.lightness() > 140 ? "#000000" : "#FFFFFF"));
-}
-
 void FlyMatchInfoDialog::syncUiFromState()
 {
-	if (homeTitle_)
-		homeTitle_->setText(state_.home.title);
-	if (homeSub_)
-		homeSub_->setText(state_.home.subtitle);
-	if (homeLogo_)
-		homeLogo_->setText(state_.home.logo);
-
-    updateColorButton(homeColor_, state_.home.color);
-
-	if (awayTitle_)
-		awayTitle_->setText(state_.away.title);
-	if (awaySub_)
-		awaySub_->setText(state_.away.subtitle);
-	if (awayLogo_)
-		awayLogo_->setText(state_.away.logo);
-
-    updateColorButton(awayColor_, state_.away.color);
+	if (competition_)
+		competition_->setText(state_.matchInfo.competition);
+	if (competitionRound_)
+		competitionRound_->setText(state_.matchInfo.competitionRound);
+	if (matchNumber_)
+		matchNumber_->setValue(state_.matchInfo.matchNumber);
+	if (datetime_)
+		datetime_->setDateTime(state_.matchInfo.datetime);
+	if (city_)
+		city_->setText(state_.matchInfo.city);
+	if (venue_)
+		venue_->setText(state_.matchInfo.venue);
+	if (spectators_)
+		spectators_->setValue(state_.matchInfo.spectators);
 }
 
 void FlyMatchInfoDialog::syncStateFromUi()
 {
-	if (homeTitle_)
-		state_.home.title = homeTitle_->text();
-	if (homeSub_)
-		state_.home.subtitle = homeSub_->text();
-	if (homeLogo_)
-		state_.home.logo = homeLogo_->text();
-	if (awayTitle_)
-		state_.away.title = awayTitle_->text();
-	if (awaySub_)
-		state_.away.subtitle = awaySub_->text();
-	if (awayLogo_)
-		state_.away.logo = awayLogo_->text();
-}
-
-void FlyMatchInfoDialog::onPickHomeColor()
-{
-    QColor start = colorFromU32(state_.home.color);
-    QColor chosen =
-	    QColorDialog::getColor(start, this, fly_i18n("Teams.PickHomeColor"), QColorDialog::ShowAlphaChannel);
-
-    if (!chosen.isValid())
-        return;
-
-    state_.home.color = u32FromColor(chosen);
-    updateColorButton(homeColor_, state_.home.color);
-    fly_state_save(dataDir_, state_);
-    LOGI("Home color updated: %u", state_.home.color);
-}
-
-void FlyMatchInfoDialog::onPickAwayColor()
-{
-    QColor start = colorFromU32(state_.away.color);
-    QColor chosen = QColorDialog::getColor(
-        start, this, fly_i18n("Teams.PickGuestsColor"),
-        QColorDialog::ShowAlphaChannel
-    );
-
-    if (!chosen.isValid())
-        return;
-
-    state_.away.color = u32FromColor(chosen);
-    updateColorButton(awayColor_, state_.away.color);
-    fly_state_save(dataDir_, state_);
-    LOGI("Guests color updated: %u", state_.away.color);
-}
-
-void FlyMatchInfoDialog::onBrowseHomeLogo()
-{
-	const QString p = QFileDialog::getOpenFileName(this, fly_i18n("Teams.SelectHomeLogo"), {},
-						       fly_i18n("Common.ImageFilter"));
-	if (p.isEmpty())
-		return;
-
-	const QString rel = fly_copy_logo_to_overlay(dataDir_, p, QStringLiteral("home"));
-	if (rel.isEmpty()) {
-		QMessageBox::warning(this, fly_i18n("Teams.MessageTitle"),
-				     fly_i18n("Teams.CopyLogoFailed"));
-		return;
-	}
-
-	if (homeLogo_)
-		homeLogo_->setText(rel);
-	state_.home.logo = rel;
-
-	fly_state_save(dataDir_, state_);
-
-	LOGI("Home logo updated: %s", rel.toUtf8().constData());
-}
-
-void FlyMatchInfoDialog::onBrowseAwayLogo()
-{
-	const QString p = QFileDialog::getOpenFileName(this, fly_i18n("Teams.SelectGuestsLogo"), {},
-						       fly_i18n("Common.ImageFilter"));
-	if (p.isEmpty())
-		return;
-
-	const QString rel = fly_copy_logo_to_overlay(dataDir_, p, QStringLiteral("guest"));
-	if (rel.isEmpty()) {
-		QMessageBox::warning(this, fly_i18n("Teams.MessageTitle"),
-				     fly_i18n("Teams.CopyLogoFailed"));
-		return;
-	}
-
-	if (awayLogo_)
-		awayLogo_->setText(rel);
-	state_.away.logo = rel;
-
-	fly_state_save(dataDir_, state_);
-
-	LOGI("Guests logo updated: %s", rel.toUtf8().constData());
+	if (competition_)
+		state_.matchInfo.competition = competition_->text();
+	if (competitionRound_)
+		state_.matchInfo.competitionRound = competitionRound_->text();
+	if (matchNumber_)
+		state_.matchInfo.matchNumber = matchNumber_->value();
+	if (datetime_)
+		state_.matchInfo.datetime = datetime_->dateTime();
+	if (city_)
+		state_.matchInfo.city = city_->text();
+	if (venue_)
+		state_.matchInfo.venue = venue_->text();
+	if (spectators_)
+		state_.matchInfo.spectators = spectators_->value();
 }
 
 void FlyMatchInfoDialog::onApply()
 {
 	syncStateFromUi();
 	fly_state_save(dataDir_, state_);
-	LOGI("Teams dialog: titles/subtitles/logos/colors saved.");
+	LOGI("Match Info dialog: competition/round/match number/datetime/city/venue/spectators saved.");
 	accept();
 }
