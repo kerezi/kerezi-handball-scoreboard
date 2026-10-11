@@ -80,6 +80,7 @@ private slots:
 	void onOpenTimersDialog();
 	void onOpenMatchInfoDialog();
 	void onOpenTeamsDialog();
+	void onOpenPlayersDialog();
 
 	void onSelectTemplateFolder();
 

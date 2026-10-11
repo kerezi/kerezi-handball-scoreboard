@@ -32,9 +32,9 @@ struct FlyGoal {
 };
 
 struct FlyPlayer {
-	int playerTshirtNumber;
-	QString playerTshirtName;
-	QString playerName;
+	int playerTshirtNumber = 0;
+	QString playerTshirtName = "";
+	QString playerName = "";
 	long long warning_ms = 0;
 	long long fst2minSusp_ms = 0;
 	long long snd2minSusp_ms = 0;

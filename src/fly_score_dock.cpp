@@ -14,6 +14,7 @@
 #include "fly_score_logo_helpers.hpp"
 #include "fly_score_match_info_dialog.hpp"
 #include "fly_score_teams_dialog.hpp"
+#include "fly_score_players_dialog.hpp"
 #include "fly_score_fields_dialog.hpp"
 #include "fly_score_timers_dialog.hpp"
 #include "fly_score_hotkeys_dialog.hpp"
@@ -543,7 +544,7 @@ bool FlyScoreDock::init()
 	connect(editTimersBtn_, &QPushButton::clicked, this, &FlyScoreDock::onOpenTimersDialog);
 	connect(matchInfoBtn_, &QPushButton::clicked, this, &FlyScoreDock::onOpenMatchInfoDialog);
 	connect(teamsBtn_, &QPushButton::clicked, this, &FlyScoreDock::onOpenTeamsDialog);
-	connect(playersBtn_, &QPushButton::clicked, this, &FlyScoreDock::onOpenTeamsDialog);
+	connect(playersBtn_, &QPushButton::clicked, this, &FlyScoreDock::onOpenPlayersDialog);
 
 	connect(toggleCarouselBtn_, &QPushButton::clicked, this, &FlyScoreDock::toggleWidgetCarouselVisible);
 	connect(eventLogToggle_, &QPushButton::clicked, this, [this]() {
@@ -2100,6 +2101,18 @@ void FlyScoreDock::onOpenTeamsDialog()
 {
 	const FlyState before = st_;
 	FlyTeamsDialog dlg(dataDir_, st_, this);
+	dlg.exec();
+
+	loadState();
+	logStateChanges(before, st_);
+	lastLoggedState_ = st_;
+	refreshUiFromState(false);
+}
+
+void FlyScoreDock::onOpenPlayersDialog()
+{
+	const FlyState before = st_;
+	FlyPlayersDialog dlg(dataDir_, st_, this);
 	dlg.exec();
 
 	loadState();
