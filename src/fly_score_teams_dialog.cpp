@@ -115,7 +115,13 @@ void FlyTeamsDialog::addTeamUI(QTabWidget *tabs, FlyTeamUI *teamUI, const char *
 	teamUI->addOfficialBtn =
 		new QPushButton(QString("+ ") + fly_i18n(name) + QString(" ") + fly_i18n("Teams.Officials"), teamTab);
 	teamUI->addOfficialBtn->setCursor(Qt::PointingHandCursor);
-	teamRoot->addWidget(teamUI->addOfficialBtn, 3, 3, 1, 2);
+	// teamRoot->addWidget(teamUI->addOfficialBtn, 3, 3, 1, 2);
+
+	//QLabel *ol = new QLabel();
+	//ol->setText(fly_i18n(name) + QString(" ") + fly_i18n("Teams.Officials"));
+	//ol->setAlignment(Qt::AlignCenter);
+	//teamRoot->addWidget(ol, 4, 0, 1, 5);
+	teamRoot->addWidget(teamUI->addOfficialBtn, 4, 0, 1, 5);
 
 	QWidget *tow = new QWidget();
 	teamUI->officialsLayout = new QVBoxLayout();
@@ -123,7 +129,7 @@ void FlyTeamsDialog::addTeamUI(QTabWidget *tabs, FlyTeamUI *teamUI, const char *
 	teamUI->officialsLayout->setSpacing(6);
 	teamUI->officialsLayout->setAlignment(Qt::AlignTop);
 	tow->setLayout(teamUI->officialsLayout);
-	teamRoot->addWidget(tow, 4, 0, 1, 5);
+	teamRoot->addWidget(tow, 5, 0, 1, 5);
 
 	teamTab->setLayout(teamRoot);
 
