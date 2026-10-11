@@ -20,6 +20,7 @@
 			snd2minSusp_ms: "long long",
 			trd2minSusp_ms: "long long",
 			disqualification_ms: "long long",
+			blueCard_ms: "long long",
 			goals: [ {
 				moment_ms: "long long",
 				type: "string"
@@ -31,7 +32,8 @@
 			officialRole: "String",
 			warning_ms: "long long",
 			fst2minSusp_ms: "long long",
-			disqualification_ms: "long long"
+			disqualification_ms: "long long",
+			blueCard_ms: "long long"
 		}],
 		fstTimeout_ms: "long long",
 		sndTimeout_ms: "long long",

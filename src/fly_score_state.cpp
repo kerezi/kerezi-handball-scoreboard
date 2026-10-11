@@ -157,6 +157,24 @@ QJsonObject fly_state_to_json_object(const FlyState &stIn)
 		o["logo"] = tm.logo;
 		o["color"] = QString::number(tm.color);
 
+		o["fstTimeout_ms"] = tm.fstTimeout_ms;
+		o["sndTimeout_ms"] = tm.sndTimeout_ms;
+		o["trdTimeout_ms"] = tm.trdTimeout_ms;
+
+		QJsonArray ssArr;
+		for (const auto &ss : tm.officials) {
+			QJsonObject oo;
+			oo["officialLetter"] = QString(ss.officialLetter);
+			oo["officialName"] = ss.officialName;
+			oo["officialRole"] = ss.officialRole;
+			oo["fst2minSusp_ms"] = ss.fst2minSusp_ms;
+			oo["warning_ms"] = ss.warning_ms;
+			oo["disqualification_ms"] = ss.disqualification_ms;
+			oo["blueCard_ms"] = ss.blueCard_ms;
+			ssArr.append(oo);
+		}
+		o["officials"] = ssArr;
+
 		return o;
 	};
 
@@ -237,6 +255,33 @@ bool fly_state_from_json_object(const QJsonObject &j, FlyState &st)
 		tm.subtitle = o.value("subtitle").toString();
 		tm.logo = o.value("logo").toString();
 		tm.color = readColor(o, "color", 0xFFFFFF);
+
+		tm.fstTimeout_ms = o.value("fstTimeout_ms").toInteger();
+		tm.sndTimeout_ms = o.value("sndTimeout_ms").toInteger();
+		tm.trdTimeout_ms = o.value("trdTimeout_ms").toInteger();
+
+		const QJsonValue ofVal = o.value("officials");
+		if (ofVal.isArray()) {
+			const QJsonArray ofArr = ofVal.toArray();
+			st.custom_fields.reserve(ofArr.size());
+
+			for (const QJsonValue v : ofArr) {
+				if (!v.isObject())
+					continue;
+				const QJsonObject o = v.toObject();
+				FlyOfficial of;
+				of.officialLetter = o.value("officialLetter").toString().at(0);
+				of.officialName = o.value("officialName").toString();
+				of.officialRole = o.value("officialRole").toString();
+				of.warning_ms = o.value("warning_ms").toInteger();
+				of.fst2minSusp_ms = o.value("fst2minSusp_ms").toInteger();
+				of.disqualification_ms = o.value("disqualification_ms").toInteger();
+				of.blueCard_ms = o.value("blueCard_ms").toInteger();
+
+				tm.officials.push_back(of);
+			}
+		}
+
 		return tm;
 	};
 
