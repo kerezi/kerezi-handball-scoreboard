@@ -25,7 +25,7 @@ async function fetchState() {
 function normalizeIncomingState(payload) {
   if (!payload) return null;
   if (payload.type === "state" && payload.state) return payload.state;
-  if (payload.home || payload.away || payload.custom_fields) return payload;
+  if (payload.home || payload.guest || payload.custom_fields) return payload;
   return null;
 }
 
@@ -442,19 +442,19 @@ function renderFrame() {
   //   - fields_xy: each custom field mapped to x/y based on swap_sides
   // ---------------------------------------------------------------------------
   const baseHome = st.home || {};
-  const baseAway = st.away || {};
+  const baseGuest = st.guest || {};
   const swap = !!st.swap_sides;
 
-  const team_x = swap ? baseAway : baseHome; // left side
-  const team_y = swap ? baseHome : baseAway; // right side
+  const team_x = swap ? baseGuest : baseHome; // left side
+  const team_y = swap ? baseHome : baseGuest; // right side
 
   if (team_x.color) team_x.color = intToHex(team_x.color);
   if (team_y.color) team_y.color = intToHex(team_y.color);
 
   const fields_xy = Array.isArray(st.custom_fields)
     ? st.custom_fields.map((cf, index) => {
-      const leftVal = swap ? cf.away : cf.home;
-      const rightVal = swap ? cf.home : cf.away;
+      const leftVal = swap ? cf.guest : cf.home;
+      const rightVal = swap ? cf.home : cf.guest;
       return {
         ...cf,
         key: fieldKey(cf.label, index),

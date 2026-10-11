@@ -25,11 +25,11 @@ struct FlyCustomFieldUi {
 	QCheckBox *visibleCheck = nullptr;
 	QLabel *labelLbl = nullptr;
 	QSpinBox *homeSpin = nullptr;
-	QSpinBox *awaySpin = nullptr;
+	QSpinBox *guestSpin = nullptr;
 	QToolButton *minusHome = nullptr;
 	QToolButton *plusHome = nullptr;
-	QToolButton *minusAway = nullptr;
-	QToolButton *plusAway = nullptr;
+	QToolButton *minusGuest = nullptr;
+	QToolButton *plusGuest = nullptr;
 };
 
 struct FlySingleStatUi {
@@ -63,7 +63,7 @@ public:
 
 public slots:
 	void bumpCustomFieldHome(int index, int delta);
-	void bumpCustomFieldAway(int index, int delta);
+	void bumpCustomFieldGuest(int index, int delta);
 	void toggleCustomFieldVisible(int index);
 	void bumpSingleStat(int index, int delta);
 	void toggleSingleStatVisible(int index);

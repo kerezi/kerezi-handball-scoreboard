@@ -179,7 +179,7 @@ QJsonObject fly_state_to_json_object(const FlyState &stIn)
 	};
 
 	j["home"] = teamToJson(st.home);
-	j["away"] = teamToJson(st.away);
+	j["guest"] = teamToJson(st.guest);
 	j["swap_sides"] = st.swap_sides;
 	j["show_scoreboard"] = st.show_scoreboard;
 
@@ -188,7 +188,7 @@ QJsonObject fly_state_to_json_object(const FlyState &stIn)
 		QJsonObject o;
 		o["label"] = cf.label;
 		o["home"] = cf.home;
-		o["away"] = cf.away;
+		o["guest"] = cf.guest;
 		o["visible"] = cf.visible;
 		cfArr.append(o);
 	}
@@ -265,12 +265,14 @@ bool fly_state_from_json_object(const QJsonObject &j, FlyState &st)
 			const QJsonArray ofArr = ofVal.toArray();
 			st.custom_fields.reserve(ofArr.size());
 
+			char ofl = 'A';
 			for (const QJsonValue v : ofArr) {
 				if (!v.isObject())
 					continue;
 				const QJsonObject o = v.toObject();
 				FlyOfficial of;
-				of.officialLetter = o.value("officialLetter").toString().at(0);
+				// of.officialLetter = o.value("officialLetter").toString().at(0);
+				of.officialLetter = QString(ofl++).at(0);
 				of.officialName = o.value("officialName").toString();
 				of.officialRole = o.value("officialRole").toString();
 				of.warning_ms = o.value("warning_ms").toInteger();
@@ -286,7 +288,7 @@ bool fly_state_from_json_object(const QJsonObject &j, FlyState &st)
 	};
 
 	st.home = readTeam(j.value("home").toObject());
-	st.away = readTeam(j.value("away").toObject());
+	st.guest = readTeam(j.value("guest").toObject());
 	st.swap_sides = j.value("swap_sides").toBool(false);
 	st.show_scoreboard = j.value("show_scoreboard").toBool(true);
 	st.custom_fields.clear();
@@ -305,7 +307,7 @@ bool fly_state_from_json_object(const QJsonObject &j, FlyState &st)
 			FlyCustomField cf;
 			cf.label = o.value("label").toString();
 			cf.home = o.value("home").toInt(0);
-			cf.away = o.value("away").toInt(0);
+			cf.guest = o.value("guest").toInt(0);
 			cf.visible = o.value("visible").toBool(true);
 
 			st.custom_fields.push_back(cf);
@@ -435,7 +437,7 @@ FlyState fly_state_make_defaults()
 	FlyState st;
 	st.matchInfo = FlyMatchInfo{};
 	st.home = FlyTeam{};
-	st.away = FlyTeam{};
+	st.guest = FlyTeam{};
 	st.swap_sides = false;
 	st.show_scoreboard = true;
 

@@ -27,7 +27,7 @@ private:
 		QWidget *row = nullptr;
 		QLineEdit *labelEdit = nullptr;
 		QSpinBox *homeSpin = nullptr;
-		QSpinBox *awaySpin = nullptr;
+		QSpinBox *guestSpin = nullptr;
 		QPushButton *remove = nullptr;
 		bool canRemove = true;
 	};

@@ -213,10 +213,10 @@ FlyFieldsDialog::Row FlyFieldsDialog::addRow(const FlyCustomField &cf, bool canR
 	homeSpin->setValue(std::max(0, cf.home));
 	homeSpin->setMinimumWidth(90);
 
-	auto *awaySpin = new QSpinBox(row);
-	awaySpin->setRange(0, std::numeric_limits<int>::max());
-	awaySpin->setValue(std::max(0, cf.away));
-	awaySpin->setMinimumWidth(90);
+	auto *guestSpin = new QSpinBox(row);
+	guestSpin->setRange(0, std::numeric_limits<int>::max());
+	guestSpin->setValue(std::max(0, cf.guest));
+	guestSpin->setMinimumWidth(90);
 
 	auto *removeBtn = new QPushButton(row);
 	removeBtn->setText(QStringLiteral("❌"));
@@ -238,7 +238,7 @@ FlyFieldsDialog::Row FlyFieldsDialog::addRow(const FlyCustomField &cf, bool canR
 	lay->addWidget(new QLabel(fly_i18n("Common.HomeColon"), row), 0, Qt::AlignVCenter);
 	lay->addWidget(homeSpin, 0, Qt::AlignVCenter);
 	lay->addWidget(new QLabel(fly_i18n("Common.GuestsColon"), row), 0, Qt::AlignVCenter);
-	lay->addWidget(awaySpin, 0, Qt::AlignVCenter);
+	lay->addWidget(guestSpin, 0, Qt::AlignVCenter);
 	lay->addWidget(removeBtn, 0, Qt::AlignVCenter);
 
 	row->setLayout(lay);
@@ -247,7 +247,7 @@ FlyFieldsDialog::Row FlyFieldsDialog::addRow(const FlyCustomField &cf, bool canR
 	r.row = row;
 	r.labelEdit = labelEdit;
 	r.homeSpin = homeSpin;
-	r.awaySpin = awaySpin;
+	r.guestSpin = guestSpin;
 	r.remove = removeBtn;
 
 	if (canRemove) {
@@ -356,7 +356,7 @@ void FlyFieldsDialog::saveToState()
 		FlyCustomField cf;
 		cf.label = r.labelEdit ? r.labelEdit->text() : QString();
 		cf.home = r.homeSpin ? r.homeSpin->value() : 0;
-		cf.away = r.awaySpin ? r.awaySpin->value() : 0;
+		cf.guest = r.guestSpin ? r.guestSpin->value() : 0;
 		cf.visible = (i >= 0 && i < vis_.size()) ? vis_[i] : true;
 
 		st_.custom_fields.push_back(cf);
@@ -380,7 +380,7 @@ void FlyFieldsDialog::onAddField()
 	FlyCustomField cf;
 	cf.label = QString();
 	cf.home = 0;
-	cf.away = 0;
+	cf.guest = 0;
 	cf.visible = true;
 
 	Row r = addRow(cf, true);

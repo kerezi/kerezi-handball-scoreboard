@@ -50,7 +50,7 @@ struct FlyTimer {
 struct FlyCustomField {
 	QString label;
 	int  home    = 0;
-	int  away    = 0;
+	int  guest    = 0;
 	bool visible = true;
 };
 
@@ -64,7 +64,7 @@ struct FlySingleStat {
 struct FlyState {
 	FlyMatchInfo matchInfo;
 	FlyTeam home;
-	FlyTeam away;
+	FlyTeam guest;
 
 	bool swap_sides      = false;
 	bool show_scoreboard = true;

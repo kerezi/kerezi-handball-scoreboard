@@ -10,7 +10,16 @@
 		7.1.2 New dialog about Match Info (Button, Dialog)
 	7.2. Teams Officials
 		7.2.0 Modify fly dialog to extract basic features (define FlyBaseDialog)
-		7.2.1 Modify struct about Teams (Struct, Serilize, Deserilize)
-		7.2.2 Modify dialog about Teams (Dialog)
-	
-		
+		7.2.1 Modify struct about Teams: Officials (Struct, Serilize, Deserilize)
+++++
+		7.2.2 Modify dialog about Teams: Officials (Dialog)
+----
+	7.3. Teams Players
+		7.3.1 Modify struct about Teams: Players (Struct, Serilize, Deserilize)
+		7.3.2 Modify dialog about Teams: Players (Dialog)
+	7.4. Timers
+		7.3.1 Modify struct about Timers (Struct, Serilize, Deserilize)
+		7.3.2 Modify dialog about Timers (Dialog)
+8. Handball Tab
+	8.0. Reorganize in Fly Doc 
+	8.1. Handball Tab Ui in Fly Doc 

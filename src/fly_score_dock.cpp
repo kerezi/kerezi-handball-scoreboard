@@ -139,8 +139,8 @@ QList<FlyHotkeyBinding> FlyScoreDock::buildDefaultHotkeyBindings() const
 		v.push_back({baseId + "_toggle", fly_i18n("Hotkey.CustomToggle").arg(label), QKeySequence()});
 		v.push_back({baseId + "_home_inc", fly_i18n("Hotkey.CustomHomeInc").arg(label), QKeySequence()});
 		v.push_back({baseId + "_home_dec", fly_i18n("Hotkey.CustomHomeDec").arg(label), QKeySequence()});
-		v.push_back({baseId + "_away_inc", fly_i18n("Hotkey.CustomGuestsInc").arg(label), QKeySequence()});
-		v.push_back({baseId + "_away_dec", fly_i18n("Hotkey.CustomGuestsDec").arg(label), QKeySequence()});
+		v.push_back({baseId + "_guest_inc", fly_i18n("Hotkey.CustomGuestsInc").arg(label), QKeySequence()});
+		v.push_back({baseId + "_guest_dec", fly_i18n("Hotkey.CustomGuestsDec").arg(label), QKeySequence()});
 	}
 
 	for (int i = 0; i < st_.single_stats.size(); ++i) {
@@ -238,12 +238,12 @@ void FlyScoreDock::applyHotkeyBindings(const QList<FlyHotkeyBinding> &bindings)
 				else if (side == QLatin1String("home") && dir == QLatin1String("dec"))
 					connect(sc, &QShortcut::activated, this,
 						[this, idx]() { bumpCustomFieldHome(idx, -1); });
-				else if (side == QLatin1String("away") && dir == QLatin1String("inc"))
+				else if (side == QLatin1String("guest") && dir == QLatin1String("inc"))
 					connect(sc, &QShortcut::activated, this,
-						[this, idx]() { bumpCustomFieldAway(idx, +1); });
-				else if (side == QLatin1String("away") && dir == QLatin1String("dec"))
+						[this, idx]() { bumpCustomFieldGuest(idx, +1); });
+				else if (side == QLatin1String("guest") && dir == QLatin1String("dec"))
 					connect(sc, &QShortcut::activated, this,
-						[this, idx]() { bumpCustomFieldAway(idx, -1); });
+						[this, idx]() { bumpCustomFieldGuest(idx, -1); });
 			}
 
 		} else if (id.startsWith(QLatin1String("single_"))) {
@@ -948,9 +948,9 @@ void FlyScoreDock::logStateChanges(const FlyState &before, const FlyState &after
 	if (before.home.title != after.home.title)
 		eventLog_.appendEvent(
 			QStringLiteral("Home team: %1").arg(teamName(after.home, QStringLiteral("Home"))));
-	if (before.away.title != after.away.title)
+	if (before.guest.title != after.guest.title)
 		eventLog_.appendEvent(
-			QStringLiteral("Guests team: %1").arg(teamName(after.away, QStringLiteral("Guests"))));
+			QStringLiteral("Guests team: %1").arg(teamName(after.guest, QStringLiteral("Guests"))));
 	if (before.swap_sides != after.swap_sides)
 		eventLog_.appendEvent(after.swap_sides ? QStringLiteral("Sides swapped")
 						       : QStringLiteral("Sides restored"));
@@ -967,13 +967,13 @@ void FlyScoreDock::logStateChanges(const FlyState &before, const FlyState &after
 			eventLog_.appendEvent(QStringLiteral("%1: %2 (%3-%4)")
 						      .arg(label, teamName(after.home, QStringLiteral("Home")))
 						      .arg(field.home)
-						      .arg(field.away));
+						      .arg(field.guest));
 		}
-		if (oldField.away != field.away) {
+		if (oldField.guest != field.guest) {
 			eventLog_.appendEvent(QStringLiteral("%1: %2 (%3-%4)")
-						      .arg(label, teamName(after.away, QStringLiteral("Guests")))
+						      .arg(label, teamName(after.guest, QStringLiteral("Guests")))
 						      .arg(field.home)
-						      .arg(field.away));
+						      .arg(field.guest));
 		}
 		if (oldField.visible != field.visible)
 			eventLog_.appendEvent(QStringLiteral("%1 %2").arg(
@@ -1144,8 +1144,8 @@ void FlyScoreDock::handleRemoteCommand(const QJsonObject &command)
 	if (action == QLatin1String("set_team")) {
 		const QString side = jsonString(command, QStringLiteral("side"));
 		FlyTeam *team = nullptr;
-		if (side == QLatin1String("away") || side == QLatin1String("guest") || side == QLatin1String("guests"))
-			team = &st_.away;
+		if (side == QLatin1String("guest") || side == QLatin1String("guest") || side == QLatin1String("guests"))
+			team = &st_.guest;
 		else
 			team = &st_.home;
 
@@ -1170,7 +1170,7 @@ void FlyScoreDock::handleRemoteCommand(const QJsonObject &command)
 		if (cf.label.isEmpty())
 			cf.label = QStringLiteral("Score");
 		cf.home = std::max(0, jsonInt(command, QStringLiteral("home")));
-		cf.away = std::max(0, jsonInt(command, QStringLiteral("away")));
+		cf.guest = std::max(0, jsonInt(command, QStringLiteral("guest")));
 		cf.visible = jsonBool(command, QStringLiteral("visible"), true);
 		st_.custom_fields.push_back(cf);
 		saveState();
@@ -1197,8 +1197,8 @@ void FlyScoreDock::handleRemoteCommand(const QJsonObject &command)
 			cf.label = jsonString(command, QStringLiteral("label"));
 		if (command.contains(QStringLiteral("home")))
 			cf.home = std::max(0, jsonInt(command, QStringLiteral("home")));
-		if (command.contains(QStringLiteral("away")))
-			cf.away = std::max(0, jsonInt(command, QStringLiteral("away")));
+		if (command.contains(QStringLiteral("guest")))
+			cf.guest = std::max(0, jsonInt(command, QStringLiteral("guest")));
 		if (command.contains(QStringLiteral("visible")))
 			cf.visible = jsonBool(command, QStringLiteral("visible"), cf.visible);
 		saveState();
@@ -1215,9 +1215,9 @@ void FlyScoreDock::handleRemoteCommand(const QJsonObject &command)
 	if (action == QLatin1String("bump_score")) {
 		const QString side = jsonString(command, QStringLiteral("side"));
 		const int delta = jsonInt(command, QStringLiteral("delta"), 1);
-		if (side == QLatin1String("away") || side == QLatin1String("guest") ||
+		if (side == QLatin1String("guest") || side == QLatin1String("guest") ||
 		    (side == QLatin1String("y") && !st_.swap_sides) || (side == QLatin1String("x") && st_.swap_sides))
-			bumpCustomFieldAway(index, delta);
+			bumpCustomFieldGuest(index, delta);
 		else
 			bumpCustomFieldHome(index, delta);
 		return;
@@ -1225,11 +1225,11 @@ void FlyScoreDock::handleRemoteCommand(const QJsonObject &command)
 	if (action == QLatin1String("set_score") && index >= 0 && index < st_.custom_fields.size()) {
 		const QString side = jsonString(command, QStringLiteral("side"));
 		const int value = std::max(0, jsonInt(command, QStringLiteral("value")));
-		const bool away = side == QLatin1String("away") || side == QLatin1String("guest") ||
+		const bool guest = side == QLatin1String("guest") || side == QLatin1String("guest") ||
 				  (side == QLatin1String("y") && !st_.swap_sides) ||
 				  (side == QLatin1String("x") && st_.swap_sides);
-		if (away)
-			st_.custom_fields[index].away = value;
+		if (guest)
+			st_.custom_fields[index].guest = value;
 		else
 			st_.custom_fields[index].home = value;
 		saveState();
@@ -1416,7 +1416,7 @@ void FlyScoreDock::onClearTeamsAndReset()
 
 	for (auto &cf : st_.custom_fields) {
 		cf.home = 0;
-		cf.away = 0;
+		cf.guest = 0;
 	}
 
 	for (auto &ss : st_.single_stats) {
@@ -1543,17 +1543,17 @@ void FlyScoreDock::loadCustomFieldControlsFromState()
 		auto *plusHome = makeStepBtn(QStringLiteral("list-add"), QStyle::SP_ArrowUp, QStringLiteral("+"),
 					     fly_i18n("Dock.HomePlusOne"), row);
 
-		auto *awaySpin = new QSpinBox(row);
-		awaySpin->setRange(0, std::numeric_limits<int>::max());
-		awaySpin->setValue(std::max(0, cf.away));
-		awaySpin->setMinimumWidth(86);
-		awaySpin->setMaximumHeight(32);
-		awaySpin->setButtonSymbols(QAbstractSpinBox::NoButtons);
+		auto *guestSpin = new QSpinBox(row);
+		guestSpin->setRange(0, std::numeric_limits<int>::max());
+		guestSpin->setValue(std::max(0, cf.guest));
+		guestSpin->setMinimumWidth(86);
+		guestSpin->setMaximumHeight(32);
+		guestSpin->setButtonSymbols(QAbstractSpinBox::NoButtons);
 
-		auto *minusAway = makeStepBtn(QStringLiteral("list-remove"), QStyle::SP_ArrowDown, QStringLiteral("-"),
+		auto *minusGuest = makeStepBtn(QStringLiteral("list-remove"), QStyle::SP_ArrowDown, QStringLiteral("-"),
 					      fly_i18n("Dock.GuestsMinusOne"), row);
 
-		auto *plusAway = makeStepBtn(QStringLiteral("list-add"), QStyle::SP_ArrowUp, QStringLiteral("+"),
+		auto *plusGuest = makeStepBtn(QStringLiteral("list-add"), QStyle::SP_ArrowUp, QStringLiteral("+"),
 					     fly_i18n("Dock.GuestsPlusOne"), row);
 
 		auto *homeBox = new QWidget(row);
@@ -1564,16 +1564,16 @@ void FlyScoreDock::loadCustomFieldControlsFromState()
 		homeLay->addWidget(homeSpin, 0, Qt::AlignHCenter | Qt::AlignVCenter);
 		homeLay->addWidget(plusHome, 0, Qt::AlignHCenter | Qt::AlignVCenter);
 
-		auto *awayBox = new QWidget(row);
-		auto *awayLay = new QHBoxLayout(awayBox);
-		awayLay->setContentsMargins(0, 0, 0, 0);
-		awayLay->setSpacing(4);
-		awayLay->addWidget(minusAway, 0, Qt::AlignHCenter | Qt::AlignVCenter);
-		awayLay->addWidget(awaySpin, 0, Qt::AlignHCenter | Qt::AlignVCenter);
-		awayLay->addWidget(plusAway, 0, Qt::AlignHCenter | Qt::AlignVCenter);
+		auto *guestBox = new QWidget(row);
+		auto *guestLay = new QHBoxLayout(guestBox);
+		guestLay->setContentsMargins(0, 0, 0, 0);
+		guestLay->setSpacing(4);
+		guestLay->addWidget(minusGuest, 0, Qt::AlignHCenter | Qt::AlignVCenter);
+		guestLay->addWidget(guestSpin, 0, Qt::AlignHCenter | Qt::AlignVCenter);
+		guestLay->addWidget(plusGuest, 0, Qt::AlignHCenter | Qt::AlignVCenter);
 
 		grid->addWidget(homeBox, 0, 2, Qt::AlignHCenter | Qt::AlignVCenter);
-		grid->addWidget(awayBox, 0, 3, Qt::AlignHCenter | Qt::AlignVCenter);
+		grid->addWidget(guestBox, 0, 3, Qt::AlignHCenter | Qt::AlignVCenter);
 
 		grid->setColumnStretch(1, 2);
 		grid->setColumnStretch(2, 1);
@@ -1585,18 +1585,18 @@ void FlyScoreDock::loadCustomFieldControlsFromState()
 		ui.visibleCheck = visibleCheck;
 		ui.labelLbl = labelLbl;
 		ui.homeSpin = homeSpin;
-		ui.awaySpin = awaySpin;
+		ui.guestSpin = guestSpin;
 		ui.minusHome = minusHome;
 		ui.plusHome = plusHome;
-		ui.minusAway = minusAway;
-		ui.plusAway = plusAway;
+		ui.minusGuest = minusGuest;
+		ui.plusGuest = plusGuest;
 
 		auto sync = [this]() {
 			syncCustomFieldControlsToState();
 		};
 
 		connect(homeSpin, qOverload<int>(&QSpinBox::valueChanged), this, [sync](int) { sync(); });
-		connect(awaySpin, qOverload<int>(&QSpinBox::valueChanged), this, [sync](int) { sync(); });
+		connect(guestSpin, qOverload<int>(&QSpinBox::valueChanged), this, [sync](int) { sync(); });
 		connect(visibleCheck, &QCheckBox::toggled, this, [sync](bool) { sync(); });
 
 		connect(minusHome, &QToolButton::clicked, this, [homeSpin, sync]() {
@@ -1607,12 +1607,12 @@ void FlyScoreDock::loadCustomFieldControlsFromState()
 			homeSpin->setValue(homeSpin->value() + 1);
 			sync();
 		});
-		connect(minusAway, &QToolButton::clicked, this, [awaySpin, sync]() {
-			awaySpin->setValue(std::max(0, awaySpin->value() - 1));
+		connect(minusGuest, &QToolButton::clicked, this, [guestSpin, sync]() {
+			guestSpin->setValue(std::max(0, guestSpin->value() - 1));
 			sync();
 		});
-		connect(plusAway, &QToolButton::clicked, this, [awaySpin, sync]() {
-			awaySpin->setValue(awaySpin->value() + 1);
+		connect(plusGuest, &QToolButton::clicked, this, [guestSpin, sync]() {
+			guestSpin->setValue(guestSpin->value() + 1);
 			sync();
 		});
 
@@ -1631,7 +1631,7 @@ void FlyScoreDock::syncCustomFieldControlsToState()
 		FlyCustomField cf;
 		cf.label = ui.labelLbl ? ui.labelLbl->text() : QString();
 		cf.home = ui.homeSpin ? ui.homeSpin->value() : 0;
-		cf.away = ui.awaySpin ? ui.awaySpin->value() : 0;
+		cf.guest = ui.guestSpin ? ui.guestSpin->value() : 0;
 		cf.visible = ui.visibleCheck ? ui.visibleCheck->isChecked() : true;
 		st_.custom_fields.push_back(cf);
 	}
@@ -1933,18 +1933,18 @@ void FlyScoreDock::bumpCustomFieldHome(int index, int delta)
 	saveState();
 }
 
-void FlyScoreDock::bumpCustomFieldAway(int index, int delta)
+void FlyScoreDock::bumpCustomFieldGuest(int index, int delta)
 {
 	if (index < 0 || index >= st_.custom_fields.size())
 		return;
 
-	if (index < customFields_.size() && customFields_[index].awaySpin) {
-		auto *spin = customFields_[index].awaySpin;
+	if (index < customFields_.size() && customFields_[index].guestSpin) {
+		auto *spin = customFields_[index].guestSpin;
 		spin->setValue(std::max(0, spin->value() + delta));
 		return;
 	}
 
-	st_.custom_fields[index].away = std::max(0, st_.custom_fields[index].away + delta);
+	st_.custom_fields[index].guest = std::max(0, st_.custom_fields[index].guest + delta);
 	saveState();
 }
 
