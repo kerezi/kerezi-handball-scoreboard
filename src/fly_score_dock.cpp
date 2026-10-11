@@ -460,10 +460,11 @@ bool FlyScoreDock::init()
 	eventsVBox->setSpacing(6);
 
 	auto *handballTab = new QWidget(tabs);
-	auto *handballVBox = new QVBoxLayout(handballTab);
-	handballVBox->setContentsMargins(6, 6, 6, 6);
-	handballVBox->setSpacing(6);
-	handballLayout_ = handballVBox;
+	auto *handballGL = new QGridLayout(handballTab);
+	handballGL->setContentsMargins(0, 0, 0, 0);
+	handballGL->setHorizontalSpacing(6);
+	handballGL->setVerticalSpacing(0);
+	handballLayout_ = handballGL;
 
 	auto *eventsTop = new QHBoxLayout();
 	eventLogStatus_ = new QLabel(eventsTab);
@@ -1414,6 +1415,7 @@ void FlyScoreDock::refreshUiFromState(bool onlyTimeIfRunning)
 	loadCustomFieldControlsFromState();
 	loadSingleStatControlsFromState();
 	loadTimerControlsFromState();
+	loadHandballFromState();
 }
 
 void FlyScoreDock::onClearTeamsAndReset()
@@ -1924,6 +1926,504 @@ void FlyScoreDock::loadTimerControlsFromState()
 		timers_.push_back(ui);
 	}
 	timersLayout_->addStretch(1);
+}
+
+void FlyScoreDock::loadHandballFromState()
+{
+	// handballLayout_->
+	// 1st row
+	int posRow = 0;
+	int posCol = 0;
+	int curHei = 0;
+	int curWid = 0;
+	{
+		QLabel *htln = new QLabel(fly_i18n("Common.Home"), handballLayout_);
+		htln->setStyleSheet(QStringLiteral("font-weight:bold;"));
+		htln->setAlignment(Qt::AlignCenter);
+		curHei = 1;
+		curWid = 4;
+		handballLayout_->addWidget(htln, posRow, posCol, curHei, curWid);
+		posCol += curWid;
+
+		QLabel *htf2s = new QLabel(fly_i18n("Common.F2MinSusp"), handballLayout_);
+		htf2s->setStyleSheet(QStringLiteral("font-weight:bold;"));
+		htf2s->setAlignment(Qt::AlignCenter);
+		curHei = 2;
+		curWid = 1;
+		handballLayout_->addWidget(htf2s, posRow, posCol, curHei, curWid);
+		posCol += curWid;
+
+		QLabel *hts2s = new QLabel(fly_i18n("Common.F2MinSusp"), handballLayout_);
+		hts2s->setStyleSheet(QStringLiteral("font-weight:bold;"));
+		hts2s->setAlignment(Qt::AlignCenter);
+		curHei = 2;
+		curWid = 1;
+		handballLayout_->addWidget(hts2s, posRow, posCol, curHei, curWid);
+		posCol += curWid;
+
+		QLabel *htt2s = new QLabel(fly_i18n("Common.F2MinSusp"), handballLayout_);
+		htt2s->setStyleSheet(QStringLiteral("font-weight:bold;"));
+		htt2s->setAlignment(Qt::AlignCenter);
+		curHei = 2;
+		curWid = 1;
+		handballLayout_->addWidget(htt2s, posRow, posCol, curHei, curWid);
+		posCol += curWid;
+
+		QLabel *mt = new QLabel(fly_i18n("Common.MatchTimer"), handballLayout_);
+		mt->setStyleSheet(QStringLiteral("font-size: 24pt; font-weight:bold;"));
+		mt->setAlignment(Qt::AlignCenter);
+		curHei = 1;
+		curWid = 6;
+		handballLayout_->addWidget(mt, posRow, posCol, curHei, curWid);
+		posCol += curWid;
+
+		QLabel *gtt2s = new QLabel(fly_i18n("Common.F2MinSusp"), handballLayout_);
+		gtt2s->setStyleSheet(QStringLiteral("font-weight:bold;"));
+		gtt2s->setAlignment(Qt::AlignCenter);
+		curHei = 2;
+		curWid = 1;
+		handballLayout_->addWidget(gtt2s, posRow, posCol, curHei, curWid);
+		posCol += curWid;
+
+		QLabel *gts2s = new QLabel(fly_i18n("Common.F2MinSusp"), handballLayout_);
+		gts2s->setStyleSheet(QStringLiteral("font-weight:bold;"));
+		gts2s->setAlignment(Qt::AlignCenter);
+		curHei = 2;
+		curWid = 1;
+		handballLayout_->addWidget(gts2s, posRow, posCol, curHei, curWid);
+		posCol += curWid;
+
+		QLabel *gtf2s = new QLabel(fly_i18n("Common.F2MinSusp"), handballLayout_);
+		gtf2s->setStyleSheet(QStringLiteral("font-weight:bold;"));
+		gtf2s->setAlignment(Qt::AlignCenter);
+		curHei = 2;
+		curWid = 1;
+		handballLayout_->addWidget(gtf2s, posRow, posCol, curHei, curWid);
+		posCol += curWid;
+
+		QLabel *gtln = new QLabel(fly_i18n("Common.Guests"), handballLayout_);
+		gtln->setStyleSheet(QStringLiteral("font-weight:bold;"));
+		gtln->setAlignment(Qt::AlignCenter);
+		curHei = 1;
+		curWid = 4;
+		handballLayout_->addWidget(gtln, posRow, posCol, curHei, curWid);
+		posCol += curWid;
+	}
+
+	posRow += 1;
+	posCol = 0;
+	// 2nd row
+	{
+		QLabel *htsn = new QLabel(fly_i18n("Common.Home") + " " +fly_i18n("Dock.Players"), handballLayout_);
+		htsn->setStyleSheet(QStringLiteral("font-weight:bold;"));
+		htsn->setAlignment(Qt::AlignCenter);
+		curHei = 1;
+		curWid = 3;
+		handballLayout_->addWidget(htsn, posRow, posCol, curHei, curWid);
+		posCol += curWid;
+
+		QLabel *htny = new QLabel(fly_i18n("Common.NumberOfYellow"), handballLayout_);
+		htny->setStyleSheet(QStringLiteral("font-weight:bold;"));
+		htny->setAlignment(Qt::AlignCenter);
+		curHei = 1;
+		curWid = 1;
+		handballLayout_->addWidget(htny, posRow, posCol, curHei, curWid);
+		posCol += curWid;
+
+		posCol += 3;
+
+		QLabel *htnd = new QLabel(fly_i18n("Common.NumberOfDisq"), handballLayout_);
+		htnd->setStyleSheet(QStringLiteral("font-weight:bold;"));
+		htnd->setAlignment(Qt::AlignCenter);
+		curHei = 1;
+		curWid = 1;
+		handballLayout_->addWidget(htnd, posRow, posCol, curHei, curWid);
+		posCol += curWid;
+
+		QLabel *htnb = new QLabel(fly_i18n("Common.NumberOfBlue"), handballLayout_);
+		htnb->setStyleSheet(QStringLiteral("font-weight:bold;"));
+		htnb->setAlignment(Qt::AlignCenter);
+		curHei = 1;
+		curWid = 1;
+		handballLayout_->addWidget(htnb, posRow, posCol, curHei, curWid);
+		posCol += curWid;
+
+		QLabel *mr = new QLabel(fly_i18n("Common.MatchResult"), handballLayout_);
+		mr->setStyleSheet(QStringLiteral("font-weight:bold;"));
+		mr->setAlignment(Qt::AlignCenter);
+		curHei = 1;
+		curWid = 2;
+		handballLayout_->addWidget(htnb, posRow, posCol, curHei, curWid);
+		posCol += curWid;
+
+		QLabel *gtnb = new QLabel(fly_i18n("Common.NumberOfBlue"), handballLayout_);
+		gtnb->setStyleSheet(QStringLiteral("font-weight:bold;"));
+		gtnb->setAlignment(Qt::AlignCenter);
+		curHei = 1;
+		curWid = 1;
+		handballLayout_->addWidget(gtnb, posRow, posCol, curHei, curWid);
+		posCol += curWid;
+
+		QLabel *gtnd = new QLabel(fly_i18n("Common.NumberOfDisq"), handballLayout_);
+		gtnd->setStyleSheet(QStringLiteral("font-weight:bold;"));
+		gtnd->setAlignment(Qt::AlignCenter);
+		curHei = 1;
+		curWid = 1;
+		handballLayout_->addWidget(gtnd, posRow, posCol, curHei, curWid);
+		posCol += curWid;
+
+		posCol += 3;
+
+		QLabel *gtny = new QLabel(fly_i18n("Common.NumberOfYellow"), handballLayout_);
+		gtny->setStyleSheet(QStringLiteral("font-weight:bold;"));
+		gtny->setAlignment(Qt::AlignCenter);
+		curHei = 1;
+		curWid = 1;
+		handballLayout_->addWidget(gtny, posRow, posCol, curHei, curWid);
+		posCol += curWid;
+
+
+		QLabel *gtsn = new QLabel(fly_i18n("Common.Guest") + " " +fly_i18n("Dock.Players"), handballLayout_);
+		gtsn->setStyleSheet(QStringLiteral("font-weight:bold;"));
+		gtsn->setAlignment(Qt::AlignCenter);
+		curHei = 1;
+		curWid = 3;
+		handballLayout_->addWidget(gtsn, posRow, posCol, curHei, curWid);
+		posCol += curWid;
+	}
+
+	posRow += 1;
+	posCol = 0;
+	// 3rd row to 18th row
+	for (; posRow < 18; posRow++)
+	{
+		posCol = 0;
+	
+		QLabel *htptn = new QLabel(fly_i18n("Common.PlayerNumber"), handballLayout_);
+		htptn->setStyleSheet(QStringLiteral("font-weight:bold;"));
+		htptn->setAlignment(Qt::AlignCenter);
+		curHei = 1;
+		curWid = 1;
+		handballLayout_->addWidget(htptn, posRow, posCol, curHei, curWid);
+		posCol += curWid;
+	
+		QLabel *htptna = new QLabel(fly_i18n("Common.Home") + " " + fly_i18n("Dock.Players") + " " + fly_i18n("Common.PlayerNumber") + " " + QString::number(posRow), handballLayout_);
+		htptna->setStyleSheet(QStringLiteral("font-weight:bold;"));
+		htptna->setAlignment(Qt::AlignCenter);
+		curHei = 1;
+		curWid = 2;
+		handballLayout_->addWidget(htptna, posRow, posCol, curHei, curWid);
+		posCol += curWid;
+	
+		QLabel *htpy = new QLabel(fly_i18n("Common.MatchTimer"), handballLayout_);
+		htpy->setStyleSheet(QStringLiteral("font-weight:bold;"));
+		htpy->setAlignment(Qt::AlignCenter);
+		curHei = 1;
+		curWid = 1;
+		handballLayout_->addWidget(htpy, posRow, posCol, curHei, curWid);
+		posCol += curWid;
+
+		QLabel *htf2s = new QLabel(fly_i18n("Common.MatchTimer"), handballLayout_);
+		htf2s->setStyleSheet(QStringLiteral("font-weight:bold;"));
+		htf2s->setAlignment(Qt::AlignCenter);
+		curHei = 1;
+		curWid = 1;
+		handballLayout_->addWidget(htf2s, posRow, posCol, curHei, curWid);
+		posCol += curWid;
+
+		QLabel *hts2s = new QLabel(fly_i18n("Common.MatchTimer"), handballLayout_);
+		hts2s->setStyleSheet(QStringLiteral("font-weight:bold;"));
+		hts2s->setAlignment(Qt::AlignCenter);
+		curHei = 1;
+		curWid = 1;
+		handballLayout_->addWidget(hts2s, posRow, posCol, curHei, curWid);
+		posCol += curWid;
+
+		QLabel *htt2s = new QLabel(fly_i18n("Common.MatchTimer"), handballLayout_);
+		htt2s->setStyleSheet(QStringLiteral("font-weight:bold;"));
+		htt2s->setAlignment(Qt::AlignCenter);
+		curHei = 1;
+		curWid = 1;
+		handballLayout_->addWidget(htt2s, posRow, posCol, curHei, curWid);
+		posCol += curWid;
+
+
+		QLabel *htnd = new QLabel(fly_i18n("Common.MatchTimer"), handballLayout_);
+		htnd->setStyleSheet(QStringLiteral("font-weight:bold;"));
+		htnd->setAlignment(Qt::AlignCenter);
+		curHei = 1;
+		curWid = 1;
+		handballLayout_->addWidget(htnd, posRow, posCol, curHei, curWid);
+		posCol += curWid;
+
+		QLabel *htnb = new QLabel(fly_i18n("Common.MatchTimer"), handballLayout_);
+		htnb->setStyleSheet(QStringLiteral("font-weight:bold;"));
+		htnb->setAlignment(Qt::AlignCenter);
+		curHei = 1;
+		curWid = 1;
+		handballLayout_->addWidget(htnb, posRow, posCol, curHei, curWid);
+		posCol += curWid;
+
+		QLabel *htng = new QLabel(fly_i18n("Common.MatchTimer"), handballLayout_);
+		htng->setStyleSheet(QStringLiteral("font-weight:bold;"));
+		htng->setAlignment(Qt::AlignCenter);
+		curHei = 1;
+		curWid = 1;
+		handballLayout_->addWidget(htng, posRow, posCol, curHei, curWid);
+		posCol += curWid;
+
+		QLabel *gtng = new QLabel(fly_i18n("Common.MatchTimer"), handballLayout_);
+		gtng->setStyleSheet(QStringLiteral("font-weight:bold;"));
+		gtng->setAlignment(Qt::AlignCenter);
+		curHei = 1;
+		curWid = 1;
+		handballLayout_->addWidget(gtng, posRow, posCol, curHei, curWid);
+		posCol += curWid;
+
+		QLabel *gtnb = new QLabel(fly_i18n("Common.MatchTimer"), handballLayout_);
+		gtnb->setStyleSheet(QStringLiteral("font-weight:bold;"));
+		gtnb->setAlignment(Qt::AlignCenter);
+		curHei = 1;
+		curWid = 1;
+		handballLayout_->addWidget(gtnb, posRow, posCol, curHei, curWid);
+		posCol += curWid;
+
+		QLabel *gtnd = new QLabel(fly_i18n("Common.MatchTimer"), handballLayout_);
+		gtnd->setStyleSheet(QStringLiteral("font-weight:bold;"));
+		gtnd->setAlignment(Qt::AlignCenter);
+		curHei = 1;
+		curWid = 1;
+		handballLayout_->addWidget(gtnd, posRow, posCol, curHei, curWid);
+		posCol += curWid;
+
+		QLabel *gtt2s = new QLabel(fly_i18n("Common.MatchTimer"), handballLayout_);
+		gtt2s->setStyleSheet(QStringLiteral("font-weight:bold;"));
+		gtt2s->setAlignment(Qt::AlignCenter);
+		curHei = 1;
+		curWid = 1;
+		handballLayout_->addWidget(gtt2s, posRow, posCol, curHei, curWid);
+		posCol += curWid;
+
+		QLabel *gts2s = new QLabel(fly_i18n("Common.MatchTimer"), handballLayout_);
+		gts2s->setStyleSheet(QStringLiteral("font-weight:bold;"));
+		gts2s->setAlignment(Qt::AlignCenter);
+		curHei = 1;
+		curWid = 1;
+		handballLayout_->addWidget(gts2s, posRow, posCol, curHei, curWid);
+		posCol += curWid;
+	
+		QLabel *gtf2s = new QLabel(fly_i18n("Common.MatchTimer"), handballLayout_);
+		gtf2s->setStyleSheet(QStringLiteral("font-weight:bold;"));
+		gtf2s->setAlignment(Qt::AlignCenter);
+		curHei = 1;
+		curWid = 1;
+		handballLayout_->addWidget(gtf2s, posRow, posCol, curHei, curWid);
+		posCol += curWid;
+
+		QLabel *gtpy = new QLabel(fly_i18n("Common.MatchTimer"), handballLayout_);
+		gtpy->setStyleSheet(QStringLiteral("font-weight:bold;"));
+		gtpy->setAlignment(Qt::AlignCenter);
+		curHei = 1;
+		curWid = 1;
+		handballLayout_->addWidget(gtpy, posRow, posCol, curHei, curWid);
+		posCol += curWid;
+
+		QLabel *gtptna = new QLabel(fly_i18n("Common.Guest") + " " + fly_i18n("Dock.Players") + " " + fly_i18n("Common.PlayerNumber") + " " + QString::number(posRow), handballLayout_);
+		gtptna->setStyleSheet(QStringLiteral("font-weight:bold;"));
+		gtptna->setAlignment(Qt::AlignCenter);
+		curHei = 1;
+		curWid = 2;
+		handballLayout_->addWidget(gtptna, posRow, posCol, curHei, curWid);
+		posCol += curWid;
+	
+
+		QLabel *gtptn = new QLabel(fly_i18n("Common.PlayerNumber"), handballLayout_);
+		gtptn->setStyleSheet(QStringLiteral("font-weight:bold;"));
+		gtptn->setAlignment(Qt::AlignCenter);
+		curHei = 1;
+		curWid = 1;
+		handballLayout_->addWidget(gtptn, posRow, posCol, curHei, curWid);
+		posCol += curWid;
+
+	}
+		
+	// posRow += 1;
+	posCol = 0;
+	// 19th row
+	{
+		QLabel *htsn = new QLabel(fly_i18n("Common.Home") + " " +fly_i18n("Teams.handballLayout_ =s"), handballLayout_);
+		htsn->setStyleSheet(QStringLiteral("font-weight:bold;"));
+		htsn->setAlignment(Qt::AlignCenter);
+		curHei = 1;
+		curWid = 2;
+		handballLayout_->addWidget(htsn, posRow, posCol, curHei, curWid);
+		posCol += curWid;
+
+		QLabel *htny = new QLabel(fly_i18n("Common.NumberOfYellow"), handballLayout_);
+		htny->setStyleSheet(QStringLiteral("font-weight:bold;"));
+		htny->setAlignment(Qt::AlignCenter);
+		curHei = 1;
+		curWid = 2;
+		handballLayout_->addWidget(htny, posRow, posCol, curHei, curWid);
+		posCol += curWid;
+
+		QLabel *hto2m = new QLabel(fly_i18n("Common.handballLayout_ =2min"), handballLayout_);
+		hto2m->setStyleSheet(QStringLiteral("font-weight:bold;"));
+		hto2m->setAlignment(Qt::AlignCenter);
+		curHei = 1;
+		curWid = 2;
+		handballLayout_->addWidget(hto2m, posRow, posCol, curHei, curWid);
+		posCol += curWid;
+
+		QLabel *htnd = new QLabel(fly_i18n("Common.Official2min"), handballLayout_);
+		htnd->setStyleSheet(QStringLiteral("font-weight:bold;"));
+		htnd->setAlignment(Qt::AlignCenter);
+		curHei = 1;
+		curWid = 2;
+		handballLayout_->addWidget(htnd, posRow, posCol, curHei, curWid);
+		posCol += curWid;
+
+		QLabel *htnb = new QLabel(fly_i18n("Common.Official2min"), handballLayout_);
+		htnb->setStyleSheet(QStringLiteral("font-weight:bold;"));
+		htnb->setAlignment(Qt::AlignCenter);
+		curHei = 1;
+		curWid = 2;
+		handballLayout_->addWidget(htnb, posRow, posCol, curHei, curWid);
+		posCol += curWid;
+
+		QLabel *gtnb = new QLabel(fly_i18n("Common.Official2min"), handballLayout_);
+		gtnb->setStyleSheet(QStringLiteral("font-weight:bold;"));
+		gtnb->setAlignment(Qt::AlignCenter);
+		curHei = 1;
+		curWid = 2;
+		handballLayout_->addWidget(gtnb, posRow, posCol, curHei, curWid);
+		posCol += curWid;
+
+		QLabel *gtnd = new QLabel(fly_i18n("Common.Official2min"), handballLayout_);
+		gtnd->setStyleSheet(QStringLiteral("font-weight:bold;"));
+		gtnd->setAlignment(Qt::AlignCenter);
+		curHei = 1;
+		curWid = 2;
+		handballLayout_->addWidget(gtnd, posRow, posCol, curHei, curWid);
+		posCol += curWid;
+
+		QLabel *gt2os = new QLabel(fly_i18n("Common.Official2min"), handballLayout_);
+		gt2os->setStyleSheet(QStringLiteral("font-weight:bold;"));
+		gt2os->setAlignment(Qt::AlignCenter);
+		curHei = 1;
+		curWid = 2;
+		handballLayout_->addWidget(gt2os, posRow, posCol, curHei, curWid);
+		posCol += curWid;
+
+		QLabel *gtny = new QLabel(fly_i18n("Common.NumberOfYellow"), handballLayout_);
+		gtny->setStyleSheet(QStringLiteral("font-weight:bold;"));
+		gtny->setAlignment(Qt::AlignCenter);
+		curHei = 1;
+		curWid = 2;
+		handballLayout_->addWidget(gtny, posRow, posCol, curHei, curWid);
+		posCol += curWid;
+
+
+		QLabel *gtsn = new QLabel(fly_i18n("Common.Guest") + " " +fly_i18n("Teams.Officials"), handballLayout_);
+		gtsn->setStyleSheet(QStringLiteral("font-weight:bold;"));
+		gtsn->setAlignment(Qt::AlignCenter);
+		curHei = 1;
+		curWid = 2;
+		handballLayout_->addWidget(gtsn, posRow, posCol, curHei, curWid);
+		posCol += curWid;
+	}
+	
+	posRow += 1;
+	posCol = 0;
+	// 20th row to 24th row
+	for (; posRow < 24; posRow++)
+	{
+		posCol = 0;
+	
+		QLabel *htptna = new QLabel(fly_i18n("Common.OfficialChar") + " " +fly_i18n("Common.Home") + " " + fly_i18n("Teams.Officials"), handballLayout_);
+		htptna->setStyleSheet(QStringLiteral("font-weight:bold;"));
+		htptna->setAlignment(Qt::AlignCenter);
+		curHei = 1;
+		curWid = 2;
+		handballLayout_->addWidget(htptna, posRow, posCol, curHei, curWid);
+		posCol += curWid;
+	
+		QLabel *htpy = new QLabel(fly_i18n("Common.MatchTimer"), handballLayout_);
+		htpy->setStyleSheet(QStringLiteral("font-weight:bold;"));
+		htpy->setAlignment(Qt::AlignCenter);
+		curHei = 1;
+		curWid = 2;
+		handballLayout_->addWidget(htpy, posRow, posCol, curHei, curWid);
+		posCol += curWid;
+
+		QLabel *htf2s = new QLabel(fly_i18n("Common.MatchTimer"), handballLayout_);
+		htf2s->setStyleSheet(QStringLiteral("font-weight:bold;"));
+		htf2s->setAlignment(Qt::AlignCenter);
+		curHei = 1;
+		curWid = 2;
+		handballLayout_->addWidget(htf2s, posRow, posCol, curHei, curWid);
+		posCol += curWid;
+
+
+		QLabel *htnd = new QLabel(fly_i18n("Common.MatchTimer"), handballLayout_);
+		htnd->setStyleSheet(QStringLiteral("font-weight:bold;"));
+		htnd->setAlignment(Qt::AlignCenter);
+		curHei = 1;
+		curWid = 2;
+		handballLayout_->addWidget(htnd, posRow, posCol, curHei, curWid);
+		posCol += curWid;
+
+		QLabel *htnb = new QLabel(fly_i18n("Common.MatchTimer"), handballLayout_);
+		htnb->setStyleSheet(QStringLiteral("font-weight:bold;"));
+		htnb->setAlignment(Qt::AlignCenter);
+		curHei = 1;
+		curWid = 2;
+		handballLayout_->addWidget(htnb, posRow, posCol, curHei, curWid);
+		posCol += curWid;
+
+		QLabel *gtnb = new QLabel(fly_i18n("Common.MatchTimer"), handballLayout_);
+		gtnb->setStyleSheet(QStringLiteral("font-weight:bold;"));
+		gtnb->setAlignment(Qt::AlignCenter);
+		curHei = 1;
+		curWid = 2;
+		handballLayout_->addWidget(gtnb, posRow, posCol, curHei, curWid);
+		posCol += curWid;
+
+		QLabel *gtnd = new QLabel(fly_i18n("Common.MatchTimer"), handballLayout_);
+		gtnd->setStyleSheet(QStringLiteral("font-weight:bold;"));
+		gtnd->setAlignment(Qt::AlignCenter);
+		curHei = 1;
+		curWid = 2;
+		handballLayout_->addWidget(gtnd, posRow, posCol, curHei, curWid);
+		posCol += curWid;
+
+		QLabel *gtf2s = new QLabel(fly_i18n("Common.MatchTimer"), handballLayout_);
+		gtf2s->setStyleSheet(QStringLiteral("font-weight:bold;"));
+		gtf2s->setAlignment(Qt::AlignCenter);
+		curHei = 1;
+		curWid = 2;
+		handballLayout_->addWidget(gtf2s, posRow, posCol, curHei, curWid);
+		posCol += curWid;
+
+		QLabel *gtpy = new QLabel(fly_i18n("Common.MatchTimer"), handballLayout_);
+		gtpy->setStyleSheet(QStringLiteral("font-weight:bold;"));
+		gtpy->setAlignment(Qt::AlignCenter);
+		curHei = 1;
+		curWid = 2;
+		handballLayout_->addWidget(gtpy, posRow, posCol, curHei, curWid);
+		posCol += curWid;
+
+		QLabel *gtptna = new QLabel(fly_i18n("Common.OfficialChar") + " " +fly_i18n("Common.Guest") + " " + fly_i18n("Teams.Officials"), handballLayout_);
+		gtptna->setStyleSheet(QStringLiteral("font-weight:bold;"));
+		gtptna->setAlignment(Qt::AlignCenter);
+		curHei = 1;
+		curWid = 2;
+		handballLayout_->addWidget(gtptna, posRow, posCol, curHei, curWid);
+		posCol += curWid;
+	}
+
+	
+
 }
 
 void FlyScoreDock::bumpCustomFieldHome(int index, int delta)

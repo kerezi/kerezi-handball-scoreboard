@@ -96,6 +96,8 @@ private:
 	void syncSingleStatControlsToState();
 	void clearAllTimerRows();
 	void loadTimerControlsFromState();
+	void loadHandballFromState();
+
 	QList<FlyHotkeyBinding> buildDefaultHotkeyBindings() const;
 	QList<FlyHotkeyBinding> buildMergedHotkeyBindings() const;
 	void applyHotkeyBindings(const QList<FlyHotkeyBinding> &bindings);
@@ -131,7 +133,7 @@ private:
 	QVBoxLayout *configLayout_ = nullptr;
 	QVBoxLayout *customFieldsLayout_ = nullptr;
 	QList<FlyCustomFieldUi> customFields_;
-	QVBoxLayout *handballLayout_ = nullptr;
+	QGridLayout *handballLayout_ = nullptr;
 	QVBoxLayout *singleStatsLayout_ = nullptr;
 	QList<FlySingleStatUi> singleStats_;
 	QVBoxLayout *timersLayout_ = nullptr;
