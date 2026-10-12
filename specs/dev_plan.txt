@@ -15,11 +15,12 @@
 	7.3. Teams Players
 		7.3.1 Modify struct about Teams: Players (Struct, Serilize, Deserilize)
 		7.3.2 Modify dialog about Teams: Players (Dialog)
-++++
-----
-	7.4. Timers
-		7.3.1 Modify struct about Timers (Struct, Serilize, Deserilize)
-		7.3.2 Modify dialog about Timers (Dialog)
+-----7.4. Timers
+-----7.3.1 Modify struct about Timers (Struct, Serilize, Deserilize)
+-----7.3.2 Modify dialog about Timers (Dialog)
 8. Handball Tab
-	8.0. Reorganize in Fly Doc 
-	8.1. Handball Tab Ui in Fly Doc 
+++++
+	8.0. Reorganize in Fly Dock
+		8.0.1. Create sub folders dialgos, tabs, help and move corespondig files there
+----
+	8.1. Handball Tab Ui in Fly Dock

@@ -48,6 +48,11 @@ endif()
 # ---------------------------------------------------------------------------
 set(FS_HLP_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/help")
 set(FS_INC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/include")
+set(FS_IDI_DIR "${FS_INC_DIR}/dialogs")
+set(FS_IHL_DIR "${FS_INC_DIR}/help")
+set(FS_ITA_DIR "${FS_INC_DIR}/tabs")
+set(FS_DIA_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/dialogs")
+set(FS_TAB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/tabs")
 set(FS_3P_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/thirdparty")
 set(FS_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(FS_DATA_DIR "${CMAKE_CURRENT_SOURCE_DIR}/data")
@@ -99,7 +104,16 @@ target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE ENABLE_QT=1)
 # ---------------------------------------------------------------------------
 # Includes
 # ---------------------------------------------------------------------------
-target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${FS_HLP_DIR} ${FS_INC_DIR} ${FS_SRC_DIR} ${FS_GEN_DIR} ${FS_3P_DIR})
+target_include_directories(${CMAKE_PROJECT_NAME}
+  PRIVATE ${FS_HLP_DIR}
+          ${FS_INC_DIR}
+          ${FS_IHL_DIR}
+          ${FS_IDI_DIR}
+          ${FS_ITA_DIR}
+          ${FS_DIA_DIR}
+          ${FS_TAB_DIR}
+          ${FS_SRC_DIR}
+          ${FS_GEN_DIR} ${FS_3P_DIR})
 
 # ---------------------------------------------------------------------------
 # Sources
@@ -108,10 +122,10 @@ set(
   OBS_FLY_SCORE_SRC
   ${FS_SRC_DIR}/fly_score_plugin.cpp
   ${FS_SRC_DIR}/fly_score_state.cpp
-  ${FS_SRC_DIR}/fly_score_qt_helpers.cpp
-  ${FS_SRC_DIR}/fly_score_logo_helpers.cpp
+  ${FS_HLP_DIR}/fly_score_qt_helpers.cpp
+  ${FS_HLP_DIR}/fly_score_logo_helpers.cpp
   ${FS_INC_DIR}/fly_score_i18n.hpp
-  ${FS_SRC_DIR}/fly_score_paths.cpp
+  ${FS_HLP_DIR}/fly_score_paths.cpp
   ${FS_SRC_DIR}/fly_score_websocket_server.cpp
   ${FS_INC_DIR}/fly_score_websocket_server.hpp
   ${FS_SRC_DIR}/fly_score_event_log.cpp
@@ -121,25 +135,25 @@ set(
 list(
   APPEND
   OBS_FLY_SCORE_SRC
-  ${FS_HLP_DIR}/fly_score_horizontal_tab_bar.hpp
-  ${FS_SRC_DIR}/fly_score_dock.cpp
-  ${FS_INC_DIR}/fly_score_dock.hpp
+  ${FS_ITA_DIR}/fly_score_horizontal_tab_bar.hpp
+  ${FS_TAB_DIR}/fly_score_dock.cpp
+  ${FS_ITA_DIR}/fly_score_dock.hpp
   ${FS_SRC_DIR}/widget.cpp
   ${FS_INC_DIR}/widget.hpp
-  ${FS_SRC_DIR}/fly_score_base_dialog.cpp
-  ${FS_INC_DIR}/fly_score_base_dialog.hpp
-  ${FS_SRC_DIR}/fly_score_match_info_dialog.cpp
-  ${FS_INC_DIR}/fly_score_match_info_dialog.hpp
-  ${FS_SRC_DIR}/fly_score_teams_dialog.cpp
-  ${FS_INC_DIR}/fly_score_teams_dialog.hpp
-  ${FS_SRC_DIR}/fly_score_players_dialog.cpp
-  ${FS_INC_DIR}/fly_score_players_dialog.hpp
-  ${FS_SRC_DIR}/fly_score_fields_dialog.cpp
-  ${FS_INC_DIR}/fly_score_fields_dialog.hpp
-  ${FS_SRC_DIR}/fly_score_timers_dialog.cpp
-  ${FS_INC_DIR}/fly_score_timers_dialog.hpp
-  ${FS_SRC_DIR}/fly_score_hotkeys_dialog.cpp
-  ${FS_INC_DIR}/fly_score_hotkeys_dialog.hpp
+  ${FS_DIA_DIR}/fly_score_base_dialog.cpp
+  ${FS_IDI_DIR}/fly_score_base_dialog.hpp
+  ${FS_DIA_DIR}/fly_score_match_info_dialog.cpp
+  ${FS_IDI_DIR}/fly_score_match_info_dialog.hpp
+  ${FS_DIA_DIR}/fly_score_teams_dialog.cpp
+  ${FS_IDI_DIR}/fly_score_teams_dialog.hpp
+  ${FS_DIA_DIR}/fly_score_players_dialog.cpp
+  ${FS_IDI_DIR}/fly_score_players_dialog.hpp
+  ${FS_DIA_DIR}/fly_score_fields_dialog.cpp
+  ${FS_IDI_DIR}/fly_score_fields_dialog.hpp
+  ${FS_DIA_DIR}/fly_score_timers_dialog.cpp
+  ${FS_IDI_DIR}/fly_score_timers_dialog.hpp
+  ${FS_DIA_DIR}/fly_score_hotkeys_dialog.cpp
+  ${FS_IDI_DIR}/fly_score_hotkeys_dialog.hpp
 )
 
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE ${OBS_FLY_SCORE_SRC})
