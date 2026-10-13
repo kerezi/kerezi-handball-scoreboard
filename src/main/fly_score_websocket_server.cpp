@@ -3,6 +3,7 @@
 #include "config.hpp"
 #define LOG_TAG "[" PLUGIN_NAME "][websocket]"
 #include "fly_score_log.hpp"
+#include "fly_score_const.hpp"
 
 #include <QByteArray>
 #include <QCryptographicHash>
@@ -11,6 +12,7 @@
 #include <QHostAddress>
 #include <QTcpServer>
 #include <QTcpSocket>
+#include <QSettings>
 
 static QByteArray websocketFrame(const QByteArray &payload)
 {
@@ -239,12 +241,12 @@ void FlyScoreWebSocketServer::removeClient(QObject *client)
 	emit statusChanged();
 }
 
-QJsonObject FlyScoreWebSocketServer::makeStateEnvelope(const FlyState &state, const QString &templateName,
+QJsonObject FlyScoreWebSocketServer::makeStateEnvelope(const FlyScoreState::FlyState &state, const QString &templateName,
 						       const QString &templatePath) const
 {
 	QJsonObject env;
 	env.insert(QStringLiteral("type"), QStringLiteral("state"));
-	env.insert(QStringLiteral("state"), fly_state_to_json_object(state));
+	env.insert(QStringLiteral("state"), FlyScoreState::fly_state_to_json_object(state));
 	env.insert(QStringLiteral("template"), templateName);
 	env.insert(QStringLiteral("template_path"), templatePath);
 	return env;
@@ -258,14 +260,14 @@ void FlyScoreWebSocketServer::sendText(QTcpSocket *client, const QString &messag
 	client->write(websocketFrame(message.toUtf8()));
 }
 
-void FlyScoreWebSocketServer::sendState(QTcpSocket *client, const FlyState &state, const QString &templateName,
+void FlyScoreWebSocketServer::sendState(QTcpSocket *client, const FlyScoreState::FlyState &state, const QString &templateName,
 					const QString &templatePath)
 {
 	const QJsonDocument doc(makeStateEnvelope(state, templateName, templatePath));
 	sendText(client, QString::fromUtf8(doc.toJson(QJsonDocument::Compact)));
 }
 
-void FlyScoreWebSocketServer::broadcastState(const FlyState &state, const QString &templateName,
+void FlyScoreWebSocketServer::broadcastState(const FlyScoreState::FlyState &state, const QString &templateName,
 					     const QString &templatePath)
 {
 	const QJsonDocument doc(makeStateEnvelope(state, templateName, templatePath));
@@ -273,4 +275,12 @@ void FlyScoreWebSocketServer::broadcastState(const FlyState &state, const QStrin
 
 	for (auto *client : clients_)
 		sendText(client, payload);
+}
+
+
+quint16 FlyScoreWebSocketServer::fly_load_websocket_port()
+{
+	QSettings s(fly_settings_org_name(), fly_settings_app_name());
+	const int p = s.value(fly_settings_key_websocket_port(), 4457).toInt();
+	return static_cast<quint16>((p > 0 && p <= 65535) ? p : 4457);
 }

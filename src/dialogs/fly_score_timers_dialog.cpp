@@ -18,44 +18,23 @@
 #include <QPushButton>
 #include <QStyle>
 
-FlyTimersDialog::FlyTimersDialog(const QString &dataDir, FlyState &state, QWidget *parent)
-	: QDialog(parent),
-	  dataDir_(dataDir),
-	  st_(state)
+FlyTimersDialog::FlyTimersDialog(const QString &dataDir, FlyScoreState::FlyState &state, QWidget *parent)
+	: FlyBaseDialog(fly_i18n("Timers.Title"),
+					fly_i18n("Timers.Hint"),
+					fly_i18n("Common.Timers"),
+					dataDir, state)
 {
-	setObjectName(QStringLiteral("FlyTimersDialog"));
-	setWindowTitle(fly_i18n("Timers.Title"));
 	setModal(true);
 	resize(560, 420);
 	setSizeGripEnabled(false);
 
 	buildUi();
-	loadFromState();
+	syncUiFromState();
 }
 
 void FlyTimersDialog::buildUi()
 {
-	auto *root = new QVBoxLayout(this);
-	root->setContentsMargins(14, 14, 14, 14);
-	root->setSpacing(10);
-
-	auto *infoBox = new QGroupBox(fly_i18n("Common.Timers"), this);
-	infoBox->setObjectName(QStringLiteral("timersInfoGroup"));
-
-	auto *infoLayout = new QVBoxLayout(infoBox);
-	infoLayout->setContentsMargins(10, 10, 10, 10);
-	infoLayout->setSpacing(8);
-
-	auto *hintLbl = new QLabel(fly_i18n("Timers.Hint"),
-				   infoBox);
-	hintLbl->setObjectName(QStringLiteral("timersHint"));
-	hintLbl->setWordWrap(true);
-	infoLayout->addWidget(hintLbl);
-
-	infoBox->setLayout(infoLayout);
-	root->addWidget(infoBox);
-
-	auto *rowsBox = new QGroupBox(QString(), this);
+	auto *rowsBox = new QWidget();
 	rowsBox->setObjectName(QStringLiteral("timersRowsGroup"));
 
 	auto *rowsLayout = new QVBoxLayout(rowsBox);
@@ -74,21 +53,18 @@ void FlyTimersDialog::buildUi()
 	rowsLayout->addWidget(addTimerBtn_, 0, Qt::AlignLeft);
 
 	rowsBox->setLayout(rowsLayout);
-	root->addWidget(rowsBox);
-
-	auto *btnBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, this);
-	root->addWidget(btnBox);
+	gl_->addWidget(rowsBox);
 
 	connect(addTimerBtn_, &QPushButton::clicked, this, &FlyTimersDialog::onAddTimer);
-	connect(btnBox, &QDialogButtonBox::accepted, this, &FlyTimersDialog::onAccept);
-	connect(btnBox, &QDialogButtonBox::rejected, this, &FlyTimersDialog::reject);
+
+	addButtons();
 }
 
-FlyTimersDialog::Row FlyTimersDialog::addRow(const FlyTimer &tm, bool canRemove)
+FlyTimersDialog::Row FlyTimersDialog::addRow(const FlyScoreState::FlyScoreState::FlyTimer &tm, bool canRemove)
 {
 	Row r;
 
-	auto *row = new QWidget(this);
+	auto *row = new QWidget();
 	auto *lay = new QHBoxLayout(row);
 	lay->setContentsMargins(0, 0, 0, 0);
 	lay->setSpacing(8);
@@ -105,7 +81,7 @@ FlyTimersDialog::Row FlyTimersDialog::addRow(const FlyTimer &tm, bool canRemove)
 	timeEdit->setMaxLength(8);
 	timeEdit->setMinimumWidth(70);
 	timeEdit->setMaximumWidth(90);
-	timeEdit->setText(fly_format_ms_mmss(tm.initial_ms > 0 ? tm.initial_ms : tm.remaining_ms));
+	timeEdit->setText(FlyQtHelper::fly_format_ms_mmss(tm.initial_ms > 0 ? tm.initial_ms : tm.remaining_ms));
 
 	auto *modeCombo = new QComboBox(row);
 	modeCombo->addItems({QStringLiteral("countdown"), QStringLiteral("countup")});
@@ -156,6 +132,7 @@ FlyTimersDialog::Row FlyTimersDialog::addRow(const FlyTimer &tm, bool canRemove)
 					rows_.removeAt(i);
 					if (timersLayout_)
 						timersLayout_->removeWidget(rr.row);
+					rr.row->setHidden(true);
 					rr.row->deleteLater();
 					break;
 				}
@@ -166,21 +143,23 @@ FlyTimersDialog::Row FlyTimersDialog::addRow(const FlyTimer &tm, bool canRemove)
 	return r;
 }
 
-void FlyTimersDialog::loadFromState()
+void FlyTimersDialog::syncUiFromState()
 {
 	for (auto &r : rows_) {
 		if (timersLayout_ && r.row)
 			timersLayout_->removeWidget(r.row);
-		if (r.row)
+		if (r.row) {
+			r.row->setHidden(true);
 			r.row->deleteLater();
+		}
 	}
 	rows_.clear();
 
 	if (!timersLayout_)
 		return;
 
-	if (st_.timers.isEmpty()) {
-		FlyTimer main;
+	if (state_.timers.isEmpty()) {
+		FlyScoreState::FlyTimer main;
 		main.label = fly_i18n("Default.Timer.FirstHalf");
 		main.mode = QStringLiteral("countdown");
 		main.running = false;
@@ -188,29 +167,29 @@ void FlyTimersDialog::loadFromState()
 		main.remaining_ms = 0;
 		main.last_tick_ms = 0;
 		main.visible = true;
-		st_.timers.push_back(main);
+		state_.timers.push_back(main);
 	}
 
-	rows_.reserve(st_.timers.size());
-	for (int i = 0; i < st_.timers.size(); ++i) {
-		const auto &tm = st_.timers[i];
+	rows_.reserve(state_.timers.size());
+	for (int i = 0; i < state_.timers.size(); ++i) {
+		const auto &tm = state_.timers[i];
 		const bool canRemove = (i > 0);
 		Row r = addRow(tm, canRemove);
 		rows_.push_back(r);
 	}
 }
 
-void FlyTimersDialog::saveToState()
+void FlyTimersDialog::syncStateFromUi()
 {
-	const auto oldTimers = st_.timers;
+	const auto oldTimers = state_.timers;
 
-	st_.timers.clear();
-	st_.timers.reserve(rows_.size());
+	state_.timers.clear();
+	state_.timers.reserve(rows_.size());
 
 	for (int i = 0; i < rows_.size(); ++i) {
 		const auto &r = rows_[i];
 
-		FlyTimer tm;
+		FlyScoreState::FlyTimer tm;
 		tm.label = r.labelEdit ? r.labelEdit->text() : QString();
 
 		QString mode = r.modeCombo ? r.modeCombo->currentText() : QStringLiteral("countdown");
@@ -218,7 +197,7 @@ void FlyTimersDialog::saveToState()
 
 		qint64 ms = 0;
 		if (r.timeEdit) {
-			qint64 parsed = fly_parse_mmss_to_ms(r.timeEdit->text());
+			qint64 parsed = FlyQtHelper::fly_parse_mmss_to_ms(r.timeEdit->text());
 			ms = (parsed >= 0) ? parsed : 0;
 		}
 
@@ -233,11 +212,11 @@ void FlyTimersDialog::saveToState()
 			tm.visible = true;
 		}
 
-		st_.timers.push_back(tm);
+		state_.timers.push_back(tm);
 	}
 
-	if (st_.timers.isEmpty()) {
-		FlyTimer main;
+	if (state_.timers.isEmpty()) {
+		FlyScoreState::FlyTimer main;
 		main.label = fly_i18n("Default.Timer.FirstHalf");
 		main.mode = QStringLiteral("countdown");
 		main.running = false;
@@ -245,15 +224,15 @@ void FlyTimersDialog::saveToState()
 		main.remaining_ms = 0;
 		main.last_tick_ms = 0;
 		main.visible = true;
-		st_.timers.push_back(main);
+		state_.timers.push_back(main);
 	}
 
-	fly_state_save(dataDir_, st_);
+	FlyScoreState::fly_state_save(dataDir_, state_);
 }
 
 void FlyTimersDialog::onAddTimer()
 {
-	FlyTimer tm;
+	FlyScoreState::FlyTimer tm;
 	tm.label = QString();
 	tm.mode = QStringLiteral("countdown");
 	tm.running = false;
@@ -266,8 +245,3 @@ void FlyTimersDialog::onAddTimer()
 	rows_.push_back(r);
 }
 
-void FlyTimersDialog::onAccept()
-{
-	saveToState();
-	accept();
-}

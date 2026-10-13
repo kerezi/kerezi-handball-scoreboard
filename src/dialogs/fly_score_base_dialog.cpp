@@ -1,7 +1,7 @@
 #include "fly_score_base_dialog.hpp"
 #include "config.hpp"
 
-#define LOG_TAG "[" PLUGIN_NAME "][teams-dialog]"
+#define LOG_TAG "[" PLUGIN_NAME "][base-dialog]"
 #include "fly_score_log.hpp"
 
 #include "fly_score_i18n.hpp"
@@ -27,7 +27,7 @@ FlyBaseDialog::FlyBaseDialog(const QString &title,
 	const QString &hints, 
 	const QString &subTitle,
 	const QString &dataDir, 
-	FlyState &state, 
+	FlyScoreState::FlyState &state, 
 	QWidget *parent)
 	: QDialog(parent),
 	  dataDir_(dataDir),
@@ -60,6 +60,7 @@ FlyBaseDialog::FlyBaseDialog(const QString &title,
 }
 
 FlyBaseDialog::~FlyBaseDialog() = default;
+
 void FlyBaseDialog::addButtons ()
 {
 	gb_->setLayout(gl_);
@@ -93,7 +94,7 @@ void FlyBaseDialog::onApply()
 {
 	this->syncStateFromUi();
 	LOGI("onApply:");
-	fly_state_save(dataDir_, state_);
+	FlyScoreState::fly_state_save(dataDir_, state_);
 	LOGI("saved.");
 	accept();
 }

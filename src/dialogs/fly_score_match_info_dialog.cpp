@@ -23,7 +23,7 @@
 #include <QMessageBox>
 #include <QStyle>
 
-FlyMatchInfoDialog::FlyMatchInfoDialog(const QString &dataDir, FlyState &state, QWidget *parent)
+FlyMatchInfoDialog::FlyMatchInfoDialog(const QString &dataDir, FlyScoreState::FlyState &state, QWidget *parent)
 	: FlyBaseDialog(fly_i18n("MatchInfo.Title"),
 					fly_i18n("MatchInfo.Hint"),
 					fly_i18n("MatchInfo.Match"),
@@ -44,28 +44,28 @@ FlyMatchInfoDialog::FlyMatchInfoDialog(const QString &dataDir, FlyState &state, 
 	spectators_->setMinimumWidth(70);
 	spectators_->setMaximumWidth(150);
 
-	gl_->addWidget(new QLabel(fly_i18n("MatchInfo.Competition"), gb_), 0, 0);
-	gl_->addWidget(competition_, 0, 1, 1, 2);
+	gl_->addWidget(new QLabel(fly_i18n("MatchInfo.Competition"), gb_), 0, 0, 1, 1, Qt::AlignRight| Qt::AlignVCenter);
+	gl_->addWidget(competition_, 0, 1, 1, 3);
 
-	gl_->addWidget(new QLabel(fly_i18n("MatchInfo.CompetitionRound"), gb_), 1, 0);
-	gl_->addWidget(competitionRound_, 1, 1);
+	gl_->addWidget(new QLabel(fly_i18n("MatchInfo.CompetitionRound"), gb_), 1, 0, 1, 1, Qt::AlignRight| Qt::AlignVCenter);
+	gl_->addWidget(competitionRound_, 1, 1, 1, 3);
 
-	gl_->addWidget(new QLabel(fly_i18n("MatchInfo.MatchNumber"), gb_), 2, 0);
-	gl_->addWidget(matchNumber_, 2, 1);
+	gl_->addWidget(new QLabel(fly_i18n("MatchInfo.MatchNumber"), gb_), 2, 0, 1, 1, Qt::AlignRight| Qt::AlignVCenter);
+	gl_->addWidget(matchNumber_, 2, 1, 1, 1);
 
-	gl_->addWidget(new QLabel(fly_i18n("MatchInfo.DateAndTime"), gb_), 3, 0);
-	gl_->addWidget(datetime_, 3, 1);
+	gl_->addWidget(new QLabel(fly_i18n("MatchInfo.Spectators"), gb_), 2, 2, 1, 1, Qt::AlignRight| Qt::AlignVCenter);
+    gl_->addWidget(spectators_, 2, 3, 1, 1);
 
-	gl_->addWidget(new QLabel(fly_i18n("MatchInfo.City"), gb_), 4, 0);
-	gl_->addWidget(city_, 4, 1);
+	gl_->addWidget(new QLabel(fly_i18n("MatchInfo.DateAndTime"), gb_), 3, 0, 1, 1, Qt::AlignRight| Qt::AlignVCenter);
+	gl_->addWidget(datetime_, 3, 1, 1, 3);
 
-	gl_->addWidget(new QLabel(fly_i18n("MatchInfo.Venue"), gb_), 5, 0);
-	gl_->addWidget(venue_, 5, 1);
+	gl_->addWidget(new QLabel(fly_i18n("MatchInfo.City"), gb_), 4, 0, 1, 1, Qt::AlignRight| Qt::AlignVCenter);
+	gl_->addWidget(city_, 4, 1, 1, 3);
 
-    gl_->addWidget(new QLabel(fly_i18n("MatchInfo.Spectators"), gb_), 6, 0);
-    gl_->addWidget(spectators_, 6, 1);
+	gl_->addWidget(new QLabel(fly_i18n("MatchInfo.Venue"), gb_), 5, 0, 1, 1, Qt::AlignRight| Qt::AlignVCenter);
+	gl_->addWidget(venue_, 5, 1, 1, 3);
 
-	FlyBaseDialog::addButtons();
+	addButtons();
 }
 
 FlyMatchInfoDialog::~FlyMatchInfoDialog() = default;

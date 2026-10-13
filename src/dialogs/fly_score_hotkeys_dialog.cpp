@@ -41,8 +41,7 @@ void FlyHotkeysDialog::buildUi(const QVector<FlyHotkeyBinding> &initial)
 	auto *titleLabel = new QLabel(fly_i18n("Hotkeys.Header"), this);
 	titleLabel->setStyleSheet(QStringLiteral("font-size: 14px; font-weight: 600;"));
 
-	auto *subtitleLabel = new QLabel(fly_i18n("Hotkeys.Subtitle"),
-					 this);
+	auto *subtitleLabel = new QLabel(fly_i18n("Hotkeys.Subtitle"), this);
 	subtitleLabel->setWordWrap(true);
 	subtitleLabel->setStyleSheet(QStringLiteral("color: #999; font-size: 11px;"));
 

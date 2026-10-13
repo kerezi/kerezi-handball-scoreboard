@@ -24,9 +24,11 @@ public:
 	QString url() const;
 	int clientCount() const;
 
-	void broadcastState(const FlyState &state, const QString &templateName, const QString &templatePath);
-	void sendState(QTcpSocket *client, const FlyState &state, const QString &templateName,
+	void broadcastState(const FlyScoreState::FlyState &state, const QString &templateName, const QString &templatePath);
+	void sendState(QTcpSocket *client, const FlyScoreState::FlyState &state, const QString &templateName,
 		       const QString &templatePath);
+			   
+	static quint16 fly_load_websocket_port();
 
 signals:
 	void commandReceived(const QJsonObject &command);
@@ -39,7 +41,7 @@ private:
 	void processBuffer(QTcpSocket *client);
 	void handleTextMessage(const QString &message);
 	void sendText(QTcpSocket *client, const QString &message);
-	QJsonObject makeStateEnvelope(const FlyState &state, const QString &templateName,
+	QJsonObject makeStateEnvelope(const FlyScoreState::FlyState &state, const QString &templateName,
 				      const QString &templatePath) const;
 
 	QTcpServer *server_ = nullptr;

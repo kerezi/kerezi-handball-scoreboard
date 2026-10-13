@@ -5,59 +5,52 @@
 #include <QString>
 
 #include "fly_score_state.hpp"
+#include "fly_score_base_dialog.hpp"
 
 class QVBoxLayout;
 class QPushButton;
 class QLineEdit;
 class QSpinBox;
 class QCheckBox;
+class QTabWidget;
+class QWidget;
 
-class FlyFieldsDialog : public QDialog {
+class FlyFieldsDialog : public FlyBaseDialog {
 	Q_OBJECT
 public:
-	FlyFieldsDialog(const QString &dataDir, FlyState &state, QWidget *parent = nullptr);
-
+	FlyFieldsDialog(const QString &dataDir, FlyScoreState::FlyState &state, QWidget *parent = nullptr);
+	~FlyFieldsDialog() override;
 private slots:
-	void onAddField();
-	void onAddSingle();
 	void onAccept();
 
 private:
-	struct Row {
+    struct FlyStatUIRow {
 		QWidget *row = nullptr;
 		QLineEdit *labelEdit = nullptr;
-		QSpinBox *homeSpin = nullptr;
-		QSpinBox *guestSpin = nullptr;
-		QPushButton *remove = nullptr;
-		bool canRemove = true;
-	};
-
-	struct SingleRow {
-		QWidget *row = nullptr;
-		QLineEdit *labelEdit = nullptr;
-		QSpinBox *valueSpin = nullptr;
+		QSpinBox *firstSpin = nullptr;
+		QSpinBox *secondSpin = nullptr;
 		QPushButton *remove = nullptr;
 		QCheckBox *visible = nullptr;
-	};
+		bool canRemove = true;
+    };
 
-	void buildUi();
-	void loadFromState();
-	void saveToState();
-	void refreshRemoveButtons();
-	Row addRow(const FlyCustomField &cf, bool canRemove);
-	SingleRow addSingleRow(const FlySingleStat &ss);
+	struct FlyStatsUI {
+        QVBoxLayout *statsLayout = nullptr;
+        QPushButton *addStatBtn = nullptr;
+        QVector<FlyStatUIRow> *statsRows = nullptr;
+    };
 
-private:
-	QString dataDir_;
-	FlyState &st_;
+	void addStatsUI(QTabWidget *tabs, FlyStatsUI *statsUI, bool isSingle);
+	void syncUiFromState() override;
+    void syncToState(bool isSingle, FlyStatsUI *statsUI, QVector<FlyScoreState::FlyStat> *stats);
+	void syncStateFromUi() override;
+	void syncFromState(bool isSingle, FlyStatsUI *statsUI, QVector<FlyScoreState::FlyStat> *stats);
+	void refreshRemoveButtons(QVector<FlyStatUIRow> * statsRows, bool isSingle);
 
-	QVBoxLayout *fieldsLayout_ = nullptr;
-	QPushButton *addFieldBtn_ = nullptr;
-	QVector<Row> rows_;
+	void addStatRow(const bool isSingle, FlyStatsUI *statsUIL, FlyScoreState::FlyStat fs);
 
-	QVBoxLayout *singleLayout_ = nullptr;
-	QPushButton *addSingleBtn_ = nullptr;
-	QVector<SingleRow> singles_;
+	private:
 
-	QVector<bool> vis_;
+	FlyStatsUI *teamStats_;
+	FlyStatsUI *singleStats_;
 };

@@ -19,7 +19,7 @@ class FlyPlayersDialog : public FlyBaseDialog {
     Q_OBJECT
 public:
     explicit FlyPlayersDialog(const QString &dataDir,
-                            FlyState &state,
+                            FlyScoreState::FlyState &state,
                             QWidget *parent = nullptr);
     ~FlyPlayersDialog() override;
 
@@ -47,10 +47,10 @@ private:
 
     void onAddPlayer(FlyPlayersUI *playersUI);
     void refreshRemoveButtons(QVector<FlyPlayerUIRow> *rows);
-    FlyPlayerUIRow addPlayerUI(const FlyPlayersUI *players, const FlyPlayer &fp, bool canRemove);
-    void addPlayersUI(QTabWidget *tabs, FlyPlayersUI *players, const char *name);
-    void syncTeamUiFromState(FlyPlayersUI *playersUI, FlyTeam *team);
-    void syncStateFromTeamUi(FlyPlayersUI *playersUI, FlyTeam *team);
+    FlyPlayerUIRow addPlayerUI(const FlyPlayersUI *players, const FlyScoreState::FlyPlayer &fp, bool canRemove);
+    void addPlayersUI(QTabWidget *tabs, FlyPlayersUI *players, const bool isHome);
+    void syncTeamUiFromState(FlyPlayersUI *playersUI, FlyScoreState::FlyTeam *team);
+    void syncStateFromTeamUi(FlyPlayersUI *playersUI, FlyScoreState::FlyTeam *team);
 
 private:
     FlyPlayersUI *home_ = nullptr;

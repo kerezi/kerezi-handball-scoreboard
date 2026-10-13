@@ -307,7 +307,6 @@ src/
   fly_score_teams_dialog.cpp
   fly_score_timers_dialog.cpp
   fly_score_websocket_server.cpp
-  widget.cpp
   include/
 ```
 

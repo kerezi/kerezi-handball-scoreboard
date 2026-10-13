@@ -18,7 +18,7 @@ public:
                             const QString &hints,
                             const QString &subTitle,
                             const QString &dataDir,
-                            FlyState &state,
+                            FlyScoreState::FlyState &state,
                             QWidget *parent = nullptr);
     ~FlyBaseDialog() override;
 
@@ -32,7 +32,7 @@ protected:
 
 protected:
     QString  dataDir_;
-    FlyState &state_;
+    FlyScoreState::FlyState &state_;
 
     QVBoxLayout *root_ = nullptr;
     QGroupBox *gb_ = nullptr;

@@ -24,23 +24,8 @@
 #include <QColorDialog>
 #include <QTabWidget>
 
-static QColor colorFromU32(uint32_t c)
-{
-	int r = (c >> 16) & 0xFF;
-	int g = (c >> 8) & 0xFF;
-	int b = (c >> 0) & 0xFF;
-	return QColor(r, g, b);
-}
 
-static uint32_t u32FromColor(const QColor &qc)
-{
-	uint32_t r = (uint32_t)qc.red() & 0xFF;
-	uint32_t g = (uint32_t)qc.green() & 0xFF;
-	uint32_t b = (uint32_t)qc.blue() & 0xFF;
-	return (r << 16) | (g << 8) | b;
-}
-
-FlyTeamsDialog::FlyTeamsDialog(const QString &dataDir, FlyState &state, QWidget *parent)
+FlyTeamsDialog::FlyTeamsDialog(const QString &dataDir, FlyScoreState::FlyState &state, QWidget *parent)
 	: FlyBaseDialog(fly_i18n("Teams.Title"), fly_i18n("Teams.Hint"), fly_i18n("Dock.Teams"), dataDir, state, parent)
 {
 	auto *tabs = new QTabWidget(this);
@@ -75,7 +60,7 @@ FlyTeamsDialog::~FlyTeamsDialog() = default;
 
 void FlyTeamsDialog::addTeamUI(QTabWidget *tabs, FlyTeamUI *teamUI, const char *name)
 {
-	auto *teamTab = new QGroupBox(tabs);
+	auto *teamTab = new QWidget();
 	auto *teamRoot = new QGridLayout(teamTab);
 	teamRoot->setContentsMargins(10, 10, 10, 10);
 	teamRoot->setSpacing(8);
@@ -86,7 +71,7 @@ void FlyTeamsDialog::addTeamUI(QTabWidget *tabs, FlyTeamUI *teamUI, const char *
 	teamUI->browse = new QToolButton(teamTab);
 	teamUI->color = new QToolButton(teamTab);
 	{
-		const QIcon openIcon = fly_themed_icon(this, "folder-open", QStyle::SP_DirOpenIcon);
+		const QIcon openIcon = FlyQtHelper::fly_themed_icon(this, "folder-open", QStyle::SP_DirOpenIcon);
 		teamUI->browse->setText(QString());
 		teamUI->browse->setIcon(openIcon);
 		teamUI->browse->setToolTip(fly_i18n("Teams.BrowseLogo"));
@@ -124,7 +109,7 @@ void FlyTeamsDialog::addTeamUI(QTabWidget *tabs, FlyTeamUI *teamUI, const char *
 	teamRoot->addWidget(teamUI->addOfficialBtn, 4, 0, 1, 5);
 
 	QWidget *tow = new QWidget();
-	teamUI->officialsLayout = new QVBoxLayout();
+	teamUI->officialsLayout = new QVBoxLayout(tow);
 	teamUI->officialsLayout->setContentsMargins(0, 4, 0, 0);
 	teamUI->officialsLayout->setSpacing(6);
 	teamUI->officialsLayout->setAlignment(Qt::AlignTop);
@@ -141,7 +126,7 @@ void FlyTeamsDialog::updateColorButton(QToolButton *btn, uint32_t color)
 	if (!btn)
 		return;
 
-	QColor qc = colorFromU32(color);
+	QColor qc = FlyQtHelper::colorFromU32(color);
 	const QString hex = qc.name(QColor::HexRgb).toUpper();
 
 	btn->setText(hex);
@@ -159,7 +144,7 @@ void FlyTeamsDialog::updateColorButton(QToolButton *btn, uint32_t color)
 
 void FlyTeamsDialog::onAddOfficial(FlyTeamUI *teamUI)
 {
-	FlyOfficial of;
+	FlyScoreState::FlyOfficial of;
 	char ol = 'A' + teamUI->officialRows->size();
 	of.officialLetter = QChar(QString(ol).at(0));
 	of.officialName = QString();
@@ -200,13 +185,13 @@ void FlyTeamsDialog::refreshRemoveButtons(QVector<FlyOfficialUIRow> *rows)
 	}
 }
 
-FlyTeamsDialog::FlyOfficialUIRow FlyTeamsDialog::addOfficialUI(const FlyTeamUI *teamUI, const FlyOfficial &of,
+FlyTeamsDialog::FlyOfficialUIRow FlyTeamsDialog::addOfficialUI(const FlyTeamUI *teamUI, const FlyScoreState::FlyOfficial &of,
 							       bool canRemove)
 {
 	FlyOfficialUIRow r;
 	r.canRemove = canRemove;
 
-	auto *row = new QWidget(this);
+	auto *row = new QWidget();
 	auto *lay = new QHBoxLayout(row);
 	lay->setContentsMargins(0, 0, 0, 0);
 	lay->setSpacing(8);
@@ -271,6 +256,7 @@ FlyTeamsDialog::FlyOfficialUIRow FlyTeamsDialog::addOfficialUI(const FlyTeamUI *
 					teamUI->officialRows->removeAt(i);
 					if (teamUI->officialsLayout)
 						teamUI->officialsLayout->removeWidget(rr.row);
+					rr.row->setHidden(true);
 					rr.row->deleteLater();
 					break;
 				}
@@ -284,7 +270,7 @@ FlyTeamsDialog::FlyOfficialUIRow FlyTeamsDialog::addOfficialUI(const FlyTeamUI *
 	return r;
 }
 
-void FlyTeamsDialog::syncTeamUiFromState(FlyTeamUI *teamUI, FlyTeam *team)
+void FlyTeamsDialog::syncTeamUiFromState(FlyTeamUI *teamUI, FlyScoreState::FlyTeam *team)
 {
 	if (teamUI && teamUI->title)
 		teamUI->title->setText(team->title);
@@ -297,18 +283,18 @@ void FlyTeamsDialog::syncTeamUiFromState(FlyTeamUI *teamUI, FlyTeam *team)
 	for (auto &r : *(teamUI->officialRows)) {
 		if (teamUI->officialsLayout && r.row)
 			teamUI->officialsLayout->removeWidget(r.row);
-		if (r.row)
+		if (r.row) {
+			r.row->setHidden(true);
 			r.row->deleteLater();
+		}
 	}
-
 	teamUI->officialRows->clear();
-	// vis_.clear();
 
 	if (!teamUI->officialsLayout)
 		return;
 
 	for (int i = 0; i < team->officials.size(); ++i) {
-		const FlyOfficial &of = team->officials[i];
+		const FlyScoreState::FlyOfficial &of = team->officials[i];
 		const bool canRemove = (team->officials.size() > 1);
 		addOfficialUI(teamUI, of, canRemove);
 		teamUI->addOfficialBtn->setDisabled(teamUI->officialRows->size() > 4);
@@ -317,7 +303,7 @@ void FlyTeamsDialog::syncTeamUiFromState(FlyTeamUI *teamUI, FlyTeam *team)
 	refreshRemoveButtons(teamUI->officialRows);
 }
 
-void FlyTeamsDialog::syncStateFromTeamUi(FlyTeamUI *teamUI, FlyTeam *team)
+void FlyTeamsDialog::syncStateFromTeamUi(FlyTeamUI *teamUI, FlyScoreState::FlyTeam *team)
 {
 	if (team != nullptr)
 		team->title = teamUI->title->text();
@@ -331,7 +317,7 @@ void FlyTeamsDialog::syncStateFromTeamUi(FlyTeamUI *teamUI, FlyTeam *team)
 	for (int i = 0; i < teamUI->officialRows->size(); ++i) {
 		const FlyOfficialUIRow &ofr = teamUI->officialRows->at(i);
 		const bool canRemove = (teamUI->officialRows->size() > 1);
-		FlyOfficial of = FlyOfficial{};
+		FlyScoreState::FlyOfficial of = FlyScoreState::FlyOfficial{};
 		of.officialLetter = ofr.officialLetterLabel->text().at(0);
 		of.officialName = ofr.officialNameEdit->text();
 		of.officialRole = ofr.officialRoleEdit->text();
@@ -351,16 +337,16 @@ void FlyTeamsDialog::syncStateFromUi()
 	syncStateFromTeamUi(guest_, &state_.guest);
 }
 
-void FlyTeamsDialog::onPickColor(FlyTeamUI *teamUI, FlyTeam *team, const char *name)
+void FlyTeamsDialog::onPickColor(FlyTeamUI *teamUI, FlyScoreState::FlyTeam *team, const char *name)
 {
-	QColor start = colorFromU32(team->color);
+	QColor start = FlyQtHelper::colorFromU32(team->color);
 	QColor chosen =
 		QColorDialog::getColor(start, this, fly_i18n("Teams.PickHomeColor"), QColorDialog::ShowAlphaChannel);
 
 	if (!chosen.isValid())
 		return;
 
-	team->color = u32FromColor(chosen);
+	team->color = FlyQtHelper::u32FromColor(chosen);
 	updateColorButton(teamUI->color, team->color);
 	LOGI("%s color updated: %u", name, team->color);
 }
@@ -375,7 +361,7 @@ void FlyTeamsDialog::onPickGuestColor()
 	onPickColor(guest_, &state_.guest, "Guest");
 }
 
-void FlyTeamsDialog::onBrowseLogo(FlyTeamUI *teamUI, FlyTeam *team, const char *name)
+void FlyTeamsDialog::onBrowseLogo(FlyTeamUI *teamUI, FlyScoreState::FlyTeam *team, const char *name)
 {
 	QString m = "Teams.Select" + QString::fromUtf8(name) + "Logo";
 	const QString p = QFileDialog::getOpenFileName(this, fly_i18n(m.toUtf8()), {},

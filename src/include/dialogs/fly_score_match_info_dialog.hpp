@@ -16,7 +16,7 @@ class FlyMatchInfoDialog : public FlyBaseDialog {
     Q_OBJECT
 public:
     explicit FlyMatchInfoDialog(const QString &dataDir,
-                            FlyState &state,
+                            FlyScoreState::FlyState &state,
                             QWidget *parent = nullptr);
     ~FlyMatchInfoDialog() override;
 

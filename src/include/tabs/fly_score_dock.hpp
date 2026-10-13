@@ -19,6 +19,7 @@ class QLabel;
 class QShortcut;
 class QJsonObject;
 class FlyScoreWebSocketServer;
+class FlyConfigTab;
 
 struct FlyCustomFieldUi {
 	QWidget *row = nullptr;
@@ -60,33 +61,22 @@ public:
 	bool init();
 
 	void handleFrontendEvent(int event);
-
-public slots:
-	void bumpCustomFieldHome(int index, int delta);
-	void bumpCustomFieldGuest(int index, int delta);
-	void toggleCustomFieldVisible(int index);
-	void bumpSingleStat(int index, int delta);
-	void toggleSingleStatVisible(int index);
-	void toggleTimerRunning(int index);
-	void toggleSwap();
-	void toggleScoreboardVisible();
-	void openHotkeysDialog();
-	void ensureResourcesDefaults();
-
-private slots:
-	void onClearTeamsAndReset();
-
-	void onOpenCustomFieldsDialog();
-	void onOpenTimersDialog();
-	void onOpenMatchInfoDialog();
-	void onOpenTeamsDialog();
-	void onOpenPlayersDialog();
-
-	void onSelectTemplateFolder();
-
-private:
 	void loadState();
 	void saveState();
+	void toggleCustomFieldVisible(int index);
+	void bumpCustomFieldHome(int index, int delta);
+	void bumpCustomFieldGuest(int index, int delta);
+	void bumpSingleStat(int index, int delta);
+	void activateTemplateFolder(const QString &path);
+public slots:
+	void toggleSingleStatVisible(int index);
+	void ensureResourcesDefaults();
+	void appendEvent(const QString &event);
+	void startEventLog(const QString &firstEvent = QStringLiteral("Stream Start"));
+	void stopEventLog(const QString &lastEvent = QStringLiteral("Stream End"));
+	void logStateChanges(const FlyScoreState::FlyState &before, const FlyScoreState::FlyState &after);
+
+private:
 	void refreshUiFromState(bool onlyTimeIfRunning = false);
 	void clearAllCustomFieldRows();
 	void loadCustomFieldControlsFromState();
@@ -98,59 +88,33 @@ private:
 	void loadTimerControlsFromState();
 	// void loadHandballFromState();
 
-	QList<FlyHotkeyBinding> buildDefaultHotkeyBindings() const;
-	QList<FlyHotkeyBinding> buildMergedHotkeyBindings() const;
-	void applyHotkeyBindings(const QList<FlyHotkeyBinding> &bindings);
-	void clearAllShortcuts();
-	void refreshActiveTemplateLabel();
-	QString selectedTemplateName() const;
-	QString selectedTemplatePath() const;
-	void activateTemplateFolder(const QString &path);
-	void broadcastCurrentState();
-	void updateWebSocketStatus();
-	void handleRemoteCommand(const QJsonObject &command);
-	void startEventLog(const QString &firstEvent = QStringLiteral("Stream Start"));
-	void stopEventLog(const QString &lastEvent = QStringLiteral("Stream End"));
-	void appendEvent(const QString &event);
-	void logStateChanges(const FlyState &before, const FlyState &after);
 	void refreshEventLogUi();
 	QString eventLogsDirectory() const;
 	QWidget *widgetCarousel_ = nullptr;
 	QPushButton *toggleCarouselBtn_ = nullptr;
-	void toggleWidgetCarouselVisible();
-	void refreshWidgetCarouselToggleUi();
 
 private:
 	QString dataDir_;
-	FlyState st_;
-	QCheckBox *swapSides_ = nullptr;
-	QCheckBox *showScoreboard_ = nullptr;
-	QPushButton *matchInfoBtn_ = nullptr;
-	QPushButton *teamsBtn_ = nullptr;
-	QPushButton *playersBtn_ = nullptr;
-	QPushButton *editFieldsBtn_ = nullptr;
-	QPushButton *editTimersBtn_ = nullptr;
-	QVBoxLayout *configLayout_ = nullptr;
+	FlyScoreState::FlyState st_;
+
+	FlyScoreState::FlyState lastLoggedState_;
+
+	FlyConfigTab *configTab_ = nullptr;
+
 	QVBoxLayout *customFieldsLayout_ = nullptr;
 	QList<FlyCustomFieldUi> customFields_;
-	// QGridLayout *handballLayout_ = nullptr;
 	QVBoxLayout *singleStatsLayout_ = nullptr;
 	QList<FlySingleStatUi> singleStats_;
 	QVBoxLayout *timersLayout_ = nullptr;
 	QList<FlyTimerUi> timers_;
-	QLabel *activeTemplateLabel_ = nullptr;
-	QLabel *webSocketStatus_ = nullptr;
 	QPushButton *selectTemplateFolderBtn_ = nullptr;
-	FlyScoreWebSocketServer *webSocketServer_ = nullptr;
-	QList<FlyHotkeyBinding> hotkeyBindings_;
-	QList<QShortcut *> shortcuts_;
 	FlyScoreEventLog eventLog_;
-	FlyState lastLoggedState_;
 	QLabel *eventLogStatus_ = nullptr;
 	QComboBox *eventTimestampMode_ = nullptr;
 	QLineEdit *eventText_ = nullptr;
 	QPushButton *eventLogToggle_ = nullptr;
 	QPushButton *eventAdd_ = nullptr;
+
 	bool frontendEventCallbackConnected_ = false;
 };
 

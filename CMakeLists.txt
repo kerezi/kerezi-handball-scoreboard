@@ -127,6 +127,8 @@ set(
   ${FS_MAI_DIR}/fly_score_plugin.cpp
   ${FS_MAI_DIR}/fly_score_state.cpp
   ${FS_HLP_DIR}/fly_score_qt_helpers.cpp
+  ${FS_HLP_DIR}/fly_score_json_helper.cpp
+  ${FS_IHL_DIR}/fly_score_json_helper.hpp
   ${FS_HLP_DIR}/fly_score_logo_helpers.cpp
   ${FS_IMA_DIR}/fly_score_i18n.hpp
   ${FS_HLP_DIR}/fly_score_paths.cpp
@@ -142,8 +144,8 @@ list(
   ${FS_ITA_DIR}/fly_score_horizontal_tab_bar.hpp
   ${FS_TAB_DIR}/fly_score_dock.cpp
   ${FS_ITA_DIR}/fly_score_dock.hpp
-  ${FS_MAI_DIR}/widget.cpp
-  ${FS_IMA_DIR}/widget.hpp
+  ${FS_TAB_DIR}/fly_score_config_tab.cpp
+  ${FS_ITA_DIR}/fly_score_config_tab.hpp
   ${FS_DIA_DIR}/fly_score_base_dialog.cpp
   ${FS_IDI_DIR}/fly_score_base_dialog.hpp
   ${FS_DIA_DIR}/fly_score_match_info_dialog.cpp

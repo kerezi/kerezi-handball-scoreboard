@@ -5,20 +5,20 @@
 #include <QString>
 
 #include "fly_score_state.hpp"
+#include "fly_score_base_dialog.hpp"
 
 class QVBoxLayout;
 class QPushButton;
 class QLineEdit;
 class QComboBox;
 
-class FlyTimersDialog : public QDialog {
+class FlyTimersDialog : public FlyBaseDialog {
     Q_OBJECT
 public:
-    FlyTimersDialog(const QString &dataDir, FlyState &state, QWidget *parent = nullptr);
+    FlyTimersDialog(const QString &dataDir, FlyScoreState::FlyState &state, QWidget *parent = nullptr);
 
 private slots:
     void onAddTimer();
-    void onAccept();
 
 private:
     struct Row {
@@ -30,14 +30,11 @@ private:
     };
 
     void buildUi();
-    void loadFromState();
-    void saveToState();
-    Row  addRow(const FlyTimer &tm, bool canRemove);
+    void syncUiFromState() override;
+    void syncStateFromUi() override;
+    Row  addRow(const FlyScoreState::FlyTimer &tm, bool canRemove);
 
 private:
-    QString  dataDir_;
-    FlyState &st_;
-
     QVBoxLayout *timersLayout_ = nullptr;
     QPushButton *addTimerBtn_  = nullptr;
     QVector<Row> rows_;

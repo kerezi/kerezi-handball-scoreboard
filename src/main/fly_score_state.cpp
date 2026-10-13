@@ -1,6 +1,5 @@
 #include "config.hpp"
 
-#define LOG_TAG "[" PLUGIN_NAME "][state]"
 #include "fly_score_log.hpp"
 
 #include "fly_score_i18n.hpp"
@@ -16,8 +15,9 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QStringList>
+#include <QSettings>
 
-static QString moduleBaseDirFromConfigFile()
+QString FlyScoreState::moduleBaseDirFromConfigFile()
 {
 	char *p = obs_module_config_path("plugin.json");
 	QString filePath = p ? QString::fromUtf8(p) : QString();
@@ -26,34 +26,34 @@ static QString moduleBaseDirFromConfigFile()
 	return filePath.isEmpty() ? QDir::homePath() : QFileInfo(filePath).absolutePath();
 }
 
-static QString overlay_dir_path(const QString &base_dir)
+QString FlyScoreState::overlay_dir_path(const QString &base_dir)
 {
 	return QDir(base_dir).absolutePath();
 }
 
-static QString overlay_plugin_json(const QString &base_dir)
+QString FlyScoreState::overlay_plugin_json(const QString &base_dir)
 {
 	return QDir(overlay_dir_path(base_dir)).filePath(QStringLiteral("plugin.json"));
 }
 
-QString fly_data_dir()
+QString FlyScoreState::fly_data_dir()
 {
-	return QDir::cleanPath(moduleBaseDirFromConfigFile());
+	return QDir::cleanPath(FlyScoreState::moduleBaseDirFromConfigFile());
 }
 
-bool fly_ensure_webroot(QString *outBaseDir)
+bool FlyScoreState::fly_ensure_webroot(QString *outBaseDir)
 {
-	const QString base = fly_data_dir();
-	const QString webroot = overlay_dir_path(base);
+	const QString base = FlyScoreState::fly_data_dir();
+	const QString webroot = FlyScoreState::overlay_dir_path(base);
 	QDir().mkpath(webroot);
 	if (outBaseDir)
 		*outBaseDir = base;
 	return true;
 }
 
-static FlyTimer makeDefaultMainTimer()
+FlyScoreState::FlyTimer FlyScoreState::makeDefaultMainTimer()
 {
-	FlyTimer t;
+	FlyScoreState::FlyTimer t;
 	t.label = fly_i18n("Default.Timer.FirstHalf");
 	t.mode = QStringLiteral("countup");
 	t.running = false;
@@ -64,7 +64,7 @@ static FlyTimer makeDefaultMainTimer()
 	return t;
 }
 
-static void ensureDefaultCustomFields(FlyState &st)
+void FlyScoreState::ensureDefaultCustomFields(FlyScoreState::FlyState &st)
 {
 	if (st.custom_fields.isEmpty()) {
 		const QStringList labels = {
@@ -73,7 +73,7 @@ static void ensureDefaultCustomFields(FlyState &st)
 			fly_i18n("Default.Field.Corners"),
 		};
 		for (const QString &label : labels) {
-			FlyCustomField field;
+			FlyScoreState::FlyStat field;
 			field.label = label;
 			field.visible = true;
 			st.custom_fields.push_back(field);
@@ -85,12 +85,12 @@ static void ensureDefaultCustomFields(FlyState &st)
 		st.custom_fields[0].label = fly_i18n("Default.Field.Score");
 }
 
-static void ensureDefaultSingleStats(FlyState &st)
+void FlyScoreState::ensureDefaultSingleStats(FlyScoreState::FlyState &st)
 {
 	if (st.single_stats.isEmpty()) {
-		FlySingleStat ss;
+	 FlyScoreState::FlyStat ss;
 		ss.label = fly_i18n("Default.Single.Period");
-		ss.value = 0;
+		ss.first = 0;
 		ss.visible = true;
 		st.single_stats.push_back(ss);
 		return;
@@ -100,7 +100,7 @@ static void ensureDefaultSingleStats(FlyState &st)
 		st.single_stats[0].label = fly_i18n("Default.Single.Period");
 }
 
-static QJsonObject timerToJson(const FlyTimer &t)
+QJsonObject FlyScoreState::timerToJson(const FlyScoreState::FlyTimer &t)
 {
 	QJsonObject o;
 	o["label"] = t.label;
@@ -113,9 +113,9 @@ static QJsonObject timerToJson(const FlyTimer &t)
 	return o;
 }
 
-static FlyTimer timerFromJson(const QJsonObject &o)
+FlyScoreState::FlyTimer FlyScoreState::timerFromJson(const QJsonObject &o)
 {
-	FlyTimer t;
+	FlyScoreState::FlyTimer t;
 	t.label = o.value("label").toString();
 	t.mode = o.value("mode").toString("countdown");
 	t.running = o.value("running").toBool(false);
@@ -126,17 +126,17 @@ static FlyTimer timerFromJson(const QJsonObject &o)
 	return t;
 }
 
-QJsonObject fly_state_to_json_object(const FlyState &stIn)
+QJsonObject FlyScoreState::fly_state_to_json_object(const FlyScoreState::FlyState &stIn)
 {
-	FlyState st = stIn;
+	FlyScoreState::FlyState st = stIn;
 
-	ensureDefaultCustomFields(st);
-	ensureDefaultSingleStats(st);
+	FlyScoreState::ensureDefaultCustomFields(st);
+	FlyScoreState::ensureDefaultSingleStats(st);
 
 	QJsonObject j;
 	j["version"] = 4;
 
-	auto matchInfoToJson = [](const FlyMatchInfo &mi) {
+	auto matchInfoToJson = [](const FlyScoreState::FlyMatchInfo &mi) {
 		QJsonObject o;
 		o["competition"] = mi.competition;
 		o["competitionRound"] = mi.competitionRound;
@@ -150,7 +150,7 @@ QJsonObject fly_state_to_json_object(const FlyState &stIn)
 
 	j["matchInfo"] = matchInfoToJson(st.matchInfo);
 
-	auto teamToJson = [](const FlyTeam &tm) {
+	auto teamToJson = [](const FlyScoreState::FlyTeam &tm) {
 		QJsonObject o;
 		o["title"] = tm.title;
 		o["subtitle"] = tm.subtitle;
@@ -213,8 +213,8 @@ QJsonObject fly_state_to_json_object(const FlyState &stIn)
 	for (const auto &cf : st.custom_fields) {
 		QJsonObject o;
 		o["label"] = cf.label;
-		o["home"] = cf.home;
-		o["guest"] = cf.guest;
+		o["home"] = cf.first;
+		o["guest"] = cf.second;
 		o["visible"] = cf.visible;
 		cfArr.append(o);
 	}
@@ -224,7 +224,7 @@ QJsonObject fly_state_to_json_object(const FlyState &stIn)
 	for (const auto &ss : st.single_stats) {
 		QJsonObject o;
 		o["label"] = ss.label;
-		o["value"] = ss.value;
+		o["value"] = ss.first;
 		o["visible"] = ss.visible;
 		ssArr.append(o);
 	}
@@ -232,10 +232,10 @@ QJsonObject fly_state_to_json_object(const FlyState &stIn)
 
 	QJsonArray timersArr;
 	if (st.timers.isEmpty()) {
-		timersArr.append(timerToJson(makeDefaultMainTimer()));
+		timersArr.append(FlyScoreState::timerToJson(FlyScoreState::makeDefaultMainTimer()));
 	} else {
 		for (const auto &tm : st.timers) {
-			timersArr.append(timerToJson(tm));
+			timersArr.append(FlyScoreState::timerToJson(tm));
 		}
 	}
 	j["timers"] = timersArr;
@@ -243,7 +243,7 @@ QJsonObject fly_state_to_json_object(const FlyState &stIn)
 	return j;
 }
 
-bool fly_state_from_json_object(const QJsonObject &j, FlyState &st)
+bool FlyScoreState::fly_state_from_json_object(const QJsonObject &j, FlyScoreState::FlyState &st)
 {
 	auto readColor = [](const QJsonObject &o, const char *key, uint32_t def = 0xFFFFFF) -> uint32_t {
 		const QJsonValue v = o.value(key);
@@ -262,7 +262,7 @@ bool fly_state_from_json_object(const QJsonObject &j, FlyState &st)
 	};
 
 	auto readMatchInfo = [&](const QJsonObject &o) {
-		FlyMatchInfo mi;
+		FlyScoreState::FlyMatchInfo mi;
 		mi.competition = o.value("competition").toString();
 		mi.competitionRound = o.value("competitionRound").toString();
 		mi.matchNumber = o.value("matchNumber").toInt();
@@ -276,7 +276,7 @@ bool fly_state_from_json_object(const QJsonObject &j, FlyState &st)
 	st.matchInfo = readMatchInfo(j.value("matchInfo").toObject());
 
 	auto readTeam = [&](const QJsonObject &o) {
-		FlyTeam tm;
+		FlyScoreState::FlyTeam tm;
 		tm.title = o.value("title").toString();
 		tm.subtitle = o.value("subtitle").toString();
 		tm.logo = o.value("logo").toString();
@@ -296,7 +296,7 @@ bool fly_state_from_json_object(const QJsonObject &j, FlyState &st)
 				if (!v.isObject())
 					continue;
 				const QJsonObject oo = v.toObject();
-				FlyOfficial of;
+				FlyScoreState::FlyOfficial of;
 				// of.officialLetter = o.value("officialLetter").toString().at(0);
 				of.officialLetter = QString(ofl++).at(0);
 				of.officialName = oo.value("officialName").toString();
@@ -319,7 +319,7 @@ bool fly_state_from_json_object(const QJsonObject &j, FlyState &st)
 				if (!v.isObject())
 					continue;
 				const QJsonObject oo = v.toObject();
-				FlyPlayer op;
+				FlyScoreState::FlyPlayer op;
 
 				op.playerTshirtNumber = oo.value("playerTshirtNumber").toInt();
 				op.playerTshirtName = oo.value("playerTshirtName").toString();
@@ -340,7 +340,7 @@ bool fly_state_from_json_object(const QJsonObject &j, FlyState &st)
 						if (!vv.isObject())
 							continue;
 						const QJsonObject ooo = v.toObject();
-						FlyGoal opg;
+						FlyScoreState::FlyGoal opg;
 
 						opg.moment_ms = ooo.value("moment_ms").toInt();
 						opg.goalType = ooo.value("goalType").toString();
@@ -372,10 +372,10 @@ bool fly_state_from_json_object(const QJsonObject &j, FlyState &st)
 
 			const QJsonObject o = v.toObject();
 
-			FlyCustomField cf;
+			FlyScoreState::FlyStat cf;
 			cf.label = o.value("label").toString();
-			cf.home = o.value("home").toInt(0);
-			cf.guest = o.value("guest").toInt(0);
+			cf.first = o.value("home").toInt(0);
+			cf.second = o.value("guest").toInt(0);
 			cf.visible = o.value("visible").toBool(true);
 
 			st.custom_fields.push_back(cf);
@@ -395,17 +395,17 @@ bool fly_state_from_json_object(const QJsonObject &j, FlyState &st)
 
 			const QJsonObject o = v.toObject();
 
-			FlySingleStat ss;
+		 FlyScoreState::FlyStat ss;
 			ss.label = o.value("label").toString();
-			ss.value = o.value("value").toInt(0);
+			ss.first = o.value("value").toInt(0);
 			ss.visible = o.value("visible").toBool(true);
 
 			st.single_stats.push_back(ss);
 		}
 	}
 
-	ensureDefaultSingleStats(st);
-	ensureDefaultCustomFields(st);
+ FlyScoreState::ensureDefaultSingleStats(st);
+	FlyScoreState::ensureDefaultCustomFields(st);
 
 	st.timers.clear();
 
@@ -420,29 +420,29 @@ bool fly_state_from_json_object(const QJsonObject &j, FlyState &st)
 				if (!v.isObject())
 					continue;
 
-				st.timers.push_back(timerFromJson(v.toObject()));
+				st.timers.push_back(FlyScoreState::timerFromJson(v.toObject()));
 			}
 		}
 	} else {
 		const QJsonObject tObj = j.value("timer").toObject();
 		if (!tObj.isEmpty())
-			st.timers.push_back(timerFromJson(tObj));
+			st.timers.push_back(FlyScoreState::timerFromJson(tObj));
 	}
 
 	if (st.timers.isEmpty())
-		st.timers.push_back(makeDefaultMainTimer());
+		st.timers.push_back(FlyScoreState::makeDefaultMainTimer());
 
-	FlyTimer &main = st.timers[0];
+	FlyScoreState::FlyTimer &main = st.timers[0];
 	if (main.mode.isEmpty())
 		main.mode = "countdown";
 
 	return true;
 }
 
-bool fly_state_read_json(const std::string &base_dir_s, std::string &out_json)
+bool FlyScoreState::fly_state_read_json(const std::string &base_dir_s, std::string &out_json)
 {
 	const QString base_dir = QString::fromStdString(base_dir_s);
-	const QString path = overlay_plugin_json(base_dir);
+	const QString path = FlyScoreState::overlay_plugin_json(base_dir);
 	QFile f(path);
 	if (!f.exists() || !f.open(QIODevice::ReadOnly))
 		return false;
@@ -451,10 +451,10 @@ bool fly_state_read_json(const std::string &base_dir_s, std::string &out_json)
 	return true;
 }
 
-bool fly_state_write_json(const std::string &base_dir_s, const std::string &json)
+bool FlyScoreState::fly_state_write_json(const std::string &base_dir_s, const std::string &json)
 {
 	const QString base_dir = QString::fromStdString(base_dir_s);
-	const QString path = overlay_plugin_json(base_dir);
+	const QString path = FlyScoreState::overlay_plugin_json(base_dir);
 	QDir().mkpath(QFileInfo(path).absolutePath());
 	QFile f(path);
 	if (!f.open(QIODevice::WriteOnly | QIODevice::Truncate))
@@ -463,7 +463,7 @@ bool fly_state_write_json(const std::string &base_dir_s, const std::string &json
 	return true;
 }
 
-static bool write_one_json(const QString &path, const QJsonDocument &doc)
+bool FlyScoreState::write_one_json(const QString &path, const QJsonDocument &doc)
 {
 	QDir().mkpath(QFileInfo(path).absolutePath());
 	QFile f(path);
@@ -473,9 +473,9 @@ static bool write_one_json(const QString &path, const QJsonDocument &doc)
 	return true;
 }
 
-bool fly_state_load(const QString &base_dir, FlyState &out)
+bool FlyScoreState::fly_state_load(const QString &base_dir, FlyScoreState::FlyState &out)
 {
-	const QString path = overlay_plugin_json(base_dir);
+	const QString path = FlyScoreState::overlay_plugin_json(base_dir);
 	QFile f(path);
 	if (!f.exists() || !f.open(QIODevice::ReadOnly))
 		return false;
@@ -487,25 +487,25 @@ bool fly_state_load(const QString &base_dir, FlyState &out)
 	return fly_state_from_json_object(doc.object(), out);
 }
 
-bool fly_state_save(const QString &base_dir, const FlyState &st)
+bool FlyScoreState::fly_state_save(const QString &base_dir, const FlyScoreState::FlyState &st)
 {
-	const QJsonDocument doc(fly_state_to_json_object(st));
-	const QString path = overlay_plugin_json(base_dir);
-	return write_one_json(path, doc);
+	const QJsonDocument doc(FlyScoreState::fly_state_to_json_object(st));
+	const QString path = FlyScoreState::overlay_plugin_json(base_dir);
+	return FlyScoreState::write_one_json(path, doc);
 }
 
-QByteArray fly_state_to_json_bytes(const FlyState &st, bool compact)
+QByteArray FlyScoreState::fly_state_to_json_bytes(const FlyScoreState::FlyState &st, bool compact)
 {
-	const QJsonDocument doc(fly_state_to_json_object(st));
+	const QJsonDocument doc(FlyScoreState::fly_state_to_json_object(st));
 	return doc.toJson(compact ? QJsonDocument::Compact : QJsonDocument::Indented);
 }
 
-FlyState fly_state_make_defaults()
+FlyScoreState::FlyState FlyScoreState::fly_state_make_defaults()
 {
-	FlyState st;
-	st.matchInfo = FlyMatchInfo{};
-	st.home = FlyTeam{};
-	st.guest = FlyTeam{};
+	FlyScoreState::FlyState st;
+	st.matchInfo = FlyScoreState::FlyMatchInfo{};
+	st.home = FlyScoreState::FlyTeam{};
+	st.guest = FlyScoreState::FlyTeam{};
 	st.swap_sides = false;
 	st.show_scoreboard = true;
 
@@ -513,30 +513,30 @@ FlyState fly_state_make_defaults()
 	st.single_stats.clear();
 	st.timers.clear();
 
-	ensureDefaultCustomFields(st);
-	ensureDefaultSingleStats(st);
+	FlyScoreState::ensureDefaultCustomFields(st);
+ FlyScoreState::ensureDefaultSingleStats(st);
 
-	st.timers.push_back(makeDefaultMainTimer());
+	st.timers.push_back(FlyScoreState::makeDefaultMainTimer());
 
 	return st;
 }
 
-bool fly_state_reset_defaults(const QString &base_dir)
+bool FlyScoreState::fly_state_reset_defaults(const QString &base_dir)
 {
-	const QString pj = overlay_plugin_json(base_dir);
+	const QString pj = FlyScoreState::overlay_plugin_json(base_dir);
 	QFile::remove(pj);
 
-	const FlyState def = fly_state_make_defaults();
-	return fly_state_save(base_dir, def);
+	const FlyScoreState::FlyState def = FlyScoreState::fly_state_make_defaults();
+	return FlyScoreState::fly_state_save(base_dir, def);
 }
 
-bool fly_state_ensure_json_exists(const QString &base_dir, const FlyState *writeState)
+bool FlyScoreState::fly_state_ensure_json_exists(const QString &base_dir, const FlyScoreState::FlyState *writeState)
 {
-	const QString path = overlay_plugin_json(base_dir);
+	const QString path = FlyScoreState::overlay_plugin_json(base_dir);
 	if (QFileInfo::exists(path))
 		return true;
 
-	FlyState st = writeState ? *writeState : fly_state_make_defaults();
+	FlyScoreState::FlyState st = writeState ? *writeState : fly_state_make_defaults();
 	const bool ok = fly_state_save(base_dir, st);
 
 	if (ok)
@@ -545,4 +545,163 @@ bool fly_state_ensure_json_exists(const QString &base_dir, const FlyState *write
 		LOGW("Failed to create default plugin.json: %s", path.toUtf8().constData());
 
 	return ok;
+}
+
+void FlyScoreState::setTimerStoppedAtInitial(FlyScoreState::FlyTimer &timer)
+{
+	timer.running = false;
+	timer.last_tick_ms = 0;
+	if (timer.initial_ms < 0)
+		timer.initial_ms = 0;
+	timer.remaining_ms = timer.initial_ms;
+}
+
+QString FlyScoreState::fly_theme_manifest_path(const QString &themePath)
+{
+	return QDir(themePath).filePath(QStringLiteral("manifest.ini"));
+}
+
+bool FlyScoreState::fly_read_theme_manifest(const QString &themePath, FlyScoreState::FlyThemeManifest &out)
+{
+	const QString manifestPath = FlyScoreState::fly_theme_manifest_path(themePath);
+	if (!QFileInfo::exists(manifestPath))
+		return false;
+
+	QSettings manifest(manifestPath, QSettings::IniFormat);
+	out.title = manifest.value(QStringLiteral("title")).toString().trimmed();
+	out.author = manifest.value(QStringLiteral("author")).toString().trimmed();
+	out.authorUrl = manifest.value(QStringLiteral("author_url")).toString().trimmed();
+	out.description = manifest.value(QStringLiteral("description")).toString().trimmed();
+	out.version = manifest.value(QStringLiteral("version")).toString().trimmed();
+
+	if (out.title.isEmpty())
+		out.title = manifest.value(QStringLiteral("theme/title")).toString().trimmed();
+	if (out.author.isEmpty())
+		out.author = manifest.value(QStringLiteral("theme/author")).toString().trimmed();
+	if (out.authorUrl.isEmpty())
+		out.authorUrl = manifest.value(QStringLiteral("theme/author_url")).toString().trimmed();
+	if (out.description.isEmpty())
+		out.description = manifest.value(QStringLiteral("theme/description")).toString().trimmed();
+	if (out.version.isEmpty())
+		out.version = manifest.value(QStringLiteral("theme/version")).toString().trimmed();
+	if (out.title.isEmpty())
+		out.title = manifest.value(QStringLiteral("Theme/title")).toString().trimmed();
+	if (out.author.isEmpty())
+		out.author = manifest.value(QStringLiteral("Theme/author")).toString().trimmed();
+	if (out.authorUrl.isEmpty())
+		out.authorUrl = manifest.value(QStringLiteral("Theme/author_url")).toString().trimmed();
+	if (out.description.isEmpty())
+		out.description = manifest.value(QStringLiteral("Theme/description")).toString().trimmed();
+	if (out.version.isEmpty())
+		out.version = manifest.value(QStringLiteral("Theme/version")).toString().trimmed();
+
+	FlyScoreState::fly_read_theme_manifest_text(manifestPath, out);
+
+	return !out.title.isEmpty() && !out.author.isEmpty() && !out.authorUrl.isEmpty() &&
+	       !out.description.isEmpty() && !out.version.isEmpty();
+}
+
+FlyScoreState::FlyThemeInfo FlyScoreState::fly_read_theme_info(const QString &themePath)
+{
+	FlyScoreState::FlyThemeInfo info;
+	const QFileInfo themeDirInfo(themePath);
+	info.path = QDir(themePath).absolutePath();
+	info.folderName = themeDirInfo.fileName();
+	info.hasIndex = QFileInfo::exists(QDir(themePath).filePath(QStringLiteral("index.html")));
+	info.hasManifest = QFileInfo::exists(FlyScoreState::fly_theme_manifest_path(themePath));
+
+	const bool manifestOk = FlyScoreState::fly_read_theme_manifest(themePath, info.manifest);
+	info.valid = info.hasIndex && manifestOk;
+
+	if (!info.hasIndex)
+		info.error = fly_i18n("Dock.TemplateMissingIndex");
+	else if (!info.hasManifest)
+		info.error = fly_i18n("Dock.TemplateMissingManifest");
+	else if (!manifestOk)
+		info.error = fly_i18n("Dock.TemplateInvalidManifest");
+
+	if (info.manifest.title.isEmpty())
+		info.manifest.title = info.folderName.isEmpty() ? info.path : info.folderName;
+
+	return info;
+}
+
+QString FlyScoreState::selectedTemplateName(QString dataDir)
+{
+	FlyScoreState::FlyThemeManifest manifest;
+	if (FlyScoreState::fly_is_valid_theme_folder(dataDir, &manifest))
+		return manifest.title;
+	return QFileInfo(dataDir).fileName();
+}
+
+
+QString FlyScoreState::fly_normalize_manifest_key(QString key, const QString &section)
+{
+	key = key.trimmed().toLower();
+	if (!section.trimmed().isEmpty())
+		key = section.trimmed().toLower() + QStringLiteral("/") + key;
+	return key;
+}
+
+void fly_apply_manifest_value(FlyScoreState::FlyThemeManifest &out, const QString &key, const QString &value)
+{
+	const QString k = key.trimmed().toLower();
+	const QString v = value.trimmed();
+	if ((k == QLatin1String("title") || k == QLatin1String("theme/title")) && out.title.isEmpty())
+		out.title = v;
+	else if ((k == QLatin1String("author") || k == QLatin1String("theme/author")) && out.author.isEmpty())
+		out.author = v;
+	else if ((k == QLatin1String("author_url") || k == QLatin1String("theme/author_url")) &&
+		 out.authorUrl.isEmpty())
+		out.authorUrl = v;
+	else if ((k == QLatin1String("description") || k == QLatin1String("theme/description")) &&
+		 out.description.isEmpty())
+		out.description = v;
+	else if ((k == QLatin1String("version") || k == QLatin1String("theme/version")) && out.version.isEmpty())
+		out.version = v;
+}
+
+void FlyScoreState::fly_read_theme_manifest_text(const QString &manifestPath, FlyScoreState::FlyThemeManifest &out)
+{
+	QFile file(manifestPath);
+	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+		return;
+
+	QTextStream stream(&file);
+	QString section;
+	while (!stream.atEnd()) {
+		QString line = stream.readLine().trimmed();
+		if (line.startsWith(QChar(0xFEFF)))
+			line.remove(0, 1);
+		if (line.isEmpty() || line.startsWith(QLatin1Char(';')) || line.startsWith(QLatin1Char('#')))
+			continue;
+		if (line.startsWith(QLatin1Char('[')) && line.endsWith(QLatin1Char(']'))) {
+			section = line.mid(1, line.size() - 2).trimmed();
+			continue;
+		}
+
+		int pos = line.indexOf(QLatin1Char('='));
+		if (pos < 0)
+			pos = line.indexOf(QLatin1Char(':'));
+		if (pos < 0)
+			continue;
+
+		QString value = line.mid(pos + 1).trimmed();
+		if ((value.startsWith(QLatin1Char('"')) && value.endsWith(QLatin1Char('"'))) ||
+		    (value.startsWith(QLatin1Char('\'')) && value.endsWith(QLatin1Char('\''))))
+			value = value.mid(1, value.size() - 2).trimmed();
+
+		fly_apply_manifest_value(out, FlyScoreState::fly_normalize_manifest_key(line.left(pos), section), value);
+	}
+}
+
+bool FlyScoreState::fly_is_valid_theme_folder(const QString &themePath, FlyScoreState::FlyThemeManifest *manifest)
+{
+	FlyScoreState::FlyThemeInfo info = FlyScoreState::fly_read_theme_info(themePath);
+	if (!info.valid)
+		return false;
+
+	if (manifest)
+		*manifest = info.manifest;
+	return true;
 }
