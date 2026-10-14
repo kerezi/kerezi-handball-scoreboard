@@ -33,12 +33,10 @@ MODULE_EXPORT const char *obs_module_description(void)
 
 static FlyScorePlugin* g_flyPlugin = nullptr;
 
-// Конструктор на класа
 FlyScorePlugin::FlyScorePlugin() {
     LOGI("Create plugin");
 }
 
-// Деструктор на класа (почистване на паметта)
 FlyScorePlugin::~FlyScorePlugin() {
 	if (!dock)
 		return;
@@ -59,7 +57,6 @@ bool FlyScorePlugin::init() {
 	flyDock->init();
 
     obs_frontend_add_dock_by_id(fly_dock_name().toUtf8(), fly_i18n("Common.Scoreboard").toUtf8(), flyDock);
-
 
 	dock = flyDock;
 	LOGI("Fly Scoreboard dock created");

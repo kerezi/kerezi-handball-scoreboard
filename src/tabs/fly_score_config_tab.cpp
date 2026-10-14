@@ -35,16 +35,6 @@
 #include <QSettings>
 #include <QFileDialog>
 
-FlyConfigTab::FlyConfigTab(const QString &title, const QString &dataDir, FlyScoreState::FlyState &state, FlyScoreDock *dock,
-			   QWidget *parent)
-	: QWidget(parent),
-	  dataDir_(dataDir),
-	  state_(state),
-	  dock_(dock)
-{
-	init();
-	buildUI();
-}
 
 void FlyConfigTab::init()
 {

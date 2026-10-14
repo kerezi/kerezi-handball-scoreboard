@@ -59,28 +59,6 @@
 #include <QToolButton>
 #include <QUrl>
 
-static void updateWidgetCarouselToggleUi(QPushButton *btn, QWidget *carousel, QStyle *st)
-{
-	if (!btn || !carousel || !st)
-		return;
-
-	const bool visible = carousel->isVisible();
-
-	btn->blockSignals(true);
-	btn->setChecked(visible);
-	btn->setToolTip(visible ? fly_i18n("Dock.HideWidgetCarousel") : fly_i18n("Dock.ShowWidgetCarousel"));
-
-	QIcon ico = visible ? QIcon::fromTheme(QStringLiteral("pan-down-symbolic"))
-			    : QIcon::fromTheme(QStringLiteral("pan-end-symbolic"));
-
-	if (ico.isNull()) {
-		ico = st->standardIcon(visible ? QStyle::SP_TitleBarShadeButton : QStyle::SP_TitleBarUnshadeButton);
-	}
-
-	btn->setIcon(ico);
-	btn->blockSignals(false);
-}
-
 #ifdef ENABLE_FRONTEND_API
 static void fly_on_frontend_event(enum obs_frontend_event event, void *data)
 {

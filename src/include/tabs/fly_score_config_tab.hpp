@@ -11,6 +11,7 @@
 
 #include "fly_score_state.hpp"
 #include "fly_score_dock.hpp"
+#include "fly_score_dock_tab.hpp"
 
 class QPushButton;
 class QVBoxLayout;
@@ -21,10 +22,15 @@ class QVBoxLayout;
 class QShortcut;
 class FlyScoreWebSocketServer;
 
-class FlyConfigTab : public QWidget {
+class FlyConfigTab : public FlyDockTab {
 public:
-	explicit FlyConfigTab(const QString &title, const QString &dataDir, FlyScoreState::FlyState &state, FlyScoreDock *dock,
-			      QWidget *parent);
+	explicit FlyConfigTab(const QString &title, const QString &dataDir, FlyScoreState::FlyState &state,
+			    FlyScoreDock *dock, QWidget *parent)
+		: FlyDockTab(title, dataDir, state, dock, parent) {
+			init();
+			buildUI();
+		};
+
 	~FlyConfigTab() override;
 
 public:
@@ -43,9 +49,6 @@ private slots:
 	void onClearTeamsAndReset();
 
 private:
-	void init();
-	void buildUI();
-	void activateTemplateFolder(const QString &path);
 	void updateWebSocketStatus();
 	void handleRemoteCommand(const QJsonObject &command);
 	void clearAllShortcuts();
@@ -58,9 +61,8 @@ private:
 	QList<FlyHotkeyBinding> hotkeyBindings_;
 
 protected:
-	QString dataDir_;
-	FlyScoreState::FlyState &state_;
-	FlyScoreDock *dock_;
+	void init() override;
+	void buildUI() override;
 
 	QVBoxLayout *configTabLayout_ = nullptr;
 	// UI Elements

@@ -148,6 +148,7 @@ list(
   ${FS_ITA_DIR}/fly_score_horizontal_tab_bar.hpp
   ${FS_TAB_DIR}/fly_score_dock.cpp
   ${FS_ITA_DIR}/fly_score_dock.hpp
+  ${FS_ITA_DIR}/fly_score_dock_tab.hpp
   ${FS_TAB_DIR}/fly_score_config_tab.cpp
   ${FS_ITA_DIR}/fly_score_config_tab.hpp
   ${FS_DIA_DIR}/fly_score_base_dialog.cpp
