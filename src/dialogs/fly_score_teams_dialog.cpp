@@ -179,8 +179,8 @@ void FlyTeamsDialog::refreshRemoveButtons(QVector<FlyOfficialUIRow> *rows)
 		if (r.remove) {
 			r.remove->setEnabled(canRemoveOfficial);
 			r.remove->setCursor(canRemoveOfficial ? Qt::PointingHandCursor : Qt::ArrowCursor);
-			r.remove->setToolTip(canRemoveOfficial ? fly_i18n("Fields.RemoveField")
-							   : fly_i18n("Fields.OneTeamStatRequired"));
+			r.remove->setToolTip(canRemoveOfficial ? fly_i18n("Stats.RemoveStat")
+							   : fly_i18n("Stats.OneTeamStatRequired"));
 		}
 	}
 }
@@ -202,20 +202,20 @@ FlyTeamsDialog::FlyOfficialUIRow FlyTeamsDialog::addOfficialUI(const FlyTeamUI *
 	officialLetterLabel->setMaximumWidth(26);
 
 	auto *officialNameEdit = new QLineEdit(row);
-	officialNameEdit->setPlaceholderText(fly_i18n("Fields.TeamLabelPlaceholder"));
+	officialNameEdit->setPlaceholderText(fly_i18n("Stats.TeamLabelPlaceholder"));
 	officialNameEdit->setText(of.officialName);
 	officialNameEdit->setMinimumWidth(180);
 	officialNameEdit->setMaximumWidth(260);
 
 	auto *officialRoleEdit = new QLineEdit(row);
-	officialRoleEdit->setPlaceholderText(fly_i18n("Fields.TeamLabelPlaceholder"));
+	officialRoleEdit->setPlaceholderText(fly_i18n("Stats.TeamLabelPlaceholder"));
 	officialRoleEdit->setText(of.officialRole);
 	officialRoleEdit->setMinimumWidth(180);
 	officialRoleEdit->setMaximumWidth(260);
 
 	auto *removeBtn = new QPushButton(row);
 	removeBtn->setText(QStringLiteral("❌"));
-	removeBtn->setToolTip(canRemove ? fly_i18n("Fields.RemoveField") : fly_i18n("Fields.FieldCannotBeRemoved"));
+	removeBtn->setToolTip(canRemove ? fly_i18n("Stats.RemoveStat") : fly_i18n("Stats.StatCannotBeRemoved"));
 	removeBtn->setCursor(canRemove ? Qt::PointingHandCursor : Qt::ArrowCursor);
 
 	const int btnSize = officialNameEdit->sizeHint().height();
@@ -246,7 +246,7 @@ FlyTeamsDialog::FlyOfficialUIRow FlyTeamsDialog::addOfficialUI(const FlyTeamUI *
 		connect(removeBtn, &QPushButton::clicked, this, [this, teamUI, row]() {
 			if (teamUI->officialRows->size() <= 1) {
 				QMessageBox::warning(this, fly_i18n("Common.CannotRemove"),
-						     fly_i18n("Fields.OneTeamStatRequired"));
+						     fly_i18n("Stats.OneTeamStatRequired"));
 				return;
 			}
 

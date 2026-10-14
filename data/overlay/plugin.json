@@ -1,49 +1,54 @@
 {
-  "away": {
+  "guest": {
     "color": "16777215",
     "logo": "guest-07cad246.png",
     "subtitle": "Team 2",
-    "title": "Guests"
+    "title": "Guests",
+    "officials": [],
+    "players": [],
+    "fstTimeout_ms": 0,
+    "sndTimeout_ms": 0,
+    "trdTimeout_ms": 0
   },
-  "custom_fields": [
+  "teamsStats": [
     {
-      "away": 0,
+      "guest": 0,
       "home": 0,
       "label": "Score",
       "visible": true
     },
     {
-      "away": 0,
+      "guest": 0,
       "home": 0,
       "label": "Fouls",
       "visible": true
     },
     {
-      "away": 0,
+      "guest": 0,
       "home": 0,
       "label": "Yellow Cards",
       "visible": true
     },
     {
-      "away": 0,
+      "guest": 0,
       "home": 0,
       "label": "Red Cards",
       "visible": true
     },
     {
-      "away": 0,
+      "guest": 0,
       "home": 0,
       "label": "Corners",
       "visible": true
     },
     {
-      "away": 0,
+      "guest": 0,
       "home": 0,
       "label": "Shots",
       "visible": true
     },
     {
-      "away": 0,
+      "guest": 0,
       "home": 0,
       "label": "Saves",
       "visible": true
@@ -53,10 +58,24 @@
     "color": "16777215",
     "logo": "home-07cad246.png",
     "subtitle": "Team 1",
-    "title": "Home"
+    "title": "Home",
+    "officials": [],
+    "players": [],
+    "fstTimeout_ms": 0,
+    "sndTimeout_ms": 0,
+    "trdTimeout_ms": 0
   },
   "server": {
     "port": 8089
+  },
+  "matchInfo": {
+    "city": "City of the Match venue",
+    "competition": "Competition Name",
+    "competitionRound": "Competition Round/Phase",
+    "datetime_ms": 1794067259999,
+    "matchNumber": 0,
+    "spectators": 0,
+    "venue": "Venue of the Match"
   },
   "show_scoreboard": true,
   "swap_sides": false,
@@ -89,8 +108,8 @@
       "visible": true
     }
   ],
-  "version": 4,
-  "single_stats": [
+  "version": 5,
+  "matchStats": [
     {
       "label": "PERIOD",
       "value": 1,

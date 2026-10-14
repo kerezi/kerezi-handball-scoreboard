@@ -1,10 +1,10 @@
 #include "config.hpp"
 
-#define LOG_TAG "[" PLUGIN_NAME "][fields-dialog]"
+#define LOG_TAG "[" PLUGIN_NAME "][stats-dialog]"
 #include "fly_score_log.hpp"
 
 #include "fly_score_horizontal_tab_bar.hpp"
-#include "fly_score_fields_dialog.hpp"
+#include "fly_score_stats_dialog.hpp"
 #include "fly_score_i18n.hpp"
 #include "fly_score_state.hpp"
 #include "fly_score_qt_helpers.hpp"
@@ -23,10 +23,10 @@
 #include <QMessageBox>
 #include <limits>
 
-FlyFieldsDialog::FlyFieldsDialog(const QString &dataDir, FlyScoreState::FlyState &state, QWidget *parent)
-	: FlyBaseDialog(fly_i18n("Fields.Title"),
-					fly_i18n("Fields.Hint"),
-					fly_i18n("Fields.Stats"),
+FlyStatsDialog::FlyStatsDialog(const QString &dataDir, FlyScoreState::FlyState &state, QWidget *parent)
+	: FlyBaseDialog(fly_i18n("Stats.Title"),
+					fly_i18n("Stats.Hint"),
+					fly_i18n("Stats.Stats"),
 					dataDir, state, parent)
 {
 	auto *tabs = new QTabWidget();
@@ -51,9 +51,9 @@ FlyFieldsDialog::FlyFieldsDialog(const QString &dataDir, FlyScoreState::FlyState
 
 	syncUiFromState();
 }
-FlyFieldsDialog::~FlyFieldsDialog() = default;
+FlyStatsDialog::~FlyStatsDialog() = default;
 
-void FlyFieldsDialog::addStatsUI(QTabWidget *tabs, FlyStatsUI *statsUI, bool isSingle)
+void FlyStatsDialog::addStatsUI(QTabWidget *tabs, FlyStatsUI *statsUI, bool isMatchStat)
 {
 	auto *statsTab = new QWidget(tabs);
 
@@ -62,21 +62,21 @@ void FlyFieldsDialog::addStatsUI(QTabWidget *tabs, FlyStatsUI *statsUI, bool isS
 	statsUI->statsLayout->setSpacing(6);
 	statsUI->statsLayout->setAlignment(Qt::AlignTop|Qt::AlignLeft);
 
-	statsUI->addStatBtn = new QPushButton(fly_i18n(isSingle ? "Fields.AddSingleStat" : "Fields.AddTeamStat"), statsTab);
+	statsUI->addStatBtn = new QPushButton(fly_i18n(isMatchStat ? "Stats.AddMatchStat" : "Stats.AddTeamStat"), statsTab);
 	statsUI->addStatBtn->setCursor(Qt::PointingHandCursor);
 	statsUI->addStatBtn->setStyleSheet("QPushButton {font-size: 16pt; min-width: 60px;min-width: 65px;}");
 	statsUI->statsLayout->addWidget(statsUI->addStatBtn, Qt::AlignCenter);
 
 	statsTab->setLayout(statsUI->statsLayout);
 
-	tabs->addTab(statsTab, fly_i18n(isSingle ? "Common.SingleStats" : "Common.TeamStats"));
+	tabs->addTab(statsTab, fly_i18n(isMatchStat ? "Common.MatchStats" : "Common.TeamStats"));
 
-	connect(statsUI->addStatBtn, &QPushButton::clicked, this, [this, isSingle, statsUI] () {
-		addStatRow(isSingle, statsUI, FlyScoreState::FlyStat {});
+	connect(statsUI->addStatBtn, &QPushButton::clicked, this, [this, isMatchStat, statsUI] () {
+		addStatRow(isMatchStat, statsUI, FlyScoreState::FlyStat {});
 	});
 }
 
-void FlyFieldsDialog::addStatRow(const bool isSingle, FlyStatsUI *statsUI, FlyScoreState::FlyStat fs)
+void FlyStatsDialog::addStatRow(const bool isMatchStat, FlyStatsUI *statsUI, FlyScoreState::FlyStat fs)
 {
 
 	FlyStatUIRow r;
@@ -88,15 +88,15 @@ void FlyFieldsDialog::addStatRow(const bool isSingle, FlyStatsUI *statsUI, FlySc
 	lay->setSpacing(8);
 
 	QCheckBox *visible = nullptr;
-	if (isSingle) {
+	if (isMatchStat) {
 		visible = new QCheckBox(row);
 		visible->setChecked(true);
-		visible->setToolTip(fly_i18n("Fields.VisibleInOverlay"));
+		visible->setToolTip(fly_i18n("Stats.VisibleInOverlay"));
 		visible->setChecked(fs.visible);
 	}
 
 	auto *labelEdit = new QLineEdit(row);
-	labelEdit->setPlaceholderText(fly_i18n(isSingle ? "Fields.SingleLabelPlaceholder" : "Fields.TeamLabelPlaceholder"));
+	labelEdit->setPlaceholderText(fly_i18n(isMatchStat ? "Stats.MatchLabelPlaceholder" : "Stats.TeamLabelPlaceholder"));
 	labelEdit->setText(fs.label);
 	labelEdit->setMinimumWidth(220);
 	labelEdit->setMaximumWidth(320);
@@ -107,7 +107,7 @@ void FlyFieldsDialog::addStatRow(const bool isSingle, FlyStatsUI *statsUI, FlySc
 	firstSpin->setMinimumWidth(70);
 	firstSpin->setMaximumWidth(90);
 	QSpinBox *secondSpin = nullptr;
-	if (!isSingle) {
+	if (!isMatchStat) {
 		secondSpin = new QSpinBox(row);
 		secondSpin->setRange(-9999, 9999);
 		secondSpin->setValue(fs.second);
@@ -117,7 +117,7 @@ void FlyFieldsDialog::addStatRow(const bool isSingle, FlyStatsUI *statsUI, FlySc
 
 	auto *removeBtn = new QPushButton(row);
 	removeBtn->setText(QStringLiteral("❌"));
-	removeBtn->setToolTip(fly_i18n(isSingle ? "Fields.RemoveSingleStat" : "Fields.RemoveTeamStat"));
+	removeBtn->setToolTip(fly_i18n(isMatchStat ? "Stats.RemoveMatchStat" : "Stats.RemoveTeamStat"));
 	removeBtn->setCursor(Qt::PointingHandCursor);
 
 	const int h = firstSpin->sizeHint().height();
@@ -128,12 +128,12 @@ void FlyFieldsDialog::addStatRow(const bool isSingle, FlyStatsUI *statsUI, FlySc
 			 "  padding:0;"
 			 "}");
 
-	if (isSingle) lay->addWidget(visible, 0, Qt::AlignVCenter);
+	if (isMatchStat) lay->addWidget(visible, 0, Qt::AlignVCenter);
 	lay->addWidget(labelEdit, 1, Qt::AlignVCenter);
-	lay->addWidget(new QLabel(fly_i18n(isSingle ? "Common.ValueColon" : "Common.HomeColon"), row), 0, Qt::AlignRight | Qt::AlignVCenter);
+	lay->addWidget(new QLabel(fly_i18n(isMatchStat ? "Common.ValueColon" : "Common.HomeColon"), row), 0, Qt::AlignRight | Qt::AlignVCenter);
 	lay->addWidget(firstSpin, 0, Qt::AlignVCenter);
-	if (!isSingle) lay->addWidget(new QLabel(fly_i18n("Common.GuestColon"), row), 0,  Qt::AlignRight | Qt::AlignVCenter);
-	if (!isSingle) 	lay->addWidget(secondSpin, 0, Qt::AlignVCenter);
+	if (!isMatchStat) lay->addWidget(new QLabel(fly_i18n("Common.GuestColon"), row), 0,  Qt::AlignRight | Qt::AlignVCenter);
+	if (!isMatchStat) 	lay->addWidget(secondSpin, 0, Qt::AlignVCenter);
 
 	lay->addWidget(removeBtn, 0, Qt::AlignVCenter);
 
@@ -148,10 +148,10 @@ void FlyFieldsDialog::addStatRow(const bool isSingle, FlyStatsUI *statsUI, FlySc
 	r.remove = removeBtn;
 	statsUI->statsRows->push_back(r);
 	
-	connect(removeBtn, &QPushButton::clicked, this, [this, row, statsUI, isSingle]() {
+	connect(removeBtn, &QPushButton::clicked, this, [this, row, statsUI, isMatchStat]() {
 		if (statsUI->statsRows->size() <= 1) {
 			QMessageBox::warning(this, fly_i18n("Common.CannotRemove"),
-					     fly_i18n(isSingle ? "Fields.OneSingleStatRequired" : "Fields.OneTeamStatRequired"));
+					     fly_i18n(isMatchStat ? "Stats.OneMatchStatRequired" : "Stats.OneTeamStatRequired"));
 			return;
 		}
 
@@ -166,10 +166,10 @@ void FlyFieldsDialog::addStatRow(const bool isSingle, FlyStatsUI *statsUI, FlySc
 
 	});
 
-	refreshRemoveButtons(statsUI->statsRows, isSingle);
+	refreshRemoveButtons(statsUI->statsRows, isMatchStat);
 }
 
-void FlyFieldsDialog::syncFromState(bool isSingle, FlyStatsUI *statsUI, QVector<FlyScoreState::FlyStat> *stats)
+void FlyStatsDialog::syncFromState(bool isMatchStat, FlyStatsUI *statsUI, QVector<FlyScoreState::FlyStat> *stats)
 {
 	for (auto &r : *statsUI->statsRows) {
 		if (statsUI->statsLayout && r.row) statsUI->statsLayout->removeWidget(r.row);
@@ -188,19 +188,19 @@ void FlyFieldsDialog::syncFromState(bool isSingle, FlyStatsUI *statsUI, QVector<
 	for (int i = 0; i < stats->size(); ++i) {
 		const FlyScoreState::FlyStat &fs = (*stats)[i];
 		const bool canRemove = (stats->size() > 1);
-		addStatRow(isSingle, statsUI, fs);
+		addStatRow(isMatchStat, statsUI, fs);
 	}
 
-	refreshRemoveButtons(statsUI->statsRows, isSingle);
+	refreshRemoveButtons(statsUI->statsRows, isMatchStat);
 }
 
-void FlyFieldsDialog::syncUiFromState()
+void FlyStatsDialog::syncUiFromState()
 {
 	syncFromState(false, teamStats_, &state_.stTeamsStats);
-	syncFromState(true, singleStats_, &state_.single_stats);
+	syncFromState(true, singleStats_, &state_.stMatchStats);
 }
 
-void FlyFieldsDialog::refreshRemoveButtons(QVector<FlyStatUIRow> * statsRows, bool isSingle)
+void FlyStatsDialog::refreshRemoveButtons(QVector<FlyStatUIRow> * statsRows, bool isMatchStat)
 {
 	const bool canRemove = statsRows->size() > 1;
 	for (auto &r : *statsRows) {
@@ -208,19 +208,19 @@ void FlyFieldsDialog::refreshRemoveButtons(QVector<FlyStatUIRow> * statsRows, bo
 		if (r.remove) {
 			r.remove->setDisabled(!canRemove);
 			r.remove->setCursor(canRemove ? Qt::PointingHandCursor : Qt::ArrowCursor);
-			r.remove->setToolTip(canRemove ? fly_i18n(isSingle ? "Fields.RemoveField" : "Fields.RemoveSingleStat")
-							   : fly_i18n(isSingle ? "Fields.OneTeamStatRequired" : "Fields.OneSingleStatRequired"));
+			r.remove->setToolTip(canRemove ? fly_i18n(isMatchStat ? "Stats.RemoveStat" : "Stats.RemoveMatchStat")
+							   : fly_i18n(isMatchStat ? "Stats.OneTeamStatRequired" : "Stats.OneMatchStatRequired"));
 		}
 	}
 }
 
-void FlyFieldsDialog::syncStateFromUi()
+void FlyStatsDialog::syncStateFromUi()
 {
 	syncToState(false, teamStats_, &state_.stTeamsStats);
-	syncToState(true, singleStats_, &state_.single_stats);
+	syncToState(true, singleStats_, &state_.stMatchStats);
 }
 
-void FlyFieldsDialog::syncToState(bool isSingle, FlyStatsUI *statsUI, QVector<FlyScoreState::FlyStat> *stats)
+void FlyStatsDialog::syncToState(bool isMatchStat, FlyStatsUI *statsUI, QVector<FlyScoreState::FlyStat> *stats)
 {
 	stats->clear();
 	stats->reserve(statsUI->statsRows->size());
@@ -240,17 +240,17 @@ void FlyFieldsDialog::syncToState(bool isSingle, FlyStatsUI *statsUI, QVector<Fl
 	FlyScoreState::fly_state_save(dataDir_, state_);
 }
 
-void FlyFieldsDialog::onAccept()
+void FlyStatsDialog::onAccept()
 {
 	if (teamStats_->statsRows->isEmpty()) {
-		QMessageBox::warning(this, fly_i18n("Fields.MissingTeamStats"),
-				     fly_i18n("Fields.MustKeepTeamStat"));
+		QMessageBox::warning(this, fly_i18n("Stats.MissingTeamStats"),
+				     fly_i18n("Stats.MustKeepTeamStat"));
 		return;
 	}
 
 	if (singleStats_->statsRows->isEmpty()) {
-		QMessageBox::warning(this, fly_i18n("Fields.MissingSingleStats"),
-				     fly_i18n("Fields.MustKeepSingleStat"));
+		QMessageBox::warning(this, fly_i18n("Stats.MissingMatchStats"),
+				     fly_i18n("Stats.MustKeepMatchStat"));
 		return;
 	}
 

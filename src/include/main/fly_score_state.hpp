@@ -103,7 +103,7 @@ public:
 		bool show_scoreboard = true;
 
 		QVector<FlyStat> stTeamsStats;
-		QVector<FlyStat> single_stats;
+		QVector<FlyStat> stMatchStats;
 		QVector<FlyTimer> timers;
 	};
 
@@ -128,11 +128,11 @@ public:
 	static bool fly_is_valid_theme_folder(const QString &themePath, FlyThemeManifest *manifest = nullptr);
 	static QString fly_normalize_manifest_key(QString key, const QString &section);
 	static FlyScoreState::FlyTimer makeDefaultMainTimer();
-	static void ensureDefaultSingleStats(FlyState &st);
+	static void ensureDefaultMatchStats(FlyState &st);
 	static QString moduleBaseDirFromConfigFile();
 	static QString overlay_dir_path(const QString &base_dir);
 	static QString overlay_plugin_json(const QString &base_dir);
-	static void ensureDefaultCustomFields(FlyState &st);
+	static void ensureDefaultTeamsStats(FlyState &st);
 	static QJsonObject timerToJson(const FlyTimer &t);
 	static FlyTimer timerFromJson(const QJsonObject &o);
 	static bool write_one_json(const QString &path, const QJsonDocument &doc);

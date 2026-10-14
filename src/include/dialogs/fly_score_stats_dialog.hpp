@@ -15,11 +15,11 @@ class QCheckBox;
 class QTabWidget;
 class QWidget;
 
-class FlyFieldsDialog : public FlyBaseDialog {
+class FlyStatsDialog : public FlyBaseDialog {
 	Q_OBJECT
 public:
-	FlyFieldsDialog(const QString &dataDir, FlyScoreState::FlyState &state, QWidget *parent = nullptr);
-	~FlyFieldsDialog() override;
+	FlyStatsDialog(const QString &dataDir, FlyScoreState::FlyState &state, QWidget *parent = nullptr);
+	~FlyStatsDialog() override;
 private slots:
 	void onAccept();
 
@@ -40,14 +40,14 @@ private:
         QVector<FlyStatUIRow> *statsRows = nullptr;
     };
 
-	void addStatsUI(QTabWidget *tabs, FlyStatsUI *statsUI, bool isSingle);
+	void addStatsUI(QTabWidget *tabs, FlyStatsUI *statsUI, bool isMatchStat);
 	void syncUiFromState() override;
-    void syncToState(bool isSingle, FlyStatsUI *statsUI, QVector<FlyScoreState::FlyStat> *stats);
+    void syncToState(bool isMatchStat, FlyStatsUI *statsUI, QVector<FlyScoreState::FlyStat> *stats);
 	void syncStateFromUi() override;
-	void syncFromState(bool isSingle, FlyStatsUI *statsUI, QVector<FlyScoreState::FlyStat> *stats);
-	void refreshRemoveButtons(QVector<FlyStatUIRow> * statsRows, bool isSingle);
+	void syncFromState(bool isMatchStat, FlyStatsUI *statsUI, QVector<FlyScoreState::FlyStat> *stats);
+	void refreshRemoveButtons(QVector<FlyStatUIRow> * statsRows, bool isMatchStat);
 
-	void addStatRow(const bool isSingle, FlyStatsUI *statsUIL, FlyScoreState::FlyStat fs);
+	void addStatRow(const bool isMatchStat, FlyStatsUI *statsUIL, FlyScoreState::FlyStat fs);
 
 	private:
 

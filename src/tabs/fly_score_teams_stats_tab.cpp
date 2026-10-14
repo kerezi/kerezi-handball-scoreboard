@@ -13,7 +13,7 @@
 #include "fly_score_state.hpp"
 #include "fly_score_dock.hpp"
 #include "fly_score_hotkeys_dialog.hpp"
-#include "fly_score_fields_dialog.hpp"
+#include "fly_score_stats_dialog.hpp"
 #include "fly_score_timers_dialog.hpp"
 #include "fly_score_teams_dialog.hpp"
 #include "fly_score_players_dialog.hpp"
@@ -174,10 +174,10 @@ void FlyTeamsStatsTab::syncUiFromState()
 		guestSpin->setButtonSymbols(QAbstractSpinBox::NoButtons);
 
 		auto *minusGuest = makeStepBtn(QStringLiteral("list-remove"), QStyle::SP_ArrowDown, QStringLiteral("-"),
-					       fly_i18n("Dock.GuestsMinusOne"), row);
+					       fly_i18n("Dock.GuestMinusOne"), row);
 
 		auto *plusGuest = makeStepBtn(QStringLiteral("list-add"), QStyle::SP_ArrowUp, QStringLiteral("+"),
-					      fly_i18n("Dock.GuestsPlusOne"), row);
+					      fly_i18n("Dock.GuestPlusOne"), row);
 
 		auto *homeBox = new QWidget(row);
 		auto *homeLay = new QHBoxLayout(homeBox);

@@ -13,19 +13,21 @@
 		7.2.1 Modify struct about Teams: Officials (Struct, Serilize, Deserilize)
 		7.2.2 Modify dialog about Teams: Officials (Dialog)
 	7.3. Teams Players
-		7.3.1 Modify struct about Teams: Players (Struct, Serilize, Deserilize)
+		7.3.1 Modify struct about Teams: Players  Single Stats (Struct, Serilize, Deserilize)
 		7.3.2 Modify dialog about Teams: Players (Dialog)
 -----7.4. Timers
 -----7.3.1 Modify struct about Timers (Struct, Serilize, Deserilize)
 -----7.3.2 Modify dialog about Timers (Dialog)
 8. Handball Tab
 	8.0. Reorganize in Fly Dock
-		8.0.1. Create sub folders dialgos, tabs, help, main and move corespondig files there
-		8.0.2. Extract config tab from main dock
+		8.0.1. Create sub folders dialgos, tabs, help, main and move corespondig files there		8.0.2. Extract config tab from main dock
 		8.0.3. Transite to OBS Studio 32.2.2.
 		8.0.4. Extract the teams stats tab from main dock
 			8.0.4.1. Add base dock tab
 			8.0.4.2. Extract the teams stats tab from main dock
+		8.0.5. Extract the match stats tab from main dock
+			8.0.4.1. Change Single Stats (Struct, Serilize, Deserilize) to Match stats
+			8.0.4.2. Extract the teams stats tab from mai Single Stats (Struct, Serilize, Deserilize)n dock
 ++++
 ----
 		8.0.*. Extract the rest tabs from main dock
@@ -33,3 +35,4 @@
 
 
 https://emojidb.org/rotated-timer-emojis?utm_source=user_search
+^([:]?[0-9][0-9]){3,3}.[0-9][0-9][0-9]:[ \[\]a-zA-Z0-9:+-\\(\\)"*_]*

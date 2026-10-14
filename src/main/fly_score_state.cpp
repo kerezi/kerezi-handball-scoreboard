@@ -66,40 +66,40 @@ FlyScoreState::FlyTimer FlyScoreState::makeDefaultMainTimer()
 	return t;
 }
 
-void FlyScoreState::ensureDefaultCustomFields(FlyScoreState::FlyState &st)
+void FlyScoreState::ensureDefaultTeamsStats(FlyScoreState::FlyState &st)
 {
 	if (st.stTeamsStats.isEmpty()) {
 		const QStringList labels = {
-			fly_i18n("Default.Field.Score"),       fly_i18n("Default.Field.Fouls"),
-			fly_i18n("Default.Field.YellowCards"), fly_i18n("Default.Field.RedCards"),
-			fly_i18n("Default.Field.Corners"),
+			fly_i18n("Default.TeamStat.Score"),       fly_i18n("Default.TeamStat.Fouls"),
+			fly_i18n("Default.TeamStat.YellowCards"), fly_i18n("Default.TeamStat.RedCards"),
+			fly_i18n("Default.TeamStat.Corners"),
 		};
 		for (const QString &label : labels) {
-			FlyScoreState::FlyStat field;
-			field.label = label;
-			field.visible = true;
-			st.stTeamsStats.push_back(field);
+			FlyScoreState::FlyStat stat;
+			stat.label = label;
+			stat.visible = true;
+			st.stTeamsStats.push_back(stat);
 		}
 		return;
 	}
 
 	if (st.stTeamsStats[0].label.isEmpty())
-		st.stTeamsStats[0].label = fly_i18n("Default.Field.Score");
+		st.stTeamsStats[0].label = fly_i18n("Default.TeamStat.Score");
 }
 
-void FlyScoreState::ensureDefaultSingleStats(FlyScoreState::FlyState &st)
+void FlyScoreState::ensureDefaultMatchStats(FlyScoreState::FlyState &st)
 {
-	if (st.single_stats.isEmpty()) {
+	if (st.stMatchStats.isEmpty()) {
 	 FlyScoreState::FlyStat ss;
-		ss.label = fly_i18n("Default.Single.Period");
+		ss.label = fly_i18n("Default.Match.Period");
 		ss.first = 0;
 		ss.visible = true;
-		st.single_stats.push_back(ss);
+		st.stMatchStats.push_back(ss);
 		return;
 	}
 
-	if (st.single_stats[0].label.isEmpty())
-		st.single_stats[0].label = fly_i18n("Default.Single.Period");
+	if (st.stMatchStats[0].label.isEmpty())
+		st.stMatchStats[0].label = fly_i18n("Default.Match.Period");
 }
 
 QJsonObject FlyScoreState::timerToJson(const FlyScoreState::FlyTimer &t)
@@ -132,11 +132,11 @@ QJsonObject FlyScoreState::fly_state_to_json_object(const FlyScoreState::FlyStat
 {
 	FlyScoreState::FlyState st = stIn;
 
-	FlyScoreState::ensureDefaultCustomFields(st);
-	FlyScoreState::ensureDefaultSingleStats(st);
+	FlyScoreState::ensureDefaultTeamsStats(st);
+	FlyScoreState::ensureDefaultMatchStats(st);
 
 	QJsonObject j;
-	j["version"] = 4;
+	j["version"] = 5;
 
 	auto matchInfoToJson = [](const FlyScoreState::FlyMatchInfo &mi) {
 		QJsonObject o;
@@ -220,17 +220,17 @@ QJsonObject FlyScoreState::fly_state_to_json_object(const FlyScoreState::FlyStat
 		o["visible"] = cf.visible;
 		cfArr.append(o);
 	}
-	j["custom_fields"] = cfArr;
+	j["teamsStats"] = cfArr;
 
-	QJsonArray ssArr;
-	for (const auto &ss : st.single_stats) {
+	QJsonArray msArr;
+	for (const auto &ms : st.stMatchStats) {
 		QJsonObject o;
-		o["label"] = ss.label;
-		o["value"] = ss.first;
-		o["visible"] = ss.visible;
-		ssArr.append(o);
+		o["label"] = ms.label;
+		o["value"] = ms.first;
+		o["visible"] = ms.visible;
+		msArr.append(o);
 	}
-	j["single_stats"] = ssArr;
+	j["matchStats"] = msArr;
 
 	QJsonArray timersArr;
 	if (st.timers.isEmpty()) {
@@ -363,7 +363,7 @@ bool FlyScoreState::fly_state_from_json_object(const QJsonObject &j, FlyScoreSta
 	st.show_scoreboard = j.value("show_scoreboard").toBool(true);
 	st.stTeamsStats.clear();
 
-	const QJsonValue cfVal = j.value("custom_fields");
+	const QJsonValue cfVal = j.value("teamsStats");
 	if (cfVal.isArray()) {
 		const QJsonArray cfArr = cfVal.toArray();
 		st.stTeamsStats.reserve(cfArr.size());
@@ -384,30 +384,30 @@ bool FlyScoreState::fly_state_from_json_object(const QJsonObject &j, FlyScoreSta
 		}
 	}
 
-	st.single_stats.clear();
+	st.stMatchStats.clear();
 
-	const QJsonValue ssVal = j.value("single_stats");
+	const QJsonValue ssVal = j.value("matchStats");
 	if (ssVal.isArray()) {
-		const QJsonArray ssArr = ssVal.toArray();
-		st.single_stats.reserve(ssArr.size());
+		const QJsonArray msArr = ssVal.toArray();
+		st.stMatchStats.reserve(msArr.size());
 
-		for (const QJsonValue v : ssArr) {
+		for (const QJsonValue v : msArr) {
 			if (!v.isObject())
 				continue;
 
 			const QJsonObject o = v.toObject();
 
-		 FlyScoreState::FlyStat ss;
-			ss.label = o.value("label").toString();
-			ss.first = o.value("value").toInt(0);
-			ss.visible = o.value("visible").toBool(true);
+		 FlyScoreState::FlyStat ms;
+			ms.label = o.value("label").toString();
+			ms.first = o.value("value").toInt(0);
+			ms.visible = o.value("visible").toBool(true);
 
-			st.single_stats.push_back(ss);
+			st.stMatchStats.push_back(ms);
 		}
 	}
 
- FlyScoreState::ensureDefaultSingleStats(st);
-	FlyScoreState::ensureDefaultCustomFields(st);
+ FlyScoreState::ensureDefaultMatchStats(st);
+	FlyScoreState::ensureDefaultTeamsStats(st);
 
 	st.timers.clear();
 
@@ -512,11 +512,11 @@ FlyScoreState::FlyState FlyScoreState::fly_state_make_defaults()
 	st.show_scoreboard = true;
 
 	st.stTeamsStats.clear();
-	st.single_stats.clear();
+	st.stMatchStats.clear();
 	st.timers.clear();
 
-	FlyScoreState::ensureDefaultCustomFields(st);
- FlyScoreState::ensureDefaultSingleStats(st);
+	FlyScoreState::ensureDefaultTeamsStats(st);
+ FlyScoreState::ensureDefaultMatchStats(st);
 
 	st.timers.push_back(FlyScoreState::makeDefaultMainTimer());
 

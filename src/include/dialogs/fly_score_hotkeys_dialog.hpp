@@ -28,7 +28,8 @@ signals:
 private slots:
 	void onAccept();
 	void onShowScoreboard();
-	void onShowFields();
+	void onShowMatchStats();
+	void onShowTeamStats();
 	void onShowTimers();
 
 private:
@@ -47,7 +48,8 @@ private:
 	QVector<RowWidgets> rows_;
 	QStackedWidget *stack_ = nullptr;
 	QPushButton *btnNavScore_ = nullptr;
-	QPushButton *btnNavFields_ = nullptr;
+	QPushButton *btnNavMatchStats_ = nullptr;
+	QPushButton *btnNavTeamStats_ = nullptr;
 	QPushButton *btnNavTimers_ = nullptr;
 	QPushButton *btnResetAll_ = nullptr;
 };

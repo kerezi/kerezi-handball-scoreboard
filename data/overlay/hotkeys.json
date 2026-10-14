@@ -10,177 +10,177 @@
     "seq": ""
   },
   {
-    "id": "field_0_toggle",
+    "id": "team_0_toggle",
     "label": "Custom: Score - Toggle visibility",
     "seq": ""
   },
   {
-    "id": "field_0_home_inc",
+    "id": "team_0_home_inc",
     "label": "Custom: Score - Home +1",
     "seq": ""
   },
   {
-    "id": "field_0_home_dec",
+    "id": "team_0_home_dec",
     "label": "Custom: Score - Home -1",
     "seq": ""
   },
   {
-    "id": "field_0_guest_inc",
+    "id": "team_0_guest_inc",
     "label": "Custom: Score - Guest +1",
     "seq": ""
   },
   {
-    "id": "field_0_guest_dec",
+    "id": "team_0_guest_dec",
     "label": "Custom: Score - Guest -1",
     "seq": ""
   },
   {
-    "id": "field_1_toggle",
+    "id": "team_1_toggle",
     "label": "Custom: Round - Toggle visibility",
     "seq": ""
   },
   {
-    "id": "field_1_home_inc",
+    "id": "team_1_home_inc",
     "label": "Custom: Round - Home +1",
     "seq": ""
   },
   {
-    "id": "field_1_home_dec",
+    "id": "team_1_home_dec",
     "label": "Custom: Round - Home -1",
     "seq": ""
   },
   {
-    "id": "field_1_guest_inc",
+    "id": "team_1_guest_inc",
     "label": "Custom: Round - Guest +1",
     "seq": ""
   },
   {
-    "id": "field_1_guest_dec",
+    "id": "team_1_guest_dec",
     "label": "Custom: Round - Guest -1",
     "seq": ""
   },
   {
-    "id": "field_2_toggle",
+    "id": "team_2_toggle",
     "label": "Custom: 2-Min Susp. - Toggle visibility",
     "seq": ""
   },
   {
-    "id": "field_2_home_inc",
+    "id": "team_2_home_inc",
     "label": "Custom: 2-Min Susp. - Home +1",
     "seq": ""
   },
   {
-    "id": "field_2_home_dec",
+    "id": "team_2_home_dec",
     "label": "Custom: 2-Min Susp. - Home -1",
     "seq": ""
   },
   {
-    "id": "field_2_guest_inc",
+    "id": "team_2_guest_inc",
     "label": "Custom: 2-Min Susp. - Guest +1",
     "seq": ""
   },
   {
-    "id": "field_2_guest_dec",
+    "id": "team_2_guest_dec",
     "label": "Custom: 2-Min Susp. - Guest -1",
     "seq": ""
   },
   {
-    "id": "field_3_toggle",
+    "id": "team_3_toggle",
     "label": "Custom: Yellow Cards - Toggle visibility",
     "seq": ""
   },
   {
-    "id": "field_3_home_inc",
+    "id": "team_3_home_inc",
     "label": "Custom: Yellow Cards - Home +1",
     "seq": ""
   },
   {
-    "id": "field_3_home_dec",
+    "id": "team_3_home_dec",
     "label": "Custom: Yellow Cards - Home -1",
     "seq": ""
   },
   {
-    "id": "field_3_guest_inc",
+    "id": "team_3_guest_inc",
     "label": "Custom: Yellow Cards - Guest +1",
     "seq": ""
   },
   {
-    "id": "field_3_guest_dec",
+    "id": "team_3_guest_dec",
     "label": "Custom: Yellow Cards - Guest -1",
     "seq": ""
   },
   {
-    "id": "field_4_toggle",
+    "id": "team_4_toggle",
     "label": "Custom: Red Cards - Toggle visibility",
     "seq": ""
   },
   {
-    "id": "field_4_home_inc",
+    "id": "team_4_home_inc",
     "label": "Custom: Red Cards - Home +1",
     "seq": ""
   },
   {
-    "id": "field_4_home_dec",
+    "id": "team_4_home_dec",
     "label": "Custom: Red Cards - Home -1",
     "seq": ""
   },
   {
-    "id": "field_4_guest_inc",
+    "id": "team_4_guest_inc",
     "label": "Custom: Red Cards - Guest +1",
     "seq": ""
   },
   {
-    "id": "field_4_guest_dec",
+    "id": "team_4_guest_dec",
     "label": "Custom: Red Cards - Guest -1",
     "seq": ""
   },
   {
-    "id": "field_5_toggle",
+    "id": "team_5_toggle",
     "label": "Custom: Shots - Toggle visibility",
     "seq": ""
   },
   {
-    "id": "field_5_home_inc",
+    "id": "team_5_home_inc",
     "label": "Custom: Shots - Home +1",
     "seq": ""
   },
   {
-    "id": "field_5_home_dec",
+    "id": "team_5_home_dec",
     "label": "Custom: Shots - Home -1",
     "seq": ""
   },
   {
-    "id": "field_5_guest_inc",
+    "id": "team_5_guest_inc",
     "label": "Custom: Shots - Guest +1",
     "seq": ""
   },
   {
-    "id": "field_5_guest_dec",
+    "id": "team_5_guest_dec",
     "label": "Custom: Shots - Guest -1",
     "seq": ""
   },
   {
-    "id": "field_6_toggle",
+    "id": "team_6_toggle",
     "label": "Custom: Saves - Toggle visibility",
     "seq": ""
   },
   {
-    "id": "field_6_home_inc",
+    "id": "team_6_home_inc",
     "label": "Custom: Saves - Home +1",
     "seq": ""
   },
   {
-    "id": "field_6_home_dec",
+    "id": "team_6_home_dec",
     "label": "Custom: Saves - Home -1",
     "seq": ""
   },
   {
-    "id": "field_6_guest_inc",
+    "id": "team_6_guest_inc",
     "label": "Custom: Saves - Guest +1",
     "seq": ""
   },
   {
-    "id": "field_6_guest_dec",
+    "id": "team_6_guest_dec",
     "label": "Custom: Saves - Guest -1",
     "seq": ""
   },
@@ -200,32 +200,32 @@
     "seq": ""
   },
   {
-    "id": "single_0_toggle",
+    "id": "match_0_toggle",
     "label": "Single: PERIOD - Toggle visibility",
     "seq": ""
   },
   {
-    "id": "single_0_inc",
+    "id": "match_0_inc",
     "label": "Single: PERIOD +1",
     "seq": ""
   },
   {
-    "id": "single_0_dec",
+    "id": "match_0_dec",
     "label": "Single: PERIOD -1",
     "seq": ""
   },
   {
-    "id": "single_1_toggle",
+    "id": "match_1_toggle",
     "label": "Single: ROUND - Toggle visibility",
     "seq": ""
   },
   {
-    "id": "single_1_inc",
+    "id": "match_1_inc",
     "label": "Single: ROUND +1",
     "seq": ""
   },
   {
-    "id": "single_1_dec",
+    "id": "match_1_dec",
     "label": "Single: ROUND -1",
     "seq": ""
   }

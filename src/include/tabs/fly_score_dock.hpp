@@ -22,7 +22,7 @@ class FlyScoreWebSocketServer;
 class FlyConfigTab;
 class FlyTeamsStatsTab;
 
-struct FlySingleStatUi {
+struct FlyMatchStatUi {
 	QWidget *row = nullptr;
 	QCheckBox *visibleCheck = nullptr;
 	QLabel *labelLbl = nullptr;
@@ -54,11 +54,12 @@ public:
 	void saveState();
 	void bumpTeamStat(int index, int delta, bool isHome);
 	void toggleTeamStatVisible(int index);
-	void bumpSingleStat(int index, int delta);
+	
+	void bumpMatchStat(int index, int delta);
 	void activateTemplateFolder(const QString &path);
 	void refreshUiFromState(bool onlyTimeIfRunning = false);
 public slots:
-	void toggleSingleStatVisible(int index);
+	void toggleMatchStatVisible(int index);
 	void ensureResourcesDefaults();
 	void appendEvent(const QString &event);
 	void startEventLog(const QString &firstEvent = QStringLiteral("Stream Start"));
@@ -66,20 +67,16 @@ public slots:
 	void logStateChanges(const FlyScoreState::FlyState &before, const FlyScoreState::FlyState &after);
 
 private:
-	void clearAllCustomFieldRows();
-	void loadCustomFieldControlsFromState();
-	void syncCustomFieldControlsToState();
-	void clearAllSingleStatRows();
-	void loadSingleStatControlsFromState();
-	void syncSingleStatControlsToState();
+	void clearAllMatchStatRows();
+	void loadMatchStatControlsFromState();
+	void syncMatchStatControlsToState();
+
 	void clearAllTimerRows();
 	void loadTimerControlsFromState();
 	// void loadHandballFromState();
 
 	void refreshEventLogUi();
 	QString eventLogsDirectory() const;
-	QWidget *widgetCarousel_ = nullptr;
-	QPushButton *toggleCarouselBtn_ = nullptr;
 
 private:
 	QString dataDir_;
@@ -90,12 +87,12 @@ private:
 	FlyConfigTab *configTab_ = nullptr;
 	FlyTeamsStatsTab *teamsStatsTab_ = nullptr;
 
-	QVBoxLayout *customFieldsLayout_ = nullptr;
 	QVBoxLayout *singleStatsLayout_ = nullptr;
-	QList<FlySingleStatUi> singleStats_;
+	QList<FlyMatchStatUi> singleStats_;
+
 	QVBoxLayout *timersLayout_ = nullptr;
 	QList<FlyTimerUi> timers_;
-	QPushButton *selectTemplateFolderBtn_ = nullptr;
+
 	FlyScoreEventLog eventLog_;
 	QLabel *eventLogStatus_ = nullptr;
 	QComboBox *eventTimestampMode_ = nullptr;

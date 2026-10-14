@@ -121,8 +121,8 @@ void FlyPlayersDialog::refreshRemoveButtons(QVector<FlyPlayerUIRow> *rows)
 		if (r.remove) {
 			r.remove->setDisabled(!canRemove);
 			r.remove->setCursor(canRemove ? Qt::PointingHandCursor : Qt::ArrowCursor);
-			r.remove->setToolTip(canRemove ? fly_i18n("Fields.RemoveField")
-							   : fly_i18n("Fields.OneTeamStatRequired"));
+			r.remove->setToolTip(canRemove ? fly_i18n("Stats.RemoveStat")
+							   : fly_i18n("Stats.OneTeamStatRequired"));
 		}
 	}
 }
@@ -167,7 +167,7 @@ FlyPlayersDialog::FlyPlayerUIRow FlyPlayersDialog::addPlayerUI(const FlyPlayersU
 
 	auto *removeBtn = new QPushButton(row);
 	removeBtn->setText(fly_i18n("Players.PlayerRemove"));
-	removeBtn->setToolTip(canRemove ? fly_i18n("Fields.RemoveField") : fly_i18n("Fields.FieldCannotBeRemoved"));
+	removeBtn->setToolTip(canRemove ? fly_i18n("Stats.RemoveStat") : fly_i18n("Stats.StatCannotBeRemoved"));
 	removeBtn->setCursor(canRemove ? Qt::PointingHandCursor : Qt::ArrowCursor);
 
 	const int btnSize = playerNameEdit->sizeHint().height();
@@ -199,7 +199,7 @@ FlyPlayersDialog::FlyPlayerUIRow FlyPlayersDialog::addPlayerUI(const FlyPlayersU
 		connect(removeBtn, &QPushButton::clicked, this, [this, playersUI, row]() {
 			if (playersUI->playersRows->size() <= 10) {
 				QMessageBox::warning(this, fly_i18n("Common.CannotRemove"),
-						     fly_i18n("Fields.OneTeamStatRequired"));
+						     fly_i18n("Stats.OneTeamStatRequired"));
 				return;
 			}
 

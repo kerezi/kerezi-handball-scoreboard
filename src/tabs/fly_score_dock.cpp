@@ -13,7 +13,7 @@
 #include "fly_score_match_info_dialog.hpp"
 #include "fly_score_teams_dialog.hpp"
 #include "fly_score_players_dialog.hpp"
-#include "fly_score_fields_dialog.hpp"
+#include "fly_score_stats_dialog.hpp"
 #include "fly_score_timers_dialog.hpp"
 #include "fly_score_hotkeys_dialog.hpp"
 #include "fly_score_paths.hpp"
@@ -169,7 +169,7 @@ bool FlyScoreDock::init()
 
 	//tabs->addTab(configTab, fly_i18n("Common.Configuration"));
 	//tabs->addTab(teamsStatTab_, fly_i18n("Common.TeamStats"));
-	//tabs->addTab(singleTab, fly_i18n("Common.SingleStats"));
+	//tabs->addTab(singleTab, fly_i18n("Common.MatchStats"));
 	//tabs->addTab(timersTab, fly_i18n("Common.Timers"));
 	//tabs->addTab(eventsTab, fly_i18n("Common.Events"));
 	//tabs->addTab(handballTab, fly_i18n("Common.Handball"));
@@ -350,39 +350,39 @@ void FlyScoreDock::logStateChanges(const FlyScoreState::FlyState &before, const 
 
 	const int commonFields = static_cast<int>(std::min(before.stTeamsStats.size(), after.stTeamsStats.size()));
 	for (int i = 0; i < commonFields; ++i) {
-		const auto &oldField = before.stTeamsStats[i];
-		const auto &field = after.stTeamsStats[i];
-		const QString label = labelOr(field.label, QStringLiteral("Score %1").arg(i + 1));
-		if (oldField.first != field.first) {
+		const auto &oldStat = before.stTeamsStats[i];
+		const auto &stat = after.stTeamsStats[i];
+		const QString label = labelOr(stat.label, QStringLiteral("Score %1").arg(i + 1));
+		if (oldStat.first != stat.first) {
 			eventLog_.appendEvent(QStringLiteral("%1: %2 (%3-%4)")
 						      .arg(label, teamName(after.home, QStringLiteral("Home")))
-						      .arg(field.first)
-						      .arg(field.second));
+						      .arg(stat.first)
+						      .arg(stat.second));
 		}
-		if (oldField.second != field.second) {
+		if (oldStat.second != stat.second) {
 			eventLog_.appendEvent(QStringLiteral("%1: %2 (%3-%4)")
 						      .arg(label, teamName(after.guest, QStringLiteral("Guest")))
-						      .arg(field.first)
-						      .arg(field.second));
+						      .arg(stat.first)
+						      .arg(stat.second));
 		}
-		if (oldField.visible != field.visible)
+		if (oldStat.visible != stat.visible)
 			eventLog_.appendEvent(QStringLiteral("%1 %2").arg(
-				label, field.visible ? QStringLiteral("shown") : QStringLiteral("hidden")));
+				label, stat.visible ? QStringLiteral("shown") : QStringLiteral("hidden")));
 	}
 	if (after.stTeamsStats.size() != before.stTeamsStats.size())
 		eventLog_.appendEvent(QStringLiteral("Team stat configuration changed"));
 
-	const int commonSingles = static_cast<int>(std::min(before.single_stats.size(), after.single_stats.size()));
-	for (int i = 0; i < commonSingles; ++i) {
-		const auto &oldStat = before.single_stats[i];
-		const auto &stat = after.single_stats[i];
+	const int commonMatchStats = static_cast<int>(std::min(before.stMatchStats.size(), after.stMatchStats.size()));
+	for (int i = 0; i < commonMatchStats; ++i) {
+		const auto &oldStat = before.stMatchStats[i];
+		const auto &stat = after.stMatchStats[i];
 		if (oldStat.first != stat.first)
 			eventLog_.appendEvent(QStringLiteral("%1: %2")
 						      .arg(labelOr(stat.label, QStringLiteral("Stat %1").arg(i + 1)))
 						      .arg(stat.first));
 	}
-	if (after.single_stats.size() != before.single_stats.size())
-		eventLog_.appendEvent(QStringLiteral("Single stat configuration changed"));
+	if (after.stMatchStats.size() != before.stMatchStats.size())
+		eventLog_.appendEvent(QStringLiteral("Match stat configuration changed"));
 
 	const int commonTimers = static_cast<int>(std::min(before.timers.size(), after.timers.size()));
 	for (int i = 0; i < commonTimers; ++i) {
@@ -442,12 +442,12 @@ void FlyScoreDock::refreshUiFromState(bool onlyTimeIfRunning)
 	configTab_->refreshUiFromState(onlyTimeIfRunning);
 	teamsStatsTab_->syncUiFromState();
 
-	loadSingleStatControlsFromState();
+	loadMatchStatControlsFromState();
 	loadTimerControlsFromState();
 	// loadHandballFromState();
 }
 
-void FlyScoreDock::clearAllSingleStatRows()
+void FlyScoreDock::clearAllMatchStatRows()
 {
 	if (singleStatsLayout_) {
 		QLayoutItem *it = nullptr;
@@ -461,13 +461,13 @@ void FlyScoreDock::clearAllSingleStatRows()
 	singleStats_.clear();
 }
 
-void FlyScoreDock::loadSingleStatControlsFromState()
+void FlyScoreDock::loadMatchStatControlsFromState()
 {
-	clearAllSingleStatRows();
+	clearAllMatchStatRows();
 	if (!singleStatsLayout_)
 		return;
 
-	singleStats_.reserve(st_.single_stats.size());
+	singleStats_.reserve(st_.stMatchStats.size());
 
 	auto makeStepBtn = [this](const QString &themeIconName, QStyle::StandardPixmap fallbackPixmap,
 				  const QString &fallbackText, const QString &tooltip,
@@ -492,9 +492,9 @@ void FlyScoreDock::loadSingleStatControlsFromState()
 		return btn;
 	};
 
-	for (int i = 0; i < st_.single_stats.size(); ++i) {
-		const auto &ss = st_.single_stats[i];
-		FlySingleStatUi ui;
+	for (int i = 0; i < st_.stMatchStats.size(); ++i) {
+		const auto &ms = st_.stMatchStats[i];
+		FlyMatchStatUi ui;
 
 		auto *row = new QWidget(this);
 		auto *lay = new QHBoxLayout(row);
@@ -502,15 +502,15 @@ void FlyScoreDock::loadSingleStatControlsFromState()
 		lay->setSpacing(6);
 
 		auto *visibleCheck = new QCheckBox(row);
-		visibleCheck->setChecked(ss.visible);
+		visibleCheck->setChecked(ms.visible);
 
 		auto *labelLbl =
-			new QLabel(ss.label.isEmpty() ? fly_i18n("Hotkey.SingleStatN").arg(i + 1) : ss.label, row);
+			new QLabel(ms.label.isEmpty() ? fly_i18n("Hotkey.MatchStatN").arg(i + 1) : ms.label, row);
 		labelLbl->setMinimumWidth(120);
 
 		auto *valueSpin = new QSpinBox(row);
 		valueSpin->setRange(-9999, 9999);
-		valueSpin->setValue(ss.first);
+		valueSpin->setValue(ms.first);
 		valueSpin->setMinimumWidth(60);
 
 		auto *minusBtn = makeStepBtn(QStringLiteral("list-remove"), QStyle::SP_ArrowDown, QStringLiteral("-"),
@@ -540,7 +540,7 @@ void FlyScoreDock::loadSingleStatControlsFromState()
 		ui.plusBtn = plusBtn;
 
 		auto sync = [this]() {
-			syncSingleStatControlsToState();
+			syncMatchStatControlsToState();
 		};
 
 		connect(visibleCheck, &QCheckBox::toggled, this, [sync](bool) { sync(); });
@@ -562,17 +562,17 @@ void FlyScoreDock::loadSingleStatControlsFromState()
 	singleStatsLayout_->addStretch(1);
 }
 
-void FlyScoreDock::syncSingleStatControlsToState()
+void FlyScoreDock::syncMatchStatControlsToState()
 {
-	st_.single_stats.clear();
-	st_.single_stats.reserve(singleStats_.size());
+	st_.stMatchStats.clear();
+	st_.stMatchStats.reserve(singleStats_.size());
 
 	for (const auto &ui : singleStats_) {
-		FlyScoreState::FlyStat ss;
-		ss.label = ui.labelLbl ? ui.labelLbl->text() : QString();
-		ss.first = ui.valueSpin ? ui.valueSpin->value() : 0;
-		ss.visible = ui.visibleCheck ? ui.visibleCheck->isChecked() : true;
-		st_.single_stats.push_back(ss);
+		FlyScoreState::FlyStat ms;
+		ms.label = ui.labelLbl ? ui.labelLbl->text() : QString();
+		ms.first = ui.valueSpin ? ui.valueSpin->value() : 0;
+		ms.visible = ui.visibleCheck ? ui.visibleCheck->isChecked() : true;
+		st_.stMatchStats.push_back(ms);
 	}
 
 	saveState();
@@ -640,7 +640,7 @@ void FlyScoreDock::loadTimerControlsFromState()
 		labelLbl->setMinimumWidth(120);
 
 		auto *timeEdit = new QLineEdit(row);
-		timeEdit->setPlaceholderText(QStringLiteral("mm:ss"));
+		timeEdit->setPlaceholderText(QStringLiteral("mm:ms"));
 		timeEdit->setClearButtonEnabled(true);
 		timeEdit->setMaxLength(8);
 		timeEdit->setMinimumWidth(60);
@@ -1226,28 +1226,28 @@ void FlyScoreDock::toggleTeamStatVisible(int index)
 	teamsStatsTab_->toggleTeamStatVisible(index);
 }
 
-void FlyScoreDock::bumpSingleStat(int idx, int delta)
+void FlyScoreDock::bumpMatchStat(int idx, int delta)
 {
-	if (idx < 0 || idx >= st_.single_stats.size())
+	if (idx < 0 || idx >= st_.stMatchStats.size())
 		return;
 
-	FlyScoreState::FlyStat &ss = st_.single_stats[idx];
-	ss.first += delta;
+	FlyScoreState::FlyStat &ms = st_.stMatchStats[idx];
+	ms.first += delta;
 
 	saveState();
-	loadSingleStatControlsFromState();
+	loadMatchStatControlsFromState();
 }
 
-void FlyScoreDock::toggleSingleStatVisible(int idx)
+void FlyScoreDock::toggleMatchStatVisible(int idx)
 {
-	if (idx < 0 || idx >= st_.single_stats.size())
+	if (idx < 0 || idx >= st_.stMatchStats.size())
 		return;
 
-	FlyScoreState::FlyStat &ss = st_.single_stats[idx];
-	ss.visible = !ss.visible;
+	FlyScoreState::FlyStat &ms = st_.stMatchStats[idx];
+	ms.visible = !ms.visible;
 
 	saveState();
-	loadSingleStatControlsFromState();
+	loadMatchStatControlsFromState();
 }
 
 void FlyScoreDock::ensureResourcesDefaults()

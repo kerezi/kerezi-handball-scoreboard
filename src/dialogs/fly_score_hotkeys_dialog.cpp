@@ -68,19 +68,23 @@ void FlyHotkeysDialog::buildUi(const QVector<FlyHotkeyBinding> &initial)
 	navLayout->addWidget(navTitle);
 
 	btnNavScore_ = new QPushButton(fly_i18n("Common.Scoreboard"), navPanel);
-	btnNavFields_ = new QPushButton(fly_i18n("Common.MatchStats"), navPanel);
+	btnNavMatchStats_ = new QPushButton(fly_i18n("Common.MatchStats"), navPanel);
+	btnNavTeamStats_ = new QPushButton(fly_i18n("Common.TeamStats"), navPanel);
 	btnNavTimers_ = new QPushButton(fly_i18n("Common.Timers"), navPanel);
 
 	btnNavScore_->setCheckable(true);
-	btnNavFields_->setCheckable(true);
+	btnNavMatchStats_->setCheckable(true);
+	btnNavTeamStats_->setCheckable(true);
 	btnNavTimers_->setCheckable(true);
 
 	btnNavScore_->setCursor(Qt::PointingHandCursor);
-	btnNavFields_->setCursor(Qt::PointingHandCursor);
+	btnNavMatchStats_->setCursor(Qt::PointingHandCursor);
+	btnNavTeamStats_->setCursor(Qt::PointingHandCursor);
 	btnNavTimers_->setCursor(Qt::PointingHandCursor);
 
 	navLayout->addWidget(btnNavScore_);
-	navLayout->addWidget(btnNavFields_);
+	navLayout->addWidget(btnNavMatchStats_);
+	navLayout->addWidget(btnNavTeamStats_);
 	navLayout->addWidget(btnNavTimers_);
 	navLayout->addStretch(1);
 
@@ -96,12 +100,15 @@ void FlyHotkeysDialog::buildUi(const QVector<FlyHotkeyBinding> &initial)
 	center->addWidget(scroll, 1);
 
 	QVector<FlyHotkeyBinding> scoreboard;
-	QVector<FlyHotkeyBinding> fields;
+	QVector<FlyHotkeyBinding> matchStats;
+	QVector<FlyHotkeyBinding> teamStats;
 	QVector<FlyHotkeyBinding> timers;
 
 	for (const auto &b : initial) {
-		if (b.actionId.startsWith(QLatin1String("field_")))
-			fields.push_back(b);
+		if (b.actionId.startsWith(QLatin1String("match_")))
+			matchStats.push_back(b);
+		else if (b.actionId.startsWith(QLatin1String("team_")))
+			teamStats.push_back(b);
 		else if (b.actionId.startsWith(QLatin1String("timer_")))
 			timers.push_back(b);
 		else
@@ -109,15 +116,18 @@ void FlyHotkeysDialog::buildUi(const QVector<FlyHotkeyBinding> &initial)
 	}
 
 	QWidget *scorePage = createSectionPage(fly_i18n("Common.Scoreboard"), scoreboard, 0);
-	QWidget *fieldsPage = createSectionPage(fly_i18n("Common.MatchStats"), fields, 1);
-	QWidget *timersPage = createSectionPage(fly_i18n("Common.Timers"), timers, 2);
+	QWidget *matchStatsPage = createSectionPage(fly_i18n("Common.MatchStats"), matchStats, 1);
+	QWidget *teamStatsPage = createSectionPage(fly_i18n("Common.TeamStats"), teamStats, 2);
+	QWidget *timersPage = createSectionPage(fly_i18n("Common.Timers"), timers, 3);
 
 	stack_->addWidget(scorePage);
-	stack_->addWidget(fieldsPage);
+	stack_->addWidget(matchStatsPage);
+	stack_->addWidget(teamStatsPage);
 	stack_->addWidget(timersPage);
 
 	connect(btnNavScore_, &QPushButton::clicked, this, &FlyHotkeysDialog::onShowScoreboard);
-	connect(btnNavFields_, &QPushButton::clicked, this, &FlyHotkeysDialog::onShowFields);
+	connect(btnNavMatchStats_, &QPushButton::clicked, this, &FlyHotkeysDialog::onShowMatchStats);
+	connect(btnNavTeamStats_, &QPushButton::clicked, this, &FlyHotkeysDialog::onShowTeamStats);
 	connect(btnNavTimers_, &QPushButton::clicked, this, &FlyHotkeysDialog::onShowTimers);
 
 	onShowScoreboard();
@@ -207,8 +217,9 @@ QWidget *FlyHotkeysDialog::createSectionPage(const QString &title, const QVector
 void FlyHotkeysDialog::setActiveSectionButton(int index)
 {
 	btnNavScore_->setChecked(index == 0);
-	btnNavFields_->setChecked(index == 1);
-	btnNavTimers_->setChecked(index == 2);
+	btnNavMatchStats_->setChecked(index == 1);
+	btnNavTeamStats_->setChecked(index == 2);
+	btnNavTimers_->setChecked(index == 3);
 }
 
 void FlyHotkeysDialog::onShowScoreboard()
@@ -217,16 +228,22 @@ void FlyHotkeysDialog::onShowScoreboard()
 	setActiveSectionButton(0);
 }
 
-void FlyHotkeysDialog::onShowFields()
+void FlyHotkeysDialog::onShowMatchStats()
 {
 	stack_->setCurrentIndex(1);
 	setActiveSectionButton(1);
 }
 
-void FlyHotkeysDialog::onShowTimers()
+void FlyHotkeysDialog::onShowTeamStats()
 {
 	stack_->setCurrentIndex(2);
 	setActiveSectionButton(2);
+}
+
+void FlyHotkeysDialog::onShowTimers()
+{
+	stack_->setCurrentIndex(3);
+	setActiveSectionButton(3);
 }
 
 QVector<FlyHotkeyBinding> FlyHotkeysDialog::bindings() const
