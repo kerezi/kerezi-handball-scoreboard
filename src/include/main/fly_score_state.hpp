@@ -102,7 +102,7 @@ public:
 		bool swap_sides = false;
 		bool show_scoreboard = true;
 
-		QVector<FlyStat> custom_fields;
+		QVector<FlyStat> stTeamsStats;
 		QVector<FlyStat> single_stats;
 		QVector<FlyTimer> timers;
 	};

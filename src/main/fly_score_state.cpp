@@ -68,7 +68,7 @@ FlyScoreState::FlyTimer FlyScoreState::makeDefaultMainTimer()
 
 void FlyScoreState::ensureDefaultCustomFields(FlyScoreState::FlyState &st)
 {
-	if (st.custom_fields.isEmpty()) {
+	if (st.stTeamsStats.isEmpty()) {
 		const QStringList labels = {
 			fly_i18n("Default.Field.Score"),       fly_i18n("Default.Field.Fouls"),
 			fly_i18n("Default.Field.YellowCards"), fly_i18n("Default.Field.RedCards"),
@@ -78,13 +78,13 @@ void FlyScoreState::ensureDefaultCustomFields(FlyScoreState::FlyState &st)
 			FlyScoreState::FlyStat field;
 			field.label = label;
 			field.visible = true;
-			st.custom_fields.push_back(field);
+			st.stTeamsStats.push_back(field);
 		}
 		return;
 	}
 
-	if (st.custom_fields[0].label.isEmpty())
-		st.custom_fields[0].label = fly_i18n("Default.Field.Score");
+	if (st.stTeamsStats[0].label.isEmpty())
+		st.stTeamsStats[0].label = fly_i18n("Default.Field.Score");
 }
 
 void FlyScoreState::ensureDefaultSingleStats(FlyScoreState::FlyState &st)
@@ -212,7 +212,7 @@ QJsonObject FlyScoreState::fly_state_to_json_object(const FlyScoreState::FlyStat
 	j["show_scoreboard"] = st.show_scoreboard;
 
 	QJsonArray cfArr;
-	for (const auto &cf : st.custom_fields) {
+	for (const auto &cf : st.stTeamsStats) {
 		QJsonObject o;
 		o["label"] = cf.label;
 		o["home"] = cf.first;
@@ -361,12 +361,12 @@ bool FlyScoreState::fly_state_from_json_object(const QJsonObject &j, FlyScoreSta
 	st.guest = readTeam(j.value("guest").toObject());
 	st.swap_sides = j.value("swap_sides").toBool(false);
 	st.show_scoreboard = j.value("show_scoreboard").toBool(true);
-	st.custom_fields.clear();
+	st.stTeamsStats.clear();
 
 	const QJsonValue cfVal = j.value("custom_fields");
 	if (cfVal.isArray()) {
 		const QJsonArray cfArr = cfVal.toArray();
-		st.custom_fields.reserve(cfArr.size());
+		st.stTeamsStats.reserve(cfArr.size());
 
 		for (const QJsonValue v : cfArr) {
 			if (!v.isObject())
@@ -380,7 +380,7 @@ bool FlyScoreState::fly_state_from_json_object(const QJsonObject &j, FlyScoreSta
 			cf.second = o.value("guest").toInt(0);
 			cf.visible = o.value("visible").toBool(true);
 
-			st.custom_fields.push_back(cf);
+			st.stTeamsStats.push_back(cf);
 		}
 	}
 
@@ -511,7 +511,7 @@ FlyScoreState::FlyState FlyScoreState::fly_state_make_defaults()
 	st.swap_sides = false;
 	st.show_scoreboard = true;
 
-	st.custom_fields.clear();
+	st.stTeamsStats.clear();
 	st.single_stats.clear();
 	st.timers.clear();
 

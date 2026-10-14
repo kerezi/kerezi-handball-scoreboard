@@ -23,7 +23,9 @@
 		8.0.1. Create sub folders dialgos, tabs, help, main and move corespondig files there
 		8.0.2. Extract config tab from main dock
 		8.0.3. Transite to OBS Studio 32.2.2.
-		8.0.5. Extract the team state tab from main dock
+		8.0.4. Extract the teams stats tab from main dock
+			8.0.4.1. Add base dock tab
+			8.0.4.2. Extract the teams stats tab from main dock
 ++++
 ----
 		8.0.*. Extract the rest tabs from main dock

@@ -20,18 +20,7 @@ class QShortcut;
 class QJsonObject;
 class FlyScoreWebSocketServer;
 class FlyConfigTab;
-
-struct FlyCustomFieldUi {
-	QWidget *row = nullptr;
-	QCheckBox *visibleCheck = nullptr;
-	QLabel *labelLbl = nullptr;
-	QSpinBox *homeSpin = nullptr;
-	QSpinBox *guestSpin = nullptr;
-	QToolButton *minusHome = nullptr;
-	QToolButton *plusHome = nullptr;
-	QToolButton *minusGuest = nullptr;
-	QToolButton *plusGuest = nullptr;
-};
+class FlyTeamsStatsTab;
 
 struct FlySingleStatUi {
 	QWidget *row = nullptr;
@@ -63,11 +52,11 @@ public:
 	void handleFrontendEvent(int event);
 	void loadState();
 	void saveState();
-	void toggleCustomFieldVisible(int index);
-	void bumpCustomFieldHome(int index, int delta);
-	void bumpCustomFieldGuest(int index, int delta);
+	void bumpTeamStat(int index, int delta, bool isHome);
+	void toggleTeamStatVisible(int index);
 	void bumpSingleStat(int index, int delta);
 	void activateTemplateFolder(const QString &path);
+	void refreshUiFromState(bool onlyTimeIfRunning = false);
 public slots:
 	void toggleSingleStatVisible(int index);
 	void ensureResourcesDefaults();
@@ -77,7 +66,6 @@ public slots:
 	void logStateChanges(const FlyScoreState::FlyState &before, const FlyScoreState::FlyState &after);
 
 private:
-	void refreshUiFromState(bool onlyTimeIfRunning = false);
 	void clearAllCustomFieldRows();
 	void loadCustomFieldControlsFromState();
 	void syncCustomFieldControlsToState();
@@ -100,9 +88,9 @@ private:
 	FlyScoreState::FlyState lastLoggedState_;
 
 	FlyConfigTab *configTab_ = nullptr;
+	FlyTeamsStatsTab *teamsStatsTab_ = nullptr;
 
 	QVBoxLayout *customFieldsLayout_ = nullptr;
-	QList<FlyCustomFieldUi> customFields_;
 	QVBoxLayout *singleStatsLayout_ = nullptr;
 	QList<FlySingleStatUi> singleStats_;
 	QVBoxLayout *timersLayout_ = nullptr;
@@ -117,7 +105,3 @@ private:
 
 	bool frontendEventCallbackConnected_ = false;
 };
-
-void fly_create_dock();
-void fly_destroy_dock();
-FlyScoreDock *fly_get_dock();

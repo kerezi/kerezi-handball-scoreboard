@@ -18,7 +18,6 @@ class QVBoxLayout;
 class QCheckBox;
 class QGridLayout;
 class QLabel;
-class QVBoxLayout;
 class QShortcut;
 class FlyScoreWebSocketServer;
 
@@ -27,14 +26,16 @@ public:
 	explicit FlyConfigTab(const QString &title, const QString &dataDir, FlyScoreState::FlyState &state,
 			    FlyScoreDock *dock, QWidget *parent)
 		: FlyDockTab(title, dataDir, state, dock, parent) {
-			init();
-			buildUI();
+			this->init();
+			this->buildUI();
 		};
 
 	~FlyConfigTab() override;
 
 public:
-	void refreshUiFromState(bool onlyTimeIfRunning);
+	void refreshUiFromState(bool onlyTimeIfRunning) override;
+	void syncUiFromState() override;
+	void syncStateFromUi() override;
 	void toggleSwap();
 	void toggleScoreboardVisible();
 	void broadcastCurrentState();

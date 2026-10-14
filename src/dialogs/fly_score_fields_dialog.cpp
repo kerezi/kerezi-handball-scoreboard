@@ -196,7 +196,7 @@ void FlyFieldsDialog::syncFromState(bool isSingle, FlyStatsUI *statsUI, QVector<
 
 void FlyFieldsDialog::syncUiFromState()
 {
-	syncFromState(false, teamStats_, &state_.custom_fields);
+	syncFromState(false, teamStats_, &state_.stTeamsStats);
 	syncFromState(true, singleStats_, &state_.single_stats);
 }
 
@@ -216,7 +216,7 @@ void FlyFieldsDialog::refreshRemoveButtons(QVector<FlyStatUIRow> * statsRows, bo
 
 void FlyFieldsDialog::syncStateFromUi()
 {
-	syncToState(false, teamStats_, &state_.custom_fields);
+	syncToState(false, teamStats_, &state_.stTeamsStats);
 	syncToState(true, singleStats_, &state_.single_stats);
 }
 

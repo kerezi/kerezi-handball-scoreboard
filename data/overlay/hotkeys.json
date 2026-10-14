@@ -1,7 +1,7 @@
 [
   {
     "id": "swap_sides",
-    "label": "Swap Home \u2194 Guests",
+    "label": "Swap Home \u2194 Guest",
     "seq": ""
   },
   {
@@ -25,13 +25,13 @@
     "seq": ""
   },
   {
-    "id": "field_0_away_inc",
-    "label": "Custom: Score - Guests +1",
+    "id": "field_0_guest_inc",
+    "label": "Custom: Score - Guest +1",
     "seq": ""
   },
   {
-    "id": "field_0_away_dec",
-    "label": "Custom: Score - Guests -1",
+    "id": "field_0_guest_dec",
+    "label": "Custom: Score - Guest -1",
     "seq": ""
   },
   {
@@ -50,13 +50,13 @@
     "seq": ""
   },
   {
-    "id": "field_1_away_inc",
-    "label": "Custom: Round - Guests +1",
+    "id": "field_1_guest_inc",
+    "label": "Custom: Round - Guest +1",
     "seq": ""
   },
   {
-    "id": "field_1_away_dec",
-    "label": "Custom: Round - Guests -1",
+    "id": "field_1_guest_dec",
+    "label": "Custom: Round - Guest -1",
     "seq": ""
   },
   {
@@ -75,13 +75,13 @@
     "seq": ""
   },
   {
-    "id": "field_2_away_inc",
-    "label": "Custom: 2-Min Susp. - Guests +1",
+    "id": "field_2_guest_inc",
+    "label": "Custom: 2-Min Susp. - Guest +1",
     "seq": ""
   },
   {
-    "id": "field_2_away_dec",
-    "label": "Custom: 2-Min Susp. - Guests -1",
+    "id": "field_2_guest_dec",
+    "label": "Custom: 2-Min Susp. - Guest -1",
     "seq": ""
   },
   {
@@ -100,13 +100,13 @@
     "seq": ""
   },
   {
-    "id": "field_3_away_inc",
-    "label": "Custom: Yellow Cards - Guests +1",
+    "id": "field_3_guest_inc",
+    "label": "Custom: Yellow Cards - Guest +1",
     "seq": ""
   },
   {
-    "id": "field_3_away_dec",
-    "label": "Custom: Yellow Cards - Guests -1",
+    "id": "field_3_guest_dec",
+    "label": "Custom: Yellow Cards - Guest -1",
     "seq": ""
   },
   {
@@ -125,13 +125,13 @@
     "seq": ""
   },
   {
-    "id": "field_4_away_inc",
-    "label": "Custom: Red Cards - Guests +1",
+    "id": "field_4_guest_inc",
+    "label": "Custom: Red Cards - Guest +1",
     "seq": ""
   },
   {
-    "id": "field_4_away_dec",
-    "label": "Custom: Red Cards - Guests -1",
+    "id": "field_4_guest_dec",
+    "label": "Custom: Red Cards - Guest -1",
     "seq": ""
   },
   {
@@ -150,13 +150,13 @@
     "seq": ""
   },
   {
-    "id": "field_5_away_inc",
-    "label": "Custom: Shots - Guests +1",
+    "id": "field_5_guest_inc",
+    "label": "Custom: Shots - Guest +1",
     "seq": ""
   },
   {
-    "id": "field_5_away_dec",
-    "label": "Custom: Shots - Guests -1",
+    "id": "field_5_guest_dec",
+    "label": "Custom: Shots - Guest -1",
     "seq": ""
   },
   {
@@ -175,13 +175,13 @@
     "seq": ""
   },
   {
-    "id": "field_6_away_inc",
-    "label": "Custom: Saves - Guests +1",
+    "id": "field_6_guest_inc",
+    "label": "Custom: Saves - Guest +1",
     "seq": ""
   },
   {
-    "id": "field_6_away_dec",
-    "label": "Custom: Saves - Guests -1",
+    "id": "field_6_guest_dec",
+    "label": "Custom: Saves - Guest -1",
     "seq": ""
   },
   {

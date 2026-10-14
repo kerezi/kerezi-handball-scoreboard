@@ -19,6 +19,7 @@
 #include "fly_score_paths.hpp"
 
 #include "fly_score_config_tab.hpp"
+#include "fly_score_teams_stats_tab.hpp"
 
 #ifdef ENABLE_EMBEDDED_DEFAULTS
 #include "embedded_assets.hpp"
@@ -101,13 +102,7 @@ bool FlyScoreDock::init()
 	tabs->tabBar()->setAutoHide(true);
 
 	configTab_ = new FlyConfigTab("tabs", dataDir_, st_, this, tabs);
-
-	auto *teamTab = new QWidget(tabs);
-	auto *teamVBox = new QVBoxLayout(teamTab);
-	teamVBox->setContentsMargins(0, 0, 0, 0);
-	teamVBox->setSpacing(4);
-	teamVBox->setAlignment(Qt::AlignTop);
-	customFieldsLayout_ = teamVBox;
+	teamsStatsTab_ = new FlyTeamsStatsTab("tabs", dataDir_, st_, this, tabs);
 
 	auto *singleTab = new QWidget(tabs);
 	auto *singleVBox = new QVBoxLayout(singleTab);
@@ -173,7 +168,7 @@ bool FlyScoreDock::init()
 	eventsVBox->addStretch(1);
 
 	//tabs->addTab(configTab, fly_i18n("Common.Configuration"));
-	//tabs->addTab(teamTab, fly_i18n("Common.TeamStats"));
+	//tabs->addTab(teamsStatTab_, fly_i18n("Common.TeamStats"));
 	//tabs->addTab(singleTab, fly_i18n("Common.SingleStats"));
 	//tabs->addTab(timersTab, fly_i18n("Common.Timers"));
 	//tabs->addTab(eventsTab, fly_i18n("Common.Events"));
@@ -181,7 +176,7 @@ bool FlyScoreDock::init()
 
 	// 👥
 	tabs->addTab(configTab_, QStringLiteral("⚙️"));
-	tabs->addTab(teamTab, QStringLiteral("📊"));
+	tabs->addTab(teamsStatsTab_, QStringLiteral("📊"));
 	tabs->addTab(singleTab, QStringLiteral("📈"));
 	tabs->addTab(timersTab, QStringLiteral("⏱️"));
 	tabs->addTab(eventsTab, QStringLiteral("🎫"));
@@ -353,10 +348,10 @@ void FlyScoreDock::logStateChanges(const FlyScoreState::FlyState &before, const 
 		eventLog_.appendEvent(after.show_scoreboard ? QStringLiteral("Scoreboard shown")
 							    : QStringLiteral("Scoreboard hidden"));
 
-	const int commonFields = static_cast<int>(std::min(before.custom_fields.size(), after.custom_fields.size()));
+	const int commonFields = static_cast<int>(std::min(before.stTeamsStats.size(), after.stTeamsStats.size()));
 	for (int i = 0; i < commonFields; ++i) {
-		const auto &oldField = before.custom_fields[i];
-		const auto &field = after.custom_fields[i];
+		const auto &oldField = before.stTeamsStats[i];
+		const auto &field = after.stTeamsStats[i];
 		const QString label = labelOr(field.label, QStringLiteral("Score %1").arg(i + 1));
 		if (oldField.first != field.first) {
 			eventLog_.appendEvent(QStringLiteral("%1: %2 (%3-%4)")
@@ -374,7 +369,7 @@ void FlyScoreDock::logStateChanges(const FlyScoreState::FlyState &before, const 
 			eventLog_.appendEvent(QStringLiteral("%1 %2").arg(
 				label, field.visible ? QStringLiteral("shown") : QStringLiteral("hidden")));
 	}
-	if (after.custom_fields.size() != before.custom_fields.size())
+	if (after.stTeamsStats.size() != before.stTeamsStats.size())
 		eventLog_.appendEvent(QStringLiteral("Team stat configuration changed"));
 
 	const int commonSingles = static_cast<int>(std::min(before.single_stats.size(), after.single_stats.size()));
@@ -445,214 +440,11 @@ void FlyScoreDock::refreshUiFromState(bool onlyTimeIfRunning)
 	Q_UNUSED(onlyTimeIfRunning);
 
 	configTab_->refreshUiFromState(onlyTimeIfRunning);
+	teamsStatsTab_->syncUiFromState();
 
-	loadCustomFieldControlsFromState();
 	loadSingleStatControlsFromState();
 	loadTimerControlsFromState();
 	// loadHandballFromState();
-}
-
-void FlyScoreDock::clearAllCustomFieldRows()
-{
-	customFields_.clear();
-	if (!customFieldsLayout_)
-		return;
-
-	while (QLayoutItem *item = customFieldsLayout_->takeAt(0)) {
-		if (QWidget *w = item->widget())
-			w->deleteLater();
-		delete item;
-	}
-}
-
-void FlyScoreDock::loadCustomFieldControlsFromState()
-{
-	clearAllCustomFieldRows();
-	if (!customFieldsLayout_)
-		return;
-
-	customFields_.reserve(st_.custom_fields.size());
-
-	{
-		auto *hdrRow = new QWidget(this);
-		auto *grid = new QGridLayout(hdrRow);
-		grid->setContentsMargins(0, 0, 0, 0);
-		grid->setHorizontalSpacing(6);
-		grid->setVerticalSpacing(0);
-
-		auto *cbSpacer = new QSpacerItem(22, 0, QSizePolicy::Fixed, QSizePolicy::Minimum);
-		grid->addItem(cbSpacer, 0, 0);
-
-		auto *statHdr = new QLabel(fly_i18n("Common.Stat"), hdrRow);
-		statHdr->setStyleSheet(QStringLiteral("font-weight:bold;"));
-		grid->addWidget(statHdr, 0, 1);
-
-		auto *homeHdr = new QLabel(fly_i18n("Common.Home"), hdrRow);
-		homeHdr->setStyleSheet(QStringLiteral("font-weight:bold;"));
-		homeHdr->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-		grid->addWidget(homeHdr, 0, 2);
-
-		auto *guestHdr = new QLabel(fly_i18n("Common.Guest"), hdrRow);
-		guestHdr->setStyleSheet(QStringLiteral("font-weight:bold;"));
-		guestHdr->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-		grid->addWidget(guestHdr, 0, 3);
-
-		grid->setColumnStretch(1, 2);
-		grid->setColumnStretch(2, 1);
-		grid->setColumnStretch(3, 1);
-
-		customFieldsLayout_->addWidget(hdrRow);
-	}
-
-	for (int i = 0; i < st_.custom_fields.size(); ++i) {
-		const auto &cf = st_.custom_fields[i];
-		FlyCustomFieldUi ui;
-
-		auto *row = new QWidget(this);
-		auto *grid = new QGridLayout(row);
-		grid->setContentsMargins(0, 0, 0, 0);
-		grid->setHorizontalSpacing(6);
-		grid->setVerticalSpacing(0);
-
-		auto *visibleCheck = new QCheckBox(row);
-		visibleCheck->setChecked(cf.visible);
-		grid->addWidget(visibleCheck, 0, 0, Qt::AlignLeft | Qt::AlignVCenter);
-
-		auto *labelLbl = new QLabel(cf.label.isEmpty() ? QStringLiteral("(unnamed)") : cf.label, row);
-		labelLbl->setMinimumWidth(120);
-		grid->addWidget(labelLbl, 0, 1);
-
-		auto makeStepBtn = [this](const QString &themeIconName, QStyle::StandardPixmap fallbackPixmap,
-					  const QString &fallbackText, const QString &tooltip,
-					  QWidget *parent) -> QToolButton * {
-			auto *btn = new QToolButton(parent);
-			btn->setToolTip(tooltip);
-			btn->setCursor(Qt::PointingHandCursor);
-			btn->setAutoRaise(false);
-			btn->setFocusPolicy(Qt::StrongFocus);
-			btn->setFixedSize(28, 28);
-			btn->setIconSize(QSize(14, 14));
-
-			QIcon icon = QIcon::fromTheme(themeIconName);
-			if (icon.isNull())
-				icon = style()->standardIcon(fallbackPixmap);
-
-			if (!icon.isNull()) {
-				btn->setIcon(icon);
-			} else {
-				btn->setText(fallbackText);
-			}
-
-			return btn;
-		};
-
-		auto *homeSpin = new QSpinBox(row);
-		homeSpin->setRange(0, std::numeric_limits<int>::max());
-		homeSpin->setValue(std::max(0, cf.first));
-		homeSpin->setMinimumWidth(86);
-		homeSpin->setMaximumHeight(32);
-		homeSpin->setButtonSymbols(QAbstractSpinBox::NoButtons);
-
-		auto *minusHome = makeStepBtn(QStringLiteral("list-remove"), QStyle::SP_ArrowDown, QStringLiteral("-"),
-					      fly_i18n("Dock.HomeMinusOne"), row);
-
-		auto *plusHome = makeStepBtn(QStringLiteral("list-add"), QStyle::SP_ArrowUp, QStringLiteral("+"),
-					     fly_i18n("Dock.HomePlusOne"), row);
-
-		auto *guestSpin = new QSpinBox(row);
-		guestSpin->setRange(0, std::numeric_limits<int>::max());
-		guestSpin->setValue(std::max(0, cf.second));
-		guestSpin->setMinimumWidth(86);
-		guestSpin->setMaximumHeight(32);
-		guestSpin->setButtonSymbols(QAbstractSpinBox::NoButtons);
-
-		auto *minusGuest = makeStepBtn(QStringLiteral("list-remove"), QStyle::SP_ArrowDown, QStringLiteral("-"),
-					       fly_i18n("Dock.GuestsMinusOne"), row);
-
-		auto *plusGuest = makeStepBtn(QStringLiteral("list-add"), QStyle::SP_ArrowUp, QStringLiteral("+"),
-					      fly_i18n("Dock.GuestsPlusOne"), row);
-
-		auto *homeBox = new QWidget(row);
-		auto *homeLay = new QHBoxLayout(homeBox);
-		homeLay->setContentsMargins(0, 0, 0, 0);
-		homeLay->setSpacing(4);
-		homeLay->addWidget(minusHome, 0, Qt::AlignHCenter | Qt::AlignVCenter);
-		homeLay->addWidget(homeSpin, 0, Qt::AlignHCenter | Qt::AlignVCenter);
-		homeLay->addWidget(plusHome, 0, Qt::AlignHCenter | Qt::AlignVCenter);
-
-		auto *guestBox = new QWidget(row);
-		auto *guestLay = new QHBoxLayout(guestBox);
-		guestLay->setContentsMargins(0, 0, 0, 0);
-		guestLay->setSpacing(4);
-		guestLay->addWidget(minusGuest, 0, Qt::AlignHCenter | Qt::AlignVCenter);
-		guestLay->addWidget(guestSpin, 0, Qt::AlignHCenter | Qt::AlignVCenter);
-		guestLay->addWidget(plusGuest, 0, Qt::AlignHCenter | Qt::AlignVCenter);
-
-		grid->addWidget(homeBox, 0, 2, Qt::AlignHCenter | Qt::AlignVCenter);
-		grid->addWidget(guestBox, 0, 3, Qt::AlignHCenter | Qt::AlignVCenter);
-
-		grid->setColumnStretch(1, 2);
-		grid->setColumnStretch(2, 1);
-		grid->setColumnStretch(3, 1);
-
-		customFieldsLayout_->addWidget(row);
-
-		ui.row = row;
-		ui.visibleCheck = visibleCheck;
-		ui.labelLbl = labelLbl;
-		ui.homeSpin = homeSpin;
-		ui.guestSpin = guestSpin;
-		ui.minusHome = minusHome;
-		ui.plusHome = plusHome;
-		ui.minusGuest = minusGuest;
-		ui.plusGuest = plusGuest;
-
-		auto sync = [this]() {
-			syncCustomFieldControlsToState();
-		};
-
-		connect(homeSpin, qOverload<int>(&QSpinBox::valueChanged), this, [sync](int) { sync(); });
-		connect(guestSpin, qOverload<int>(&QSpinBox::valueChanged), this, [sync](int) { sync(); });
-		connect(visibleCheck, &QCheckBox::toggled, this, [sync](bool) { sync(); });
-
-		connect(minusHome, &QToolButton::clicked, this, [homeSpin, sync]() {
-			homeSpin->setValue(std::max(0, homeSpin->value() - 1));
-			sync();
-		});
-		connect(plusHome, &QToolButton::clicked, this, [homeSpin, sync]() {
-			homeSpin->setValue(homeSpin->value() + 1);
-			sync();
-		});
-		connect(minusGuest, &QToolButton::clicked, this, [guestSpin, sync]() {
-			guestSpin->setValue(std::max(0, guestSpin->value() - 1));
-			sync();
-		});
-		connect(plusGuest, &QToolButton::clicked, this, [guestSpin, sync]() {
-			guestSpin->setValue(guestSpin->value() + 1);
-			sync();
-		});
-
-		customFields_.push_back(ui);
-	}
-
-	customFieldsLayout_->addStretch(1);
-}
-
-void FlyScoreDock::syncCustomFieldControlsToState()
-{
-	st_.custom_fields.clear();
-	st_.custom_fields.reserve(customFields_.size());
-
-	for (const auto &ui : customFields_) {
-		FlyScoreState::FlyStat cf;
-		cf.label = ui.labelLbl ? ui.labelLbl->text() : QString();
-		cf.first = ui.homeSpin ? ui.homeSpin->value() : 0;
-		cf.second = ui.guestSpin ? ui.guestSpin->value() : 0;
-		cf.visible = ui.visibleCheck ? ui.visibleCheck->isChecked() : true;
-		st_.custom_fields.push_back(cf);
-	}
-
-	saveState();
 }
 
 void FlyScoreDock::clearAllSingleStatRows()
@@ -1424,34 +1216,14 @@ void FlyScoreDock::loadTimerControlsFromState()
 // 	}
 // }
 
-void FlyScoreDock::bumpCustomFieldHome(int index, int delta)
+void FlyScoreDock::bumpTeamStat(int index, int delta, bool isHome)
 {
-	if (index < 0 || index >= st_.custom_fields.size())
-		return;
-
-	if (index < customFields_.size() && customFields_[index].homeSpin) {
-		auto *spin = customFields_[index].homeSpin;
-		spin->setValue(std::max(0, spin->value() + delta));
-		return;
-	}
-
-	st_.custom_fields[index].first = std::max(0, st_.custom_fields[index].first + delta);
-	saveState();
+	teamsStatsTab_->bumpTeamStat(index, delta, isHome);
 }
 
-void FlyScoreDock::bumpCustomFieldGuest(int index, int delta)
+void FlyScoreDock::toggleTeamStatVisible(int index)
 {
-	if (index < 0 || index >= st_.custom_fields.size())
-		return;
-
-	if (index < customFields_.size() && customFields_[index].guestSpin) {
-		auto *spin = customFields_[index].guestSpin;
-		spin->setValue(std::max(0, spin->value() + delta));
-		return;
-	}
-
-	st_.custom_fields[index].second = std::max(0, st_.custom_fields[index].second + delta);
-	saveState();
+	teamsStatsTab_->toggleTeamStatVisible(index);
 }
 
 void FlyScoreDock::bumpSingleStat(int idx, int delta)
@@ -1476,21 +1248,6 @@ void FlyScoreDock::toggleSingleStatVisible(int idx)
 
 	saveState();
 	loadSingleStatControlsFromState();
-}
-
-void FlyScoreDock::toggleCustomFieldVisible(int index)
-{
-	if (index < 0 || index >= st_.custom_fields.size())
-		return;
-
-	if (index < customFields_.size() && customFields_[index].visibleCheck) {
-		auto *chk = customFields_[index].visibleCheck;
-		chk->setChecked(!chk->isChecked());
-		return;
-	}
-
-	st_.custom_fields[index].visible = !st_.custom_fields[index].visible;
-	saveState();
 }
 
 void FlyScoreDock::ensureResourcesDefaults()

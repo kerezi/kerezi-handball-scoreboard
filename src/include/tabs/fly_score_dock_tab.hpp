@@ -21,6 +21,9 @@ public:
 		  state_(state),
 		  dock_(dock)
 	{ };
+    virtual void syncUiFromState() = 0;
+    virtual void syncStateFromUi() = 0;
+	virtual void refreshUiFromState(bool onlyTimeIfRunning) = 0;
 
 protected:
 	QString dataDir_;
