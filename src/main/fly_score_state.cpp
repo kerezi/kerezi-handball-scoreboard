@@ -1,5 +1,7 @@
 #include "config.hpp"
 
+
+#define LOG_TAG "[" PLUGIN_NAME "][state]"
 #include "fly_score_log.hpp"
 
 #include "fly_score_i18n.hpp"

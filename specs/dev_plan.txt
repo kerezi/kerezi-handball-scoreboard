@@ -21,8 +21,8 @@
 8. Handball Tab
 	8.0. Reorganize in Fly Dock
 		8.0.1. Create sub folders dialgos, tabs, help, main and move corespondig files there
-++++
 		8.0.2. Extract config tab from main dock
+++++
 ----
 		8.0.3. Extract the rest tabs from main dock
 	8.1. Handball Tab Ui in Fly Dock

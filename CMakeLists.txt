@@ -124,14 +124,18 @@ target_include_directories(${CMAKE_PROJECT_NAME}
 # ---------------------------------------------------------------------------
 set(
   OBS_FLY_SCORE_SRC
+  ${FS_IMA_DIR}/fly_score_plugin.hpp
   ${FS_MAI_DIR}/fly_score_plugin.cpp
   ${FS_MAI_DIR}/fly_score_state.cpp
+  ${FS_IMA_DIR}/fly_score_state.hpp
   ${FS_HLP_DIR}/fly_score_qt_helpers.cpp
   ${FS_HLP_DIR}/fly_score_json_helper.cpp
   ${FS_IHL_DIR}/fly_score_json_helper.hpp
   ${FS_HLP_DIR}/fly_score_logo_helpers.cpp
+  ${FS_IHL_DIR}/fly_score_logo_helpers.hpp
   ${FS_IMA_DIR}/fly_score_i18n.hpp
   ${FS_HLP_DIR}/fly_score_paths.cpp
+  ${FS_IHL_DIR}/fly_score_paths.hpp
   ${FS_MAI_DIR}/fly_score_websocket_server.cpp
   ${FS_IMA_DIR}/fly_score_websocket_server.hpp
   ${FS_MAI_DIR}/fly_score_event_log.cpp

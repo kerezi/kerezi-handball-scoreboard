@@ -108,7 +108,7 @@ bool FlyScoreDock::init()
 	lastLoggedState_ = st_;
 	ensureResourcesDefaults();
 
-	setObjectName(QStringLiteral("FlyScoreDock"));
+	setObjectName(fly_dock_name());
 	setAttribute(Qt::WA_StyledBackground, true);
 	setStyleSheet(QStringLiteral("FlyScoreDock { background: rgba(39, 42, 51, 1.0)}"));
 
@@ -248,6 +248,15 @@ bool FlyScoreDock::init()
 	return true;
 }
 
+FlyScoreDock::~FlyScoreDock()
+{
+#ifdef ENABLE_FRONTEND_API
+	if (frontendEventCallbackConnected_) {
+		obs_frontend_remove_event_callback(fly_on_frontend_event, this);
+		frontendEventCallbackConnected_ = false;
+	}
+#endif
+}
 
 QString FlyScoreDock::eventLogsDirectory() const
 {
@@ -1532,55 +1541,6 @@ void FlyScoreDock::ensureResourcesDefaults()
 #endif
 
 	FlyScoreState::fly_state_ensure_json_exists(resDir, &st_);
-}
-
-static QWidget *g_dockContent = nullptr;
-
-FlyScoreDock::~FlyScoreDock()
-{
-#ifdef ENABLE_FRONTEND_API
-	if (frontendEventCallbackConnected_) {
-		obs_frontend_remove_event_callback(fly_on_frontend_event, this);
-		frontendEventCallbackConnected_ = false;
-	}
-#endif
-}
-
-void fly_create_dock()
-{
-	if (g_dockContent)
-		return;
-
-	auto *panel = new FlyScoreDock(nullptr);
-	panel->init();
-
-#if defined(HAVE_OBS_DOCK_BY_ID)
-	obs_frontend_add_dock_by_id(kFlyDockId, kFlyDockTitle, panel);
-#else
-	obs_frontend_add_dock(panel);
-#endif
-
-	g_dockContent = panel;
-	LOGI("Fly Scoreboard dock created");
-}
-
-void fly_destroy_dock()
-{
-	if (!g_dockContent)
-		return;
-
-#if defined(HAVE_OBS_DOCK_BY_ID)
-	obs_frontend_remove_dock(kFlyDockId);
-#else
-	obs_frontend_remove_dock(g_dockContent);
-#endif
-
-	g_dockContent = nullptr;
-}
-
-FlyScoreDock *fly_get_dock()
-{
-	return qobject_cast<FlyScoreDock *>(g_dockContent);
 }
 
 void FlyScoreDock::activateTemplateFolder(const QString &path)

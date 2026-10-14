@@ -1,5 +1,7 @@
 #include "fly_score_event_log.hpp"
 
+#define LOG_TAG "[" PLUGIN_NAME "][event-log]"
+
 #include <QDir>
 #include <QFile>
 #include <QTextStream>

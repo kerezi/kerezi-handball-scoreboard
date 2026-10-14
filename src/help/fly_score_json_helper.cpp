@@ -1,3 +1,4 @@
+#define LOG_TAG "[" PLUGIN_NAME "][json-helper]"
 
 #include "fly_score_json_helper.hpp"
 

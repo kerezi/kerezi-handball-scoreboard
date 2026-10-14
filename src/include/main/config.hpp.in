@@ -1,4 +1,10 @@
 #pragma once
 
+#ifndef PLUGIN_NAME "fly-scoreboard"
 #define PLUGIN_NAME "@PROJECT_NAME@"
+#endif
+
+#ifndef PLUGIN_VERSION "fly-scoreboard"
 #define PLUGIN_VERSION "@PROJECT_VERSION@"
+#endif
+

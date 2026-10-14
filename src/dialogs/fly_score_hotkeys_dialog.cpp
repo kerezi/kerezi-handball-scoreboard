@@ -1,3 +1,5 @@
+#define LOG_TAG "[" PLUGIN_NAME "][hotkeys-dialog]"
+
 #include "fly_score_hotkeys_dialog.hpp"
 #include "fly_score_i18n.hpp"
 

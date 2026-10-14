@@ -1,7 +1,7 @@
 #include "fly_score_players_dialog.hpp"
 #include "config.hpp"
 
-#define LOG_TAG "[" PLUGIN_NAME "][teams-dialog]"
+#define LOG_TAG "[" PLUGIN_NAME "][players-dialog]"
 #include "fly_score_log.hpp"
 
 #include "fly_score_logo_helpers.hpp"

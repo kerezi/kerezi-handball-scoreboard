@@ -1,5 +1,7 @@
 #include "fly_score_qt_helpers.hpp"
 
+#define LOG_TAG "[" PLUGIN_NAME "][qt-helpers]"
+
 #include <QDateTime>
 #include <QRegularExpression>
 #include <QWidget>
