@@ -19,7 +19,7 @@
 #include "fly_score_paths.hpp"
 
 #include "fly_score_config_tab.hpp"
-#include "fly_score_teams_stats_tab.hpp"
+#include "fly_score_stats_tab.hpp"
 
 #ifdef ENABLE_EMBEDDED_DEFAULTS
 #include "embedded_assets.hpp"
@@ -102,14 +102,8 @@ bool FlyScoreDock::init()
 	tabs->tabBar()->setAutoHide(true);
 
 	configTab_ = new FlyConfigTab("tabs", dataDir_, st_, this, tabs);
-	teamsStatsTab_ = new FlyTeamsStatsTab("tabs", dataDir_, st_, this, tabs);
-
-	auto *singleTab = new QWidget(tabs);
-	auto *singleVBox = new QVBoxLayout(singleTab);
-	singleVBox->setContentsMargins(0, 0, 0, 0);
-	singleVBox->setSpacing(4);
-	singleVBox->setAlignment(Qt::AlignTop);
-	singleStatsLayout_ = singleVBox;
+	teamsStatsTab_ = new FlyStatsTab("tabs", false, dataDir_, st_, this, tabs);
+	matchStatsTab_ = new FlyStatsTab("tabs", true, dataDir_, st_, this, tabs);
 
 	auto *timersTab = new QWidget(tabs);
 	auto *timersVBox = new QVBoxLayout(timersTab);
@@ -177,7 +171,7 @@ bool FlyScoreDock::init()
 	// 👥
 	tabs->addTab(configTab_, QStringLiteral("⚙️"));
 	tabs->addTab(teamsStatsTab_, QStringLiteral("📊"));
-	tabs->addTab(singleTab, QStringLiteral("📈"));
+	tabs->addTab(matchStatsTab_, QStringLiteral("📈"));
 	tabs->addTab(timersTab, QStringLiteral("⏱️"));
 	tabs->addTab(eventsTab, QStringLiteral("🎫"));
 	tabs->addTab(handballTab, QStringLiteral("🤾‍♀️"));
@@ -441,141 +435,10 @@ void FlyScoreDock::refreshUiFromState(bool onlyTimeIfRunning)
 
 	configTab_->refreshUiFromState(onlyTimeIfRunning);
 	teamsStatsTab_->syncUiFromState();
+	matchStatsTab_->syncUiFromState();
 
-	loadMatchStatControlsFromState();
 	loadTimerControlsFromState();
 	// loadHandballFromState();
-}
-
-void FlyScoreDock::clearAllMatchStatRows()
-{
-	if (singleStatsLayout_) {
-		QLayoutItem *it = nullptr;
-		while ((it = singleStatsLayout_->takeAt(0)) != nullptr) {
-			if (QWidget *w = it->widget())
-				w->deleteLater();
-			delete it;
-		}
-	}
-
-	singleStats_.clear();
-}
-
-void FlyScoreDock::loadMatchStatControlsFromState()
-{
-	clearAllMatchStatRows();
-	if (!singleStatsLayout_)
-		return;
-
-	singleStats_.reserve(st_.stMatchStats.size());
-
-	auto makeStepBtn = [this](const QString &themeIconName, QStyle::StandardPixmap fallbackPixmap,
-				  const QString &fallbackText, const QString &tooltip,
-				  QWidget *parent) -> QToolButton * {
-		auto *btn = new QToolButton(parent);
-		btn->setToolTip(tooltip);
-		btn->setCursor(Qt::PointingHandCursor);
-		btn->setAutoRaise(false);
-		btn->setFocusPolicy(Qt::StrongFocus);
-		btn->setFixedSize(28, 28);
-		btn->setIconSize(QSize(14, 14));
-
-		QIcon icon = QIcon::fromTheme(themeIconName);
-		if (icon.isNull())
-			icon = this->style()->standardIcon(fallbackPixmap);
-
-		if (!icon.isNull())
-			btn->setIcon(icon);
-		else
-			btn->setText(fallbackText);
-
-		return btn;
-	};
-
-	for (int i = 0; i < st_.stMatchStats.size(); ++i) {
-		const auto &ms = st_.stMatchStats[i];
-		FlyMatchStatUi ui;
-
-		auto *row = new QWidget(this);
-		auto *lay = new QHBoxLayout(row);
-		lay->setContentsMargins(0, 0, 0, 0);
-		lay->setSpacing(6);
-
-		auto *visibleCheck = new QCheckBox(row);
-		visibleCheck->setChecked(ms.visible);
-
-		auto *labelLbl =
-			new QLabel(ms.label.isEmpty() ? fly_i18n("Hotkey.MatchStatN").arg(i + 1) : ms.label, row);
-		labelLbl->setMinimumWidth(120);
-
-		auto *valueSpin = new QSpinBox(row);
-		valueSpin->setRange(-9999, 9999);
-		valueSpin->setValue(ms.first);
-		valueSpin->setMinimumWidth(60);
-
-		auto *minusBtn = makeStepBtn(QStringLiteral("list-remove"), QStyle::SP_ArrowDown, QStringLiteral("-"),
-					     fly_i18n("Dock.LabelMinusOne").arg(labelLbl->text()), row);
-
-		auto *plusBtn = makeStepBtn(QStringLiteral("list-add"), QStyle::SP_ArrowUp, QStringLiteral("+"),
-					    fly_i18n("Dock.LabelPlusOne").arg(labelLbl->text()), row);
-
-		const int h = valueSpin->sizeHint().height();
-		minusBtn->setFixedSize(h, h);
-		plusBtn->setFixedSize(h, h);
-
-		lay->addWidget(visibleCheck, 0, Qt::AlignVCenter);
-		lay->addWidget(labelLbl);
-		lay->addStretch(1);
-		lay->addWidget(minusBtn, 0, Qt::AlignVCenter);
-		lay->addWidget(valueSpin, 0, Qt::AlignVCenter);
-		lay->addWidget(plusBtn, 0, Qt::AlignVCenter);
-
-		singleStatsLayout_->addWidget(row);
-
-		ui.row = row;
-		ui.visibleCheck = visibleCheck;
-		ui.labelLbl = labelLbl;
-		ui.valueSpin = valueSpin;
-		ui.minusBtn = minusBtn;
-		ui.plusBtn = plusBtn;
-
-		auto sync = [this]() {
-			syncMatchStatControlsToState();
-		};
-
-		connect(visibleCheck, &QCheckBox::toggled, this, [sync](bool) { sync(); });
-		connect(valueSpin, qOverload<int>(&QSpinBox::valueChanged), this, [sync](int) { sync(); });
-
-		connect(minusBtn, &QToolButton::clicked, this, [valueSpin, sync]() {
-			valueSpin->setValue(valueSpin->value() - 1);
-			sync();
-		});
-
-		connect(plusBtn, &QToolButton::clicked, this, [valueSpin, sync]() {
-			valueSpin->setValue(valueSpin->value() + 1);
-			sync();
-		});
-
-		singleStats_.push_back(ui);
-	}
-
-	singleStatsLayout_->addStretch(1);
-}
-
-void FlyScoreDock::syncMatchStatControlsToState()
-{
-	st_.stMatchStats.clear();
-	st_.stMatchStats.reserve(singleStats_.size());
-
-	for (const auto &ui : singleStats_) {
-		FlyScoreState::FlyStat ms;
-		ms.label = ui.labelLbl ? ui.labelLbl->text() : QString();
-		ms.first = ui.valueSpin ? ui.valueSpin->value() : 0;
-		ms.visible = ui.visibleCheck ? ui.visibleCheck->isChecked() : true;
-		st_.stMatchStats.push_back(ms);
-	}
-
-	saveState();
 }
 
 void FlyScoreDock::clearAllTimerRows()
@@ -1216,38 +1079,20 @@ void FlyScoreDock::loadTimerControlsFromState()
 // 	}
 // }
 
-void FlyScoreDock::bumpTeamStat(int index, int delta, bool isHome)
+void FlyScoreDock::bumpStat(int index, int delta, bool isHome, bool isMatchStat)
 {
-	teamsStatsTab_->bumpTeamStat(index, delta, isHome);
+	if (isMatchStat)
+		matchStatsTab_->bumpStat(index, delta, isHome);
+	else
+		teamsStatsTab_->bumpStat(index, delta, isHome);
 }
 
-void FlyScoreDock::toggleTeamStatVisible(int index)
+void FlyScoreDock::toggleStatVisible(int index, bool isMatchStat)
 {
-	teamsStatsTab_->toggleTeamStatVisible(index);
-}
-
-void FlyScoreDock::bumpMatchStat(int idx, int delta)
-{
-	if (idx < 0 || idx >= st_.stMatchStats.size())
-		return;
-
-	FlyScoreState::FlyStat &ms = st_.stMatchStats[idx];
-	ms.first += delta;
-
-	saveState();
-	loadMatchStatControlsFromState();
-}
-
-void FlyScoreDock::toggleMatchStatVisible(int idx)
-{
-	if (idx < 0 || idx >= st_.stMatchStats.size())
-		return;
-
-	FlyScoreState::FlyStat &ms = st_.stMatchStats[idx];
-	ms.visible = !ms.visible;
-
-	saveState();
-	loadMatchStatControlsFromState();
+	if (isMatchStat)
+		matchStatsTab_->toggleStatVisible(index);
+	else
+		teamsStatsTab_->toggleStatVisible(index);
 }
 
 void FlyScoreDock::ensureResourcesDefaults()

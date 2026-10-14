@@ -26,8 +26,9 @@
 			8.0.4.1. Add base dock tab
 			8.0.4.2. Extract the teams stats tab from main dock
 		8.0.5. Extract the match stats tab from main dock
-			8.0.4.1. Change Single Stats (Struct, Serilize, Deserilize) to Match stats
-			8.0.4.2. Extract the teams stats tab from mai Single Stats (Struct, Serilize, Deserilize)n dock
+			8.0.4.1. Change Single Stats (Struct, Serilize, Deserilize) to Match stats & Custom field to Team Stats
+			8.0.4.2. Extract the teams stats tab from main dock
+			8.0.4.3. Extract the match stats tab from main dock
 ++++
 ----
 		8.0.*. Extract the rest tabs from main dock

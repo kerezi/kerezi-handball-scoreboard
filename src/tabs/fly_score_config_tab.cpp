@@ -236,8 +236,8 @@ void FlyConfigTab::onClearTeamsAndReset()
 		ts.second = 0;
 	}
 
-	for (auto &ss : state_.stMatchStats) {
-		ss.first = 0;
+	for (auto &ms : state_.stMatchStats) {
+		ms.first = 0;
 	}
 
 	for (auto &tm : state_.timers) {
@@ -366,7 +366,7 @@ void FlyConfigTab::applyHotkeyBindings(const QList<FlyHotkeyBinding> &bindings)
 		} else if (id == QLatin1String("toggle_scoreboard")) {
 			connect(sc, &QShortcut::activated, this, [this]() { toggleScoreboardVisible(); });
 
-		} else if (id.startsWith(QLatin1String("stat_"))) {
+		} else if (id.startsWith(QLatin1String("teamStat_"))) {
 			const auto parts = id.split(QLatin1Char('_'));
 			if (parts.size() < 3)
 				continue;
@@ -378,26 +378,26 @@ void FlyConfigTab::applyHotkeyBindings(const QList<FlyHotkeyBinding> &bindings)
 
 			if (parts.size() == 3 && parts[2] == QLatin1String("toggle")) {
 				connect(sc, &QShortcut::activated, this,
-					[this, idx]() { dock_->toggleTeamStatVisible(idx); });
+					[this, idx]() { dock_->toggleStatVisible(idx, false); });
 			} else if (parts.size() == 4) {
 				const QString side = parts[2];
 				const QString dir = parts[3];
 
 				if (side == QLatin1String("home") && dir == QLatin1String("inc"))
 					connect(sc, &QShortcut::activated, this,
-						[this, idx]() { dock_->bumpTeamStat(idx, +1, true); });
+						[this, idx]() { dock_->bumpStat(idx, +1, true, false); });
 				else if (side == QLatin1String("home") && dir == QLatin1String("dec"))
 					connect(sc, &QShortcut::activated, this,
-						[this, idx]() { dock_->bumpTeamStat(idx, -1, true); });
+						[this, idx]() { dock_->bumpStat(idx, -1, true, false); });
 				else if (side == QLatin1String("guest") && dir == QLatin1String("inc"))
 					connect(sc, &QShortcut::activated, this,
-						[this, idx]() { dock_->bumpTeamStat(idx, +1, false); });
+						[this, idx]() { dock_->bumpStat(idx, +1, false, false); });
 				else if (side == QLatin1String("guest") && dir == QLatin1String("dec"))
 					connect(sc, &QShortcut::activated, this,
-						[this, idx]() { dock_->bumpTeamStat(idx, -1, false); });
+						[this, idx]() { dock_->bumpStat(idx, -1, false, false); });
 			}
 
-		} else if (id.startsWith(QLatin1String("single_"))) {
+		} else if (id.startsWith(QLatin1String("matchStat_"))) {
 			const auto parts = id.split(QLatin1Char('_'));
 			if (parts.size() != 3)
 				continue;
@@ -410,11 +410,11 @@ void FlyConfigTab::applyHotkeyBindings(const QList<FlyHotkeyBinding> &bindings)
 			const QString action = parts[2];
 			if (action == QLatin1String("toggle"))
 				connect(sc, &QShortcut::activated, this,
-					[this, idx]() { dock_->toggleMatchStatVisible(idx); });
+					[this, idx]() { dock_->toggleStatVisible(idx, true); });
 			else if (action == QLatin1String("inc"))
-				connect(sc, &QShortcut::activated, this, [this, idx]() { dock_->bumpMatchStat(idx, +1); });
+				connect(sc, &QShortcut::activated, this, [this, idx]() { dock_->bumpStat(idx, +1, false, true); });
 			else if (action == QLatin1String("dec"))
-				connect(sc, &QShortcut::activated, this, [this, idx]() { dock_->bumpMatchStat(idx, -1); });
+				connect(sc, &QShortcut::activated, this, [this, idx]() { dock_->bumpStat(idx, -1, false, true); });
 
 		} else if (id.startsWith(QLatin1String("timer_"))) {
 			const auto parts = id.split(QLatin1Char('_'));
@@ -610,9 +610,9 @@ void FlyConfigTab::handleRemoteCommand(const QJsonObject &command)
 		if (side == QLatin1String("guest") || side == QLatin1String("guest") ||
 		    (side == QLatin1String("y") && !state_.swap_sides) ||
 		    (side == QLatin1String("x") && state_.swap_sides))
-			dock_->bumpTeamStat(index, delta, false);
+			dock_->bumpStat(index, delta, false, false);
 		else
-			dock_->bumpTeamStat(index, delta, false);
+			dock_->bumpStat(index, delta, true, false);
 		return;
 	}
 	if (action == QLatin1String("set_score") && index >= 0 && index < state_.stTeamsStats.size()) {
@@ -629,29 +629,29 @@ void FlyConfigTab::handleRemoteCommand(const QJsonObject &command)
 		dock_->refreshUiFromState(false);
 		return;
 	}
-	if (action == QLatin1String("bump_single")) {
-		dock_->bumpMatchStat(index, FlyJsonHelper::jsonInt(command, QStringLiteral("delta"), 1));
+	if (action == QLatin1String("bump_matchStat")) {
+		dock_->bumpStat(index, FlyJsonHelper::jsonInt(command, QStringLiteral("delta"), 1), false, true);
 		return;
 	}
-	if (action == QLatin1String("toggle_single") && index >= 0 && index < state_.stMatchStats.size()) {
-		dock_->toggleMatchStatVisible(index);
+	if (action == QLatin1String("toggle_matchStat") && index >= 0 && index < state_.stMatchStats.size()) {
+		dock_->toggleStatVisible(index, true);
 		return;
 	}
-	if (action == QLatin1String("add_single")) {
-		FlyScoreState::FlyStat ss;
-		ss.label = FlyJsonHelper::jsonString(command, QStringLiteral("label"));
-		if (ss.label.isEmpty())
-			ss.label = QStringLiteral("STAT");
-		ss.first = FlyJsonHelper::jsonInt(command, QStringLiteral("value"));
-		ss.visible = FlyJsonHelper::jsonBool(command, QStringLiteral("visible"), true);
-		state_.stMatchStats.push_back(ss);
+	if (action == QLatin1String("add_matchStat")) {
+		FlyScoreState::FlyStat ms;
+		ms.label = FlyJsonHelper::jsonString(command, QStringLiteral("label"));
+		if (ms.label.isEmpty())
+			ms.label = QStringLiteral("STAT");
+		ms.first = FlyJsonHelper::jsonInt(command, QStringLiteral("value"));
+		ms.visible = FlyJsonHelper::jsonBool(command, QStringLiteral("visible"), true);
+		state_.stMatchStats.push_back(ms);
 		dock_->saveState();
 		dock_->refreshUiFromState(false);
 		hotkeyBindings_ = buildMergedHotkeyBindings();
 		applyHotkeyBindings(hotkeyBindings_);
 		return;
 	}
-	if (action == QLatin1String("remove_single") && index >= 0 && index < state_.stMatchStats.size()) {
+	if (action == QLatin1String("remove_matchStat") && index >= 0 && index < state_.stMatchStats.size()) {
 		if (state_.stMatchStats.size() > 1) {
 			state_.stMatchStats.removeAt(index);
 			dock_->saveState();
@@ -661,14 +661,14 @@ void FlyConfigTab::handleRemoteCommand(const QJsonObject &command)
 		}
 		return;
 	}
-	if (action == QLatin1String("set_single") && index >= 0 && index < state_.stMatchStats.size()) {
-		FlyScoreState::FlyStat &ss = state_.stMatchStats[index];
+	if (action == QLatin1String("set_matchStat") && index >= 0 && index < state_.stMatchStats.size()) {
+		FlyScoreState::FlyStat &ms = state_.stMatchStats[index];
 		if (command.contains(QStringLiteral("label")))
-			ss.label = FlyJsonHelper::jsonString(command, QStringLiteral("label"));
+			ms.label = FlyJsonHelper::jsonString(command, QStringLiteral("label"));
 		if (command.contains(QStringLiteral("value")))
-			ss.first = FlyJsonHelper::jsonInt(command, QStringLiteral("value"));
+			ms.first = FlyJsonHelper::jsonInt(command, QStringLiteral("value"));
 		if (command.contains(QStringLiteral("visible")))
-			ss.visible = FlyJsonHelper::jsonBool(command, QStringLiteral("visible"), ss.visible);
+			ms.visible = FlyJsonHelper::jsonBool(command, QStringLiteral("visible"), ms.visible);
 		dock_->saveState();
 		dock_->refreshUiFromState(false);
 		return;

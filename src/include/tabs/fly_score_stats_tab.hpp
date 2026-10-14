@@ -1,5 +1,5 @@
-#ifndef FLY_SCORE_TEAMS_STATS_TAB
-#define FLY_SCORE_TEAMS_STATS_TAB
+#ifndef FLY_SCORE_STATS_TAB
+#define FLY_SCORE_STATS_TAB
 
 #pragma once
 
@@ -22,52 +22,50 @@ class QLabel;
 class QShortcut;
 class FlyScoreWebSocketServer;
 
-class FlyTeamsStatsTab : public FlyDockTab {
+class FlyStatsTab : public FlyDockTab {
 public:
-	explicit FlyTeamsStatsTab(const QString &title, const QString &dataDir, FlyScoreState::FlyState &state,
-				  FlyScoreDock *dock, QWidget *parent)
-		: FlyDockTab(title, dataDir, state, dock, parent)
+	explicit FlyStatsTab(const QString &title, const bool isMatchStat, const QString &dataDir,
+			     FlyScoreState::FlyState &state, FlyScoreDock *dock, QWidget *parent)
+		: FlyDockTab(title, dataDir, state, dock, parent), isMatchStat(isMatchStat)
 	{
 		this->init();
 		this->buildUI();
 	};
 
-	~FlyTeamsStatsTab() override;
+	~FlyStatsTab() override;
 
 public:
 	void refreshUiFromState(bool onlyTimeIfRunning) override;
 	void syncUiFromState() override;
 	void syncStateFromUi() override;
-	void bumpTeamStat(int index, int delta, bool isHome);
-	void toggleTeamStatVisible(int index);
+	void bumpStat(int index, int delta, bool isHome);
+	void toggleStatVisible(int index);
 
 public slots:
 
 private slots:
 
 private:
-	struct FlyTeamsStatUIRow {
+	struct FlyStatUIRow {
 		QWidget *row = nullptr;
 		QCheckBox *visibleCheck = nullptr;
 		QLabel *labelLbl = nullptr;
-		QSpinBox *homeSpin = nullptr;
-		QSpinBox *guestSpin = nullptr;
-		QToolButton *minusHome = nullptr;
-		QToolButton *plusHome = nullptr;
-		QToolButton *minusGuest = nullptr;
-		QToolButton *plusGuest = nullptr;
+		QSpinBox *firstSpin = nullptr;
+		QToolButton *minusFirstSpin = nullptr;
+		QToolButton *plusFirstSpin = nullptr;
+		QSpinBox *secondSpin = nullptr;
+		QToolButton *minusSecondSpin = nullptr;
+		QToolButton *plusSecondSpin = nullptr;
 	};
 
-	
 	QVBoxLayout *layout = nullptr;
-	QList<FlyTeamsStatUIRow> teamsStats;
-
-	void clearAllTeamsStatsRows();
+	QList<FlyStatUIRow> stats;
+	bool isMatchStat;
+	void clearAllStatsRows();
 
 protected:
 	void init() override;
 	void buildUI() override;
-
 };
 
 #endif

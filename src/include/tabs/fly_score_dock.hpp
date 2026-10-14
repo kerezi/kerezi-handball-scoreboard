@@ -20,7 +20,7 @@ class QShortcut;
 class QJsonObject;
 class FlyScoreWebSocketServer;
 class FlyConfigTab;
-class FlyTeamsStatsTab;
+class FlyStatsTab;
 
 struct FlyMatchStatUi {
 	QWidget *row = nullptr;
@@ -52,14 +52,12 @@ public:
 	void handleFrontendEvent(int event);
 	void loadState();
 	void saveState();
-	void bumpTeamStat(int index, int delta, bool isHome);
-	void toggleTeamStatVisible(int index);
+	void bumpStat(int index, int delta, bool isHome, bool isMatchStat);
+	void toggleStatVisible(int index, bool isMatchStat);
 	
-	void bumpMatchStat(int index, int delta);
 	void activateTemplateFolder(const QString &path);
 	void refreshUiFromState(bool onlyTimeIfRunning = false);
 public slots:
-	void toggleMatchStatVisible(int index);
 	void ensureResourcesDefaults();
 	void appendEvent(const QString &event);
 	void startEventLog(const QString &firstEvent = QStringLiteral("Stream Start"));
@@ -68,8 +66,6 @@ public slots:
 
 private:
 	void clearAllMatchStatRows();
-	void loadMatchStatControlsFromState();
-	void syncMatchStatControlsToState();
 
 	void clearAllTimerRows();
 	void loadTimerControlsFromState();
@@ -85,10 +81,8 @@ private:
 	FlyScoreState::FlyState lastLoggedState_;
 
 	FlyConfigTab *configTab_ = nullptr;
-	FlyTeamsStatsTab *teamsStatsTab_ = nullptr;
-
-	QVBoxLayout *singleStatsLayout_ = nullptr;
-	QList<FlyMatchStatUi> singleStats_;
+	FlyStatsTab *teamsStatsTab_ = nullptr;
+	FlyStatsTab *matchStatsTab_ = nullptr;
 
 	QVBoxLayout *timersLayout_ = nullptr;
 	QList<FlyTimerUi> timers_;
