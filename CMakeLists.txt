@@ -153,6 +153,8 @@ list(
   ${FS_ITA_DIR}/fly_score_config_tab.hpp
   ${FS_TAB_DIR}/fly_score_stats_tab.cpp
   ${FS_ITA_DIR}/fly_score_stats_tab.hpp
+  ${FS_TAB_DIR}/fly_score_handball_tab.cpp
+  ${FS_ITA_DIR}/fly_score_handball_tab.hpp
   ${FS_DIA_DIR}/fly_score_base_dialog.cpp
   ${FS_IDI_DIR}/fly_score_base_dialog.hpp
   ${FS_DIA_DIR}/fly_score_match_info_dialog.cpp

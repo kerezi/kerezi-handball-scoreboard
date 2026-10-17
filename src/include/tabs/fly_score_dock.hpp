@@ -21,6 +21,7 @@ class QJsonObject;
 class FlyScoreWebSocketServer;
 class FlyConfigTab;
 class FlyStatsTab;
+class FlyHandballTab;
 
 struct FlyMatchStatUi {
 	QWidget *row = nullptr;
@@ -83,6 +84,8 @@ private:
 	FlyConfigTab *configTab_ = nullptr;
 	FlyStatsTab *teamsStatsTab_ = nullptr;
 	FlyStatsTab *matchStatsTab_ = nullptr;
+	FlyHandballTab *handballTab_ = nullptr;
+	
 
 	QVBoxLayout *timersLayout_ = nullptr;
 	QList<FlyTimerUi> timers_;

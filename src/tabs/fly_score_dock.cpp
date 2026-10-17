@@ -21,6 +21,8 @@
 #include "fly_score_config_tab.hpp"
 #include "fly_score_stats_tab.hpp"
 
+#include "fly_score_handball_tab.hpp"
+
 #ifdef ENABLE_EMBEDDED_DEFAULTS
 #include "embedded_assets.hpp"
 #endif
@@ -117,12 +119,7 @@ bool FlyScoreDock::init()
 	eventsVBox->setContentsMargins(6, 6, 6, 6);
 	eventsVBox->setSpacing(6);
 
-	auto *handballTab = new QWidget(tabs);
-	auto *handballGL = new QGridLayout(handballTab);
-	handballGL->setContentsMargins(0, 0, 0, 0);
-	handballGL->setHorizontalSpacing(6);
-	handballGL->setVerticalSpacing(0);
-	// handballLayout_ = handballGL;
+	handballTab_ = new FlyHandballTab("tabs", dataDir_, st_, this, tabs);
 
 	auto *eventsTop = new QHBoxLayout();
 	eventLogStatus_ = new QLabel(eventsTab);
@@ -174,7 +171,7 @@ bool FlyScoreDock::init()
 	tabs->addTab(matchStatsTab_, QStringLiteral("📈"));
 	tabs->addTab(timersTab, QStringLiteral("⏱️"));
 	tabs->addTab(eventsTab, QStringLiteral("🎫"));
-	tabs->addTab(handballTab, QStringLiteral("🤾‍♀️"));
+	tabs->addTab(handballTab_, QStringLiteral("🤾‍♀️"));
 
 	connect(eventLogToggle_, &QPushButton::clicked, this, [this]() {
 		if (eventLog_.isActive())
@@ -588,9 +585,6 @@ void FlyScoreDock::loadTimerControlsFromState()
 	}
 	timersLayout_->addStretch(1);
 }
-
-// void FlyScoreDock::loadHandballFromState()
-// {
 // 	// handballLayout_->
 // 	// 1st row
 // 	int posRow = 0;
@@ -670,7 +664,6 @@ void FlyScoreDock::loadTimerControlsFromState()
 // 		handballLayout_->addWidget(gtln, posRow, posCol, curHei, curWid);
 // 		posCol += curWid;
 // 	}
-
 // 	posRow += 1;
 // 	posCol = 0;
 // 	// 2nd row
@@ -751,6 +744,10 @@ void FlyScoreDock::loadTimerControlsFromState()
 // 		handballLayout_->addWidget(gtsn, posRow, posCol, curHei, curWid);
 // 		posCol += curWid;
 // 	}
+// void FlyScoreDock::loadHandballFromState()
+// {
+
+
 
 // 	posRow += 1;
 // 	posCol = 0;

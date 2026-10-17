@@ -5,8 +5,6 @@
 
 #define LOG_TAG "[" PLUGIN_NAME "][stats-tab]"
 
-#include "fly_score_log.hpp"
-
 #include "fly_score_i18n.hpp"
 #include "fly_score_qt_helpers.hpp"
 #include "fly_score_state.hpp"

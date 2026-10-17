@@ -28,10 +28,12 @@
 		8.0.5. Extract the match stats tab from main dock
 			8.0.4.1. Change Single Stats (Struct, Serilize, Deserilize) to Match stats & Custom field to Team Stats
 			8.0.4.2. Extract the teams stats tab from main dock
-			8.0.4.3. Extract the match stats tab from main dock
+			8.0.4.3. Extract the match stats tab from main dock and generalize tab with team stat tab
+--------8.0.6. Extract the timer tab from main dock
+--------8.0.7. Extract the event log tab from main dock
+--------8.0.*. Move out from tabs and dock related to websocket server
 ++++
 ----
-		8.0.*. Extract the rest tabs from main dock
 	8.1. Handball Tab Ui in Fly Dock
 
 
