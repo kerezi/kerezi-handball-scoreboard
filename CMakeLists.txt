@@ -47,12 +47,14 @@ endif()
 # Paths
 # ---------------------------------------------------------------------------
 set(FS_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
+set(FS_SUI_DIR "${FS_SRC_DIR}/ui")
 set(FS_MAI_DIR "${FS_SRC_DIR}/main")
 set(FS_HLP_DIR "${FS_SRC_DIR}/help")
 set(FS_DIA_DIR "${FS_SRC_DIR}/dialogs")
 set(FS_TAB_DIR "${FS_SRC_DIR}/tabs")
 set(FS_3P_DIR "${FS_SRC_DIR}/thirdparty")
 set(FS_INC_DIR "${FS_SRC_DIR}/include")
+set(FS_IUI_DIR "${FS_INC_DIR}/ui")
 set(FS_IMA_DIR "${FS_INC_DIR}/main")
 set(FS_IDI_DIR "${FS_INC_DIR}/dialogs")
 set(FS_IHL_DIR "${FS_INC_DIR}/help")
@@ -108,11 +110,13 @@ target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE ENABLE_QT=1)
 # ---------------------------------------------------------------------------
 target_include_directories(${CMAKE_PROJECT_NAME}
   PRIVATE ${FS_SRC_DIR}
+            ${FS_SUI_DIR}
             ${FS_MAI_DIR}
             ${FS_HLP_DIR}
             ${FS_DIA_DIR}
             ${FS_TAB_DIR}
             ${FS_INC_DIR}
+              ${FS_IUI_DIR}
               ${FS_IMA_DIR}
               ${FS_IHL_DIR}
               ${FS_IDI_DIR}
@@ -146,6 +150,8 @@ list(
   APPEND
   OBS_FLY_SCORE_SRC
   ${FS_ITA_DIR}/fly_score_horizontal_tab_bar.hpp
+  ${FS_SUI_DIR}/fly_score_clickable_label.cpp
+  ${FS_IUI_DIR}/fly_score_clickable_label.hpp
   ${FS_TAB_DIR}/fly_score_dock.cpp
   ${FS_ITA_DIR}/fly_score_dock.hpp
   ${FS_ITA_DIR}/fly_score_dock_tab.hpp

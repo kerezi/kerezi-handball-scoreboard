@@ -20,15 +20,18 @@ class QGridLayout;
 class QLabel;
 class QShortcut;
 class FlyScoreWebSocketServer;
+class FlyClickableLabel;
+
 
 class FlyHandballTab : public FlyDockTab {
 public:
 	explicit FlyHandballTab(const QString &title, const QString &dataDir, FlyScoreState::FlyState &state,
-			    FlyScoreDock *dock, QWidget *parent)
-		: FlyDockTab(title, dataDir, state, dock, parent) {
-			this->init();
-			this->buildUI();
-		};
+				FlyScoreDock *dock, QWidget *parent)
+		: FlyDockTab(title, dataDir, state, dock, parent)
+	{
+		this->init();
+		this->buildUI();
+	};
 
 	~FlyHandballTab() override;
 
@@ -41,17 +44,42 @@ private slots:
 	void onClearTeamsAndReset();
 
 private:
-
-private:
 	int posRow = 0;
 	int posCol = 0;
 	int curHei = 0;
 	int curWid = 0;
 
-    void buildUI_matchInfo();
-    // void buildUI_players();
-    // void buildUI_matchOfficialInfo();
-    // void buildUI_matchOfficials();
+	QLabel *htln = nullptr;
+	QLabel *htf2s = nullptr;
+	QLabel *hts2s = nullptr;
+	QLabel *htt2s = nullptr;
+	FlyClickableLabel *mt = nullptr;
+	QLabel *gtt2s = nullptr;
+	QLabel *gts2s = nullptr;
+	QLabel *gtf2s = nullptr;
+	QLabel *gtln = nullptr;
+	QLabel *htsn = nullptr;
+	QLabel *htny = nullptr;
+	QLabel *htnf2ms = nullptr;
+	QLabel *htns2ms = nullptr;
+	QLabel *htnt2ms = nullptr;
+	QLabel *htnd = nullptr;
+	QLabel *htnb = nullptr;
+	QLabel *mr = nullptr;
+	QLabel *gtnb = nullptr;
+	QLabel *gtnd = nullptr;
+	QLabel *gtny = nullptr;
+	QLabel *gtnf2ms = nullptr;
+	QLabel *gtns2ms = nullptr;
+	QLabel *gtnt2ms = nullptr;
+	QLabel *gtsn = nullptr;
+
+	void buildUI_matchInfo();
+	// void buildUI_players();
+	// void buildUI_matchOfficialInfo();
+	// void buildUI_matchOfficials();
+
+	void connectUi();
 
 protected:
 	void init() override;
@@ -59,6 +87,5 @@ protected:
 
 	QGridLayout *handballTabLayout_ = nullptr;
 };
-
 
 #endif

@@ -56,6 +56,8 @@ public:
 	void bumpStat(int index, int delta, bool isHome, bool isMatchStat);
 	void toggleStatVisible(int index, bool isMatchStat);
 	
+	void toggleTimerRunning(int index);
+
 	void activateTemplateFolder(const QString &path);
 	void refreshUiFromState(bool onlyTimeIfRunning = false);
 public slots:

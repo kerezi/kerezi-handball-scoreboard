@@ -37,5 +37,10 @@
 	8.1. Handball Tab Ui in Fly Dock
 
 
+-----------
+
 https://emojidb.org/rotated-timer-emojis?utm_source=user_search
+
 ^([:]?[0-9][0-9]){3,3}.[0-9][0-9][0-9]:[ \[\]a-zA-Z0-9:+-\\(\\)"*_]*
+
+ = [\w \\(".\\)]*

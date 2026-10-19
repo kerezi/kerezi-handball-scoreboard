@@ -433,6 +433,7 @@ void FlyScoreDock::refreshUiFromState(bool onlyTimeIfRunning)
 	configTab_->refreshUiFromState(onlyTimeIfRunning);
 	teamsStatsTab_->syncUiFromState();
 	matchStatsTab_->syncUiFromState();
+	handballTab_->syncUiFromState();
 
 	loadTimerControlsFromState();
 	// loadHandballFromState();
@@ -1090,6 +1091,12 @@ void FlyScoreDock::toggleStatVisible(int index, bool isMatchStat)
 		matchStatsTab_->toggleStatVisible(index);
 	else
 		teamsStatsTab_->toggleStatVisible(index);
+}
+
+void FlyScoreDock::toggleTimerRunning(int index)
+{
+	LOGI("toggleTimerRunning(int index = %d)", index);
+	configTab_->toggleTimerRunning(index);
 }
 
 void FlyScoreDock::ensureResourcesDefaults()
