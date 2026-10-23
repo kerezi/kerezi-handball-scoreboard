@@ -220,7 +220,8 @@ void FlyStatsTab::syncUiFromState()
 		};
 
 		connect(firstSpin, qOverload<int>(&QSpinBox::valueChanged), this, [sync](int) { sync(); });
-		connect(secondSpin, qOverload<int>(&QSpinBox::valueChanged), this, [sync](int) { sync(); });
+		if (secondSpin != nullptr)
+			connect(secondSpin, qOverload<int>(&QSpinBox::valueChanged), this, [sync](int) { sync(); });
 		connect(visibleCheck, &QCheckBox::toggled, this, [sync](bool) { sync(); });
 
 		connect(minusFirstSpin, &QToolButton::clicked, this, [firstSpin, sync]() {
@@ -281,7 +282,7 @@ void FlyStatsTab::bumpStat(int index, int delta, bool isHome)
 		spin->setValue(std::max(0, spin->value() + delta));
 		return;
 	}
-	
+
 	(*stStats)[index].first = std::max(0, (*stStats)[index].first + delta);
 	dock_->saveState();
 }

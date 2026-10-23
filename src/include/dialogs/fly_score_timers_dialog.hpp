@@ -25,6 +25,7 @@ private:
         QWidget    *row       = nullptr;
         QLineEdit  *labelEdit = nullptr;
         QLineEdit  *timeEdit  = nullptr;
+        QLineEdit  *durationEdit  = nullptr;
         QComboBox  *modeCombo = nullptr;
         QPushButton *remove   = nullptr;
     };

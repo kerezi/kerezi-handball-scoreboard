@@ -34,7 +34,7 @@ function liveTimerMs(timer) {
 
   const mode = timer.mode || "countdown";
   const running = !!timer.running;
-  const baseRemaining = Number(timer.remaining_ms ?? 0);
+  const baseRemaining = Number(timer.current_moment_ms ?? 0);
   const lastTick = Number(timer.last_tick_ms ?? 0);
 
   // If not running or no tick info, just trust remaining_ms

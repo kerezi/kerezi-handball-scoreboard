@@ -8,6 +8,7 @@
 #include <QList>
 #include <QKeySequence>
 #include <QToolButton>
+#include <QVector>
 
 #include "fly_score_state.hpp"
 #include "fly_score_dock.hpp"
@@ -20,8 +21,7 @@ class QGridLayout;
 class QLabel;
 class QShortcut;
 class FlyScoreWebSocketServer;
-class FlyClickableLabel;
-
+class QPushButton;
 
 class FlyHandballTab : public FlyDockTab {
 public:
@@ -44,42 +44,74 @@ private slots:
 	void onClearTeamsAndReset();
 
 private:
+	struct FlyTeamPlayerUI {
+		QLabel *teamPlayerTShirtNumber = nullptr;
+		QLabel *teamPlayerTShirtName = nullptr;
+
+		QPushButton *teamPlayerWarningTime = nullptr;
+		QPushButton *teamPlayerFrst2minSuspTimer = nullptr;
+		QPushButton *teamPlayerScnd2minSuspTimer = nullptr;
+		QPushButton *teamPlayerThrd2minSuspTimer = nullptr;
+		QPushButton *teamPlayerDisqualificationTime = nullptr;
+		QPushButton *teamPlayerBlueCardTime = nullptr;
+		QPushButton *teamPlayerGoals = nullptr;
+	};
+
+	struct FlyTeamUI {
+		QLabel *teamLongName = nullptr;
+		QLabel *teamFrst2minSuspTimer = nullptr;
+		QLabel *teamScnd2minSuspTimer = nullptr;
+		QLabel *teamThrd2minSuspTimer = nullptr;
+
+		QLabel *teamShrtName = nullptr;
+		QLabel *teamNumOfYllCard = nullptr;
+		QLabel *teamNumOfFrst2minSup = nullptr;
+		QLabel *teamNumOfScnd2minSup = nullptr;
+		QLabel *teamNumOfThrd2minSup = nullptr;
+		QLabel *teamNumOfRedCard = nullptr;
+		QLabel *teamNumOfBluCard = nullptr;
+
+		QVector<FlyTeamPlayerUI *> *players = new QVector<FlyTeamPlayerUI *>();
+
+		QPushButton *teamTimeout = nullptr;
+		QLabel *teamOfficials = nullptr;
+		QLabel *teamOfficialsNumOfYllCard = nullptr;
+		QLabel *teamOfficialsNumOf2minSup = nullptr;
+		QLabel *teamOfficialsNumOfRedCard = nullptr;
+		QLabel *teamOfficialsNumOfBluCard = nullptr;
+
+		QVector<FlyTeamPlayerUI *> *officials = new QVector<FlyTeamPlayerUI *>();
+	};
+
 	int posRow = 0;
 	int posCol = 0;
 	int curHei = 0;
 	int curWid = 0;
 
-	QLabel *htln = nullptr;
-	QLabel *htf2s = nullptr;
-	QLabel *hts2s = nullptr;
-	QLabel *htt2s = nullptr;
-	FlyClickableLabel *mt = nullptr;
-	QLabel *gtt2s = nullptr;
-	QLabel *gts2s = nullptr;
-	QLabel *gtf2s = nullptr;
-	QLabel *gtln = nullptr;
-	QLabel *htsn = nullptr;
-	QLabel *htny = nullptr;
-	QLabel *htnf2ms = nullptr;
-	QLabel *htns2ms = nullptr;
-	QLabel *htnt2ms = nullptr;
-	QLabel *htnd = nullptr;
-	QLabel *htnb = nullptr;
+	int debugId = 0;
+
+	FlyTeamUI *home = nullptr;
+	FlyTeamUI *guest = nullptr;
+
+	QPushButton *mt = nullptr;
 	QLabel *mr = nullptr;
-	QLabel *gtnb = nullptr;
-	QLabel *gtnd = nullptr;
-	QLabel *gtny = nullptr;
-	QLabel *gtnf2ms = nullptr;
-	QLabel *gtns2ms = nullptr;
-	QLabel *gtnt2ms = nullptr;
-	QLabel *gtsn = nullptr;
 
 	void buildUI_matchInfo();
-	// void buildUI_players();
-	// void buildUI_matchOfficialInfo();
-	// void buildUI_matchOfficials();
+	void buildUI_matchInfo_Team_FirstLine(bool isHome);
+	void buildUI_matchInfo_Team_SecondLine(bool isHome);
+
+	void buildUI_players();
+	void buildUI_team_player(int row, bool isHome);
+	void buildUI_matchOfficialInfo(bool isHome);
+	void buildUI_matchOfficials();
+	void buildUI_team_official(int row, bool isHome);
+
+	QLabel *newQLabel(QString title, int height, int width, bool isHome, bool isTeam = false, QFlags<Qt::AlignmentFlag> alf = Qt::AlignCenter);
+	QPushButton *newFlyClickableLabel(QString title, int height, int width, bool isHome, bool isTeam = false, QFlags<Qt::AlignmentFlag> alf = Qt::AlignCenter);
 
 	void connectUi();
+	void syncLabelFromState(QLabel *l, bool disable, bool out, QString text);
+	void syncButtonFromState(QPushButton *b, bool disable, bool out, QString text);
 
 protected:
 	void init() override;

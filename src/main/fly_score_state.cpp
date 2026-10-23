@@ -60,7 +60,7 @@ FlyScoreState::FlyTimer FlyScoreState::makeDefaultMainTimer()
 	t.mode = QStringLiteral("countup");
 	t.running = false;
 	t.initial_ms = 0;
-	t.remaining_ms = 0;
+	t.current_moment_ms = 0;
 	t.last_tick_ms = 0;
 	t.visible = true;
 	return t;
@@ -109,7 +109,8 @@ QJsonObject FlyScoreState::timerToJson(const FlyScoreState::FlyTimer &t)
 	o["mode"] = t.mode;
 	o["running"] = t.running;
 	o["initial_ms"] = QString::number(t.initial_ms);
-	o["remaining_ms"] = QString::number(t.remaining_ms);
+	o["duration_ms"] = QString::number(t.duration_ms);
+	o["current_moment_ms"] = QString::number(t.current_moment_ms);
 	o["last_tick_ms"] = QString::number(t.last_tick_ms);
 	o["visible"] = t.visible;
 	return o;
@@ -122,7 +123,8 @@ FlyScoreState::FlyTimer FlyScoreState::timerFromJson(const QJsonObject &o)
 	t.mode = o.value("mode").toString("countdown");
 	t.running = o.value("running").toBool(false);
 	t.initial_ms = o.value("initial_ms").toString("0").toLongLong();
-	t.remaining_ms = o.value("remaining_ms").toString("0").toLongLong();
+	t.duration_ms = o.value("duration_ms").toString("0").toLongLong();
+	t.current_moment_ms = o.value("current_moment_ms").toString("0").toLongLong();
 	t.last_tick_ms = o.value("last_tick_ms").toString("0").toLongLong();
 	t.visible = o.value("visible").toBool(true);
 	return t;
@@ -555,7 +557,7 @@ void FlyScoreState::setTimerStoppedAtInitial(FlyScoreState::FlyTimer &timer)
 	timer.last_tick_ms = 0;
 	if (timer.initial_ms < 0)
 		timer.initial_ms = 0;
-	timer.remaining_ms = timer.initial_ms;
+	timer.current_moment_ms = timer.initial_ms;
 }
 
 QString FlyScoreState::fly_theme_manifest_path(const QString &themePath)

@@ -28,6 +28,8 @@
 FlyPlayersDialog::FlyPlayersDialog(const QString &dataDir, FlyScoreState::FlyState &state, QWidget *parent)
 	: FlyBaseDialog(fly_i18n("Players.Title"), fly_i18n("Players.Hint"), fly_i18n("Dock.Players"), dataDir, state, parent)
 {
+	resize(660, 820);
+
 	auto *tabs = new QTabWidget();
 	tabs->setObjectName(fly_i18n("Dock.Players"));
 	tabs->setDocumentMode(true);
@@ -149,7 +151,7 @@ FlyPlayersDialog::FlyPlayerUIRow FlyPlayersDialog::addPlayerUI(const FlyPlayersU
 
 	auto *playerTshirtNameEdit = new QLineEdit(row);
 	playerTshirtNameEdit->setPlaceholderText(fly_i18n("Players.PlayerNameLabelPlaceholder"));
-	playerTshirtNameEdit->setText(fp.playerName);
+	playerTshirtNameEdit->setText(fp.playerTshirtName);
 	playerTshirtNameEdit->setMinimumWidth(180);
 	playerTshirtNameEdit->setMaximumWidth(260);
 	if (fp.playerTshirtName == nullptr || fp.playerTshirtName == "") {

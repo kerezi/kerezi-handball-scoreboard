@@ -82,7 +82,8 @@ public:
 		QString mode;
 		bool running = false;
 		long long initial_ms = 0;
-		long long remaining_ms = 0;
+		long long duration_ms = 0;
+		long long current_moment_ms = 0;
 		long long last_tick_ms = 0;
 		bool visible = true;
 	};

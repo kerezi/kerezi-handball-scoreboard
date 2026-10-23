@@ -15,9 +15,9 @@
 	7.3. Teams Players
 		7.3.1 Modify struct about Teams: Players  Single Stats (Struct, Serilize, Deserilize)
 		7.3.2 Modify dialog about Teams: Players (Dialog)
------7.4. Timers
------7.3.1 Modify struct about Timers (Struct, Serilize, Deserilize)
------7.3.2 Modify dialog about Timers (Dialog)
+	7.4. Timers
+		7.4.1 Modify struct about Timers (Struct, Serilize, Deserilize)
+		7.4.2 Modify dialog about Timers (Dialog)
 8. Handball Tab
 	8.0. Reorganize in Fly Dock
 		8.0.1. Create sub folders dialgos, tabs, help, main and move corespondig files there		8.0.2. Extract config tab from main dock
@@ -32,9 +32,9 @@
 --------8.0.6. Extract the timer tab from main dock
 --------8.0.7. Extract the event log tab from main dock
 --------8.0.*. Move out from tabs and dock related to websocket server
+	8.1. Handball Tab Ui in Fly Dock
 ++++
 ----
-	8.1. Handball Tab Ui in Fly Dock
 
 
 -----------

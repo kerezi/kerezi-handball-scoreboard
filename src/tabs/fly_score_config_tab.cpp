@@ -35,7 +35,6 @@
 #include <QSettings>
 #include <QFileDialog>
 
-
 void FlyConfigTab::init()
 {
 	hotkeyBindings_ = fly_hotkeys_load(dataDir_);
@@ -180,18 +179,24 @@ void FlyConfigTab::buildUI()
 
 	connect(selectTemplateFolderBtn_, &QPushButton::clicked, this, [this](bool on) {
 		const QString cur = dataDir_.isEmpty() ? fly_get_data_root_no_ui() : dataDir_;
-		const QString picked = QFileDialog::getExistingDirectory(this, fly_i18n("Dock.SelectTemplateFolderTitle"), cur);
+		const QString picked =
+			QFileDialog::getExistingDirectory(this, fly_i18n("Dock.SelectTemplateFolderTitle"), cur);
 		if (picked.isEmpty())
 			return;
 
 		dock_->activateTemplateFolder(picked);
 	});
 
-	connect(matchInfoBtn_, &QPushButton::clicked, this, [this](bool on) {onOpenDialog(new FlyMatchInfoDialog(dataDir_, state_, this));});
-	connect(teamsBtn_, &QPushButton::clicked, this, [this](bool on) {onOpenDialog(new FlyTeamsDialog(dataDir_, state_, this));});
-	connect(playersBtn_, &QPushButton::clicked, this, [this](bool on) {onOpenDialog(new FlyPlayersDialog(dataDir_, state_, this));});
-	connect(editFieldsBtn_, &QPushButton::clicked, this, [this](bool on) {onOpenDialog(new FlyStatsDialog(dataDir_, state_, this));});
-	connect(editTimersBtn_, &QPushButton::clicked, this, [this](bool on) {onOpenDialog(new FlyTimersDialog(dataDir_, state_, this));});
+	connect(matchInfoBtn_, &QPushButton::clicked, this,
+		[this](bool on) { onOpenDialog(new FlyMatchInfoDialog(dataDir_, state_, this)); });
+	connect(teamsBtn_, &QPushButton::clicked, this,
+		[this](bool on) { onOpenDialog(new FlyTeamsDialog(dataDir_, state_, this)); });
+	connect(playersBtn_, &QPushButton::clicked, this,
+		[this](bool on) { onOpenDialog(new FlyPlayersDialog(dataDir_, state_, this)); });
+	connect(editFieldsBtn_, &QPushButton::clicked, this,
+		[this](bool on) { onOpenDialog(new FlyStatsDialog(dataDir_, state_, this)); });
+	connect(editTimersBtn_, &QPushButton::clicked, this,
+		[this](bool on) { onOpenDialog(new FlyTimersDialog(dataDir_, state_, this)); });
 }
 
 void FlyConfigTab::onOpenDialog(QDialog *dlg)
@@ -207,13 +212,12 @@ void FlyConfigTab::onOpenDialog(QDialog *dlg)
 	applyHotkeyBindings(hotkeyBindings_);
 }
 
-void FlyConfigTab::syncUiFromState() {
+void FlyConfigTab::syncUiFromState()
+{
 	refreshUiFromState(false);
 }
 
-void FlyConfigTab::syncStateFromUi() {
-	
-}
+void FlyConfigTab::syncStateFromUi() {}
 
 void FlyConfigTab::refreshUiFromState(bool onlyTimeIfRunning)
 {
@@ -244,9 +248,24 @@ void FlyConfigTab::onClearTeamsAndReset()
 		qint64 ms = tm.initial_ms;
 		if (ms < 0)
 			ms = 0;
-		tm.remaining_ms = ms;
+		tm.current_moment_ms = ms;
 		tm.running = false;
 		// tm.last_tick_ms = 0;
+	}
+
+	for (FlyScoreState::FlyTeam *t : {&state_.home, &state_.guest}) {
+		t->fstTimeout_ms = 0;
+		t->sndTimeout_ms = 0;
+		t->trdTimeout_ms = 0;
+		for (int i = 0; i < t->players.size(); i++) {
+			t->players[i].warning_ms = 0;
+			t->players[i].fst2minSusp_ms = 0;
+			t->players[i].snd2minSusp_ms = 0;
+			t->players[i].trd2minSusp_ms = 0;
+			t->players[i].disqualification_ms = 0;
+			t->players[i].blueCard_ms = 0;
+			t->players[i].goals.clear();
+		}
 	}
 
 	dock_->saveState();
@@ -412,9 +431,11 @@ void FlyConfigTab::applyHotkeyBindings(const QList<FlyHotkeyBinding> &bindings)
 				connect(sc, &QShortcut::activated, this,
 					[this, idx]() { dock_->toggleStatVisible(idx, true); });
 			else if (action == QLatin1String("inc"))
-				connect(sc, &QShortcut::activated, this, [this, idx]() { dock_->bumpStat(idx, +1, false, true); });
+				connect(sc, &QShortcut::activated, this,
+					[this, idx]() { dock_->bumpStat(idx, +1, false, true); });
 			else if (action == QLatin1String("dec"))
-				connect(sc, &QShortcut::activated, this, [this, idx]() { dock_->bumpStat(idx, -1, false, true); });
+				connect(sc, &QShortcut::activated, this,
+					[this, idx]() { dock_->bumpStat(idx, -1, false, true); });
 
 		} else if (id.startsWith(QLatin1String("timer_"))) {
 			const auto parts = id.split(QLatin1Char('_'));
@@ -449,7 +470,6 @@ void FlyConfigTab::openHotkeysDialog()
 
 	dlg->show();
 }
-
 
 void FlyConfigTab::onSelectTemplateFolder()
 {
@@ -510,7 +530,8 @@ void FlyConfigTab::handleRemoteCommand(const QJsonObject &command)
 
 	if (action == QLatin1String("set_state") && command.value(QStringLiteral("state")).isObject()) {
 		FlyScoreState::FlyState next;
-		if (FlyScoreState::fly_state_from_json_object(command.value(QStringLiteral("state")).toObject(), next)) {
+		if (FlyScoreState::fly_state_from_json_object(command.value(QStringLiteral("state")).toObject(),
+							      next)) {
 			state_ = next;
 			dock_->saveState();
 			dock_->refreshUiFromState(false);
@@ -717,11 +738,11 @@ void FlyConfigTab::handleRemoteCommand(const QJsonObject &command)
 		if (command.contains(QStringLiteral("initial_ms")))
 			timer.initial_ms =
 				std::max<qint64>(0, FlyJsonHelper::jsonInt64(command, QStringLiteral("initial_ms")));
-		if (command.contains(QStringLiteral("remaining_ms")))
-			timer.remaining_ms =
-				std::max<qint64>(0, FlyJsonHelper::jsonInt64(command, QStringLiteral("remaining_ms")));
+		if (command.contains(QStringLiteral("current_moment_ms")))
+			timer.current_moment_ms = std::max<qint64>(
+				0, FlyJsonHelper::jsonInt64(command, QStringLiteral("current_moment_ms")));
 		else if (command.contains(QStringLiteral("initial_ms")))
-			timer.remaining_ms = timer.initial_ms;
+			timer.current_moment_ms = timer.initial_ms;
 		if (command.contains(QStringLiteral("visible")))
 			timer.visible = FlyJsonHelper::jsonBool(command, QStringLiteral("visible"), timer.visible);
 
@@ -750,7 +771,7 @@ void FlyConfigTab::handleRemoteCommand(const QJsonObject &command)
 	}
 	if (action == QLatin1String("timer_reset") && index >= 0 && index < state_.timers.size()) {
 		FlyScoreState::FlyTimer &t = state_.timers[index];
-		t.remaining_ms = std::max<qint64>(0, t.initial_ms);
+		t.current_moment_ms = std::max<qint64>(0, t.initial_ms);
 		t.running = false;
 		t.last_tick_ms = 0;
 		dock_->saveState();
@@ -768,11 +789,11 @@ void FlyConfigTab::toggleTimerRunning(int index)
 	const qint64 now = FlyQtHelper::fly_now_ms();
 
 	if (!tm.running) {
-		if (tm.remaining_ms < 0) {
+		if (tm.current_moment_ms < 0) {
 			if (tm.mode == QStringLiteral("countdown"))
-				tm.remaining_ms = (tm.initial_ms > 0) ? tm.initial_ms : 0;
+				tm.current_moment_ms = (tm.initial_ms > 0) ? tm.initial_ms : 0;
 			else
-				tm.remaining_ms = 0;
+				tm.current_moment_ms = 0;
 		}
 		tm.last_tick_ms = now;
 		tm.running = true;
@@ -783,11 +804,11 @@ void FlyConfigTab::toggleTimerRunning(int index)
 				elapsed = 0;
 
 			if (tm.mode == QStringLiteral("countup"))
-				tm.remaining_ms += elapsed;
+				tm.current_moment_ms += elapsed;
 			else {
-				tm.remaining_ms -= elapsed;
-				if (tm.remaining_ms < 0)
-					tm.remaining_ms = 0;
+				tm.current_moment_ms -= elapsed;
+				if (tm.current_moment_ms < 0)
+					tm.current_moment_ms = 0;
 			}
 		}
 		tm.running = false;

@@ -383,9 +383,9 @@ void FlyScoreDock::logStateChanges(const FlyScoreState::FlyState &before, const 
 		if (oldTimer.running != timer.running)
 			eventLog_.appendEvent(QStringLiteral("%1 %2").arg(
 				label, timer.running ? QStringLiteral("Start") : QStringLiteral("Pause")));
-		else if (!timer.running && oldTimer.remaining_ms != timer.remaining_ms)
+		else if (!timer.running && oldTimer.current_moment_ms != timer.current_moment_ms)
 			eventLog_.appendEvent(
-				QStringLiteral("%1 set to %2 seconds").arg(label).arg(timer.remaining_ms / 1000));
+				QStringLiteral("%1 set to %2 seconds").arg(label).arg(timer.current_moment_ms / 1000));
 		if (oldTimer.visible != timer.visible)
 			eventLog_.appendEvent(QStringLiteral("%1 %2").arg(
 				label, timer.visible ? QStringLiteral("shown") : QStringLiteral("hidden")));
@@ -409,7 +409,7 @@ void FlyScoreDock::loadState()
 		main.mode = QStringLiteral("countup");
 		main.running = false;
 		main.initial_ms = 0;
-		main.remaining_ms = 0;
+		main.current_moment_ms = 0;
 		main.last_tick_ms = 0;
 		st_.timers.push_back(main);
 		FlyScoreState::fly_state_save(dataDir_, st_);
@@ -464,7 +464,7 @@ void FlyScoreDock::loadTimerControlsFromState()
 		main.mode = QStringLiteral("countup");
 		main.running = false;
 		main.initial_ms = 0;
-		main.remaining_ms = 0;
+		main.current_moment_ms = 0;
 		main.last_tick_ms = 0;
 		main.visible = true;
 		st_.timers.push_back(main);
@@ -505,7 +505,7 @@ void FlyScoreDock::loadTimerControlsFromState()
 		timeEdit->setClearButtonEnabled(true);
 		timeEdit->setMaxLength(8);
 		timeEdit->setMinimumWidth(60);
-		timeEdit->setText(FlyQtHelper::fly_format_ms_mmss(tm.remaining_ms));
+		timeEdit->setText(FlyQtHelper::fly_format_ms_mmss(tm.current_moment_ms));
 
 		auto *startStopBtn =
 			makeEmojiBtn(tm.running ? QStringLiteral("⏸️") : QStringLiteral("▶️"),
@@ -547,20 +547,20 @@ void FlyScoreDock::loadTimerControlsFromState()
 
 			FlyScoreState::FlyTimer &t = st_.timers[i];
 			if (t.running) {
-				timeEdit->setText(FlyQtHelper::fly_format_ms_mmss(t.remaining_ms));
+				timeEdit->setText(FlyQtHelper::fly_format_ms_mmss(t.current_moment_ms));
 				return;
 			}
 
 			qint64 ms = FlyQtHelper::fly_parse_mmss_to_ms(timeEdit->text());
 			if (ms < 0) {
-				timeEdit->setText(FlyQtHelper::fly_format_ms_mmss(t.remaining_ms));
+				timeEdit->setText(FlyQtHelper::fly_format_ms_mmss(t.current_moment_ms));
 				return;
 			}
 
 			t.initial_ms = ms;
-			t.remaining_ms = ms;
+			t.current_moment_ms = ms;
 			saveState();
-			timeEdit->setText(FlyQtHelper::fly_format_ms_mmss(t.remaining_ms));
+			timeEdit->setText(FlyQtHelper::fly_format_ms_mmss(t.current_moment_ms));
 		});
 
 		connect(startStopBtn, &QPushButton::clicked, this, [this, i]() { configTab_->toggleTimerRunning(i); });
@@ -574,7 +574,7 @@ void FlyScoreDock::loadTimerControlsFromState()
 			if (ms < 0)
 				ms = 0;
 
-			t.remaining_ms = ms;
+			t.current_moment_ms = ms;
 			t.running = false;
 			t.last_tick_ms = 0;
 
@@ -745,11 +745,6 @@ void FlyScoreDock::loadTimerControlsFromState()
 // 		handballLayout_->addWidget(gtsn, posRow, posCol, curHei, curWid);
 // 		posCol += curWid;
 // 	}
-// void FlyScoreDock::loadHandballFromState()
-// {
-
-
-
 // 	posRow += 1;
 // 	posCol = 0;
 // 	// 3rd row to 18th row
@@ -902,6 +897,12 @@ void FlyScoreDock::loadTimerControlsFromState()
 // 		posCol += curWid;
 
 // 	}
+
+
+// void FlyScoreDock::loadHandballFromState()
+// {
+
+
 
 // 	// posRow += 1;
 // 	posCol = 0;
@@ -1095,7 +1096,6 @@ void FlyScoreDock::toggleStatVisible(int index, bool isMatchStat)
 
 void FlyScoreDock::toggleTimerRunning(int index)
 {
-	LOGI("toggleTimerRunning(int index = %d)", index);
 	configTab_->toggleTimerRunning(index);
 }
 

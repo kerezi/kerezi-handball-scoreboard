@@ -19,13 +19,10 @@
 #include <QStyle>
 
 FlyTimersDialog::FlyTimersDialog(const QString &dataDir, FlyScoreState::FlyState &state, QWidget *parent)
-	: FlyBaseDialog(fly_i18n("Timers.Title"),
-					fly_i18n("Timers.Hint"),
-					fly_i18n("Common.Timers"),
-					dataDir, state)
+	: FlyBaseDialog(fly_i18n("Timers.Title"), fly_i18n("Timers.Hint"), fly_i18n("Common.Timers"), dataDir, state)
 {
 	setModal(true);
-	resize(560, 420);
+	resize(860, 420);
 	setSizeGripEnabled(false);
 
 	buildUi();
@@ -81,7 +78,16 @@ FlyTimersDialog::Row FlyTimersDialog::addRow(const FlyScoreState::FlyScoreState:
 	timeEdit->setMaxLength(8);
 	timeEdit->setMinimumWidth(70);
 	timeEdit->setMaximumWidth(90);
-	timeEdit->setText(FlyQtHelper::fly_format_ms_mmss(tm.initial_ms > 0 ? tm.initial_ms : tm.remaining_ms));
+	timeEdit->setText(FlyQtHelper::fly_format_ms_mmss(tm.initial_ms > 0 ? tm.initial_ms : tm.current_moment_ms));
+
+	auto *durationEdit = new QLineEdit(row);
+	durationEdit->setPlaceholderText(QStringLiteral("mm:ss"));
+	durationEdit->setClearButtonEnabled(true);
+	durationEdit->setMaxLength(8);
+	durationEdit->setMinimumWidth(70);
+	durationEdit->setMaximumWidth(90);
+	durationEdit->setText(
+		FlyQtHelper::fly_format_ms_mmss(tm.duration_ms > 0 ? tm.duration_ms : tm.current_moment_ms));
 
 	auto *modeCombo = new QComboBox(row);
 	modeCombo->addItems({QStringLiteral("countdown"), QStringLiteral("countup")});
@@ -94,8 +100,7 @@ FlyTimersDialog::Row FlyTimersDialog::addRow(const FlyScoreState::FlyScoreState:
 
 	auto *removeBtn = new QPushButton(row);
 	removeBtn->setText(QStringLiteral("❌"));
-	removeBtn->setToolTip(canRemove ? fly_i18n("Timers.RemoveTimer")
-					: fly_i18n("Timers.TimerCannotBeRemoved"));
+	removeBtn->setToolTip(canRemove ? fly_i18n("Timers.RemoveTimer") : fly_i18n("Timers.TimerCannotBeRemoved"));
 	removeBtn->setCursor(canRemove ? Qt::PointingHandCursor : Qt::ArrowCursor);
 
 	const int h = timeEdit->sizeHint().height();
@@ -109,9 +114,11 @@ FlyTimersDialog::Row FlyTimersDialog::addRow(const FlyScoreState::FlyScoreState:
 				 "}");
 
 	lay->addWidget(labelEdit, 1, Qt::AlignVCenter);
-	lay->addWidget(new QLabel(fly_i18n("Common.TimeColon"), row), 0, Qt::AlignVCenter);
+	lay->addWidget(new QLabel(fly_i18n("Common.TimeColon"), row), 0, Qt::AlignVCenter | Qt::AlignRight);
 	lay->addWidget(timeEdit, 0, Qt::AlignVCenter);
-	lay->addWidget(new QLabel(fly_i18n("Common.TypeColon"), row), 0, Qt::AlignVCenter);
+	lay->addWidget(new QLabel(fly_i18n("Common.DurationColon"), row), 0, Qt::AlignVCenter | Qt::AlignRight);
+	lay->addWidget(durationEdit, 0, Qt::AlignVCenter);
+	lay->addWidget(new QLabel(fly_i18n("Common.TypeColon"), row), 0, Qt::AlignVCenter | Qt::AlignRight);
 	lay->addWidget(modeCombo, 0, Qt::AlignVCenter);
 	lay->addWidget(removeBtn, 0, Qt::AlignVCenter);
 
@@ -121,6 +128,7 @@ FlyTimersDialog::Row FlyTimersDialog::addRow(const FlyScoreState::FlyScoreState:
 	r.row = row;
 	r.labelEdit = labelEdit;
 	r.timeEdit = timeEdit;
+	r.durationEdit = durationEdit;
 	r.modeCombo = modeCombo;
 	r.remove = removeBtn;
 
@@ -164,7 +172,8 @@ void FlyTimersDialog::syncUiFromState()
 		main.mode = QStringLiteral("countdown");
 		main.running = false;
 		main.initial_ms = 0;
-		main.remaining_ms = 0;
+		main.duration_ms = 0;
+		main.current_moment_ms = 0;
 		main.last_tick_ms = 0;
 		main.visible = true;
 		state_.timers.push_back(main);
@@ -200,9 +209,15 @@ void FlyTimersDialog::syncStateFromUi()
 			qint64 parsed = FlyQtHelper::fly_parse_mmss_to_ms(r.timeEdit->text());
 			ms = (parsed >= 0) ? parsed : 0;
 		}
+		qint64 dms = 0;
+		if (r.durationEdit) {
+			qint64 parsed = FlyQtHelper::fly_parse_mmss_to_ms(r.durationEdit->text());
+			dms = (parsed >= 0) ? parsed : 0;
+		}
 
 		tm.initial_ms = ms;
-		tm.remaining_ms = ms;
+		tm.duration_ms = dms;
+		tm.current_moment_ms = ms;
 		tm.running = false;
 		tm.last_tick_ms = 0;
 
@@ -221,7 +236,8 @@ void FlyTimersDialog::syncStateFromUi()
 		main.mode = QStringLiteral("countdown");
 		main.running = false;
 		main.initial_ms = 0;
-		main.remaining_ms = 0;
+		main.duration_ms = 0;
+		main.current_moment_ms = 0;
 		main.last_tick_ms = 0;
 		main.visible = true;
 		state_.timers.push_back(main);
@@ -237,11 +253,10 @@ void FlyTimersDialog::onAddTimer()
 	tm.mode = QStringLiteral("countdown");
 	tm.running = false;
 	tm.initial_ms = 0;
-	tm.remaining_ms = 0;
+	tm.current_moment_ms = 0;
 	tm.last_tick_ms = 0;
 	tm.visible = true;
 
 	Row r = addRow(tm, true);
 	rows_.push_back(r);
 }
-
