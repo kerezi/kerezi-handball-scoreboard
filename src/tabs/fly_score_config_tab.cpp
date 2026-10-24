@@ -266,6 +266,12 @@ void FlyConfigTab::onClearTeamsAndReset()
 			t->players[i].blueCard_ms = 0;
 			t->players[i].goals.clear();
 		}
+		for (int i = 0; i < t->officials.size(); i++) {
+			t->officials[i].warning_ms = 0;
+			t->officials[i].fst2minSusp_ms = 0;
+			t->officials[i].disqualification_ms = 0;
+			t->officials[i].blueCard_ms = 0;
+		}
 	}
 
 	dock_->saveState();
