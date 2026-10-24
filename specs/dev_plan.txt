@@ -18,6 +18,7 @@
 	7.4. Timers
 		7.4.1 Modify struct about Timers (Struct, Serilize, Deserilize)
 		7.4.2 Modify dialog about Timers (Dialog)
+--------7.4.3 Modify Timers about initial_ms and current_moment_ms
 8. Handball Tab
 	8.0. Reorganize in Fly Dock
 		8.0.1. Create sub folders dialgos, tabs, help, main and move corespondig files there		8.0.2. Extract config tab from main dock
@@ -33,6 +34,33 @@
 --------8.0.7. Extract the event log tab from main dock
 --------8.0.*. Move out from tabs and dock related to websocket server
 	8.1. Handball Tab Ui in Fly Dock
+9. Overlay:
+	9.1. Main Overlay
+	9.2. Goals by time Overlay
+	9.3. Team Statistics Overlay
+• Резултат и голове (Goals): Общ брой отбелязани голове и процент на успеваемост на стрелбата (напр. 25/40 или 63%).
+• Ефективност на атаката (Attack Efficiency): Процентът на атаките, завършили с гол, спрямо общия брой владения на топката.
+• Притежание на топката (Ball Possession): Процентно изражение на времето, в което даден отбор контролира топката.
+• Стрелба по зони (Shot Distribution): Статистика откъде са отправяни ударите (от 6 метра, от 9 метра / деветметрова линия, от крилата или от 7-метрови наказателни удари).
+• Технически грешки (Technical Faults): Грешни пасове, стъпки, двойно водене или фалове в атака.
+• Пасове и асистенции (Passes & Assists): Общ брой подавания и пасове, довели директно до гол.
+	9.4. Individual Stats:
+🏃‍♂️ Индивидуална статистика на играчите (Player Statistics)
+• Голове / Стрелба (Goals / Shots): Изписва се във формат „голове/опити“ (напр. 7/9) за всеки състезател.
+• Асистенции (Assists): Ключови подавания, завършили с попадение.
+• Блокади в защита (Blocked Shots): Успешно блокирани от бранителите удари към вратата.
+• Откраднати топки (Steals): Пресечени пасове или отнемане на топката от противника.
+	9.5. GK Stats:
+🧤 Статистика на вратарите (Goalkeeper Statistics)
+• Спасявания (Saves): Общ брой отразени удари.
+• Процент на спасяванията (Save Percentage): Най-важният показател за един вратар (напр. 35% или 40% спасявания се счита за отлично представяне).
+• Спасени дузпи (7m Saves): Брой отразени 7-метрови наказателни удари.
+	9.6. Warning and Suspentions Stats:
+⚠️ Дисциплина и наказания (Disciplinary actions)
+• Жълти картони (Yellow Cards): Предупреждения за груба игра.
+• 2-минутни отстранявания (2-Minute Suspensions): Временно изваждане на играч от игра (отборът играе с човек по-малко).
+• Червени / Сини картони (Red / Blue Cards): Директно дисквалифициране на играч от срещата (синият картон изисква и писмен доклад след мача).
+
 ++++
 ----
 

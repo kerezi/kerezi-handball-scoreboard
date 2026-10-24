@@ -165,6 +165,8 @@ QJsonObject FlyScoreState::fly_state_to_json_object(const FlyScoreState::FlyStat
 		o["sndTimeout_ms"] = tm.sndTimeout_ms;
 		o["trdTimeout_ms"] = tm.trdTimeout_ms;
 
+		int scores = 0;
+
 		QJsonArray ofsArr;
 		for (const auto &of : tm.officials) {
 			QJsonObject oo;
@@ -194,6 +196,7 @@ QJsonObject FlyScoreState::fly_state_to_json_object(const FlyScoreState::FlyStat
 
 			QJsonArray plrgArr;
 			for (const auto &plrg : plr.goals) {
+				scores++;
 				QJsonObject ooo;
 				ooo["moment_ms"] = plrg.moment_ms;
 				ooo["goalType"] = plrg.goalType;
@@ -204,6 +207,7 @@ QJsonObject FlyScoreState::fly_state_to_json_object(const FlyScoreState::FlyStat
 			plrsArr.append(oo);
 		}
 		o["players"] = plrsArr;
+		o["scores"] = scores;
 
 		return o;
 	};

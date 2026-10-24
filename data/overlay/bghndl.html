@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <title>БФХ - "А" РХГ, сезон 2026/27</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="bhstyle.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+
+<body>
+	<ul id="scoreboard" fs-if="show_scoreboard">
+		<li class="bfh-logo"><img alt="" src="logo-color-vertical.png" /></li>
+		<li class="timers" fs-if="timers[0] && timers[0].visible">
+			<span class="timers" >{{timers[0].label}}</span>
+			<hr>
+			<span class="timers" >{{timers[0].mmss}}</span>
+		</li>
+		<li class="timers touts" fs-if="timers[0] && timers[1].running && (fields_by_key.touts.x > 0)">
+			<span class="timers" > {{fields_by_key.touts.label}} {{fields_by_key.touts.x}} {{team_x.subtitle}}</span>
+			<hr>
+			<span class="timers" >{{timers[1].mmss}}</span>
+		</li>
+		<li class="timers touts" fs-if="timers[2] && timers[2].visible && (fields_by_key.touts.y > 0)">
+			<span class="timers" > {{fields_by_key.touts.label}} {{fields_by_key.touts.y}} {{team_y.subtitle}}</span>
+			<hr>
+			<span class="timers" >{{timers[2].mmss}}</span>
+		</li>
+		<li class="logos" fs-if="!!team_x.logo && !!team_y.logo">
+			<span><img alt="" src="{{team_x.logo}}" /></span>
+			<hr>
+			<span><img alt="" src="{{team_y.logo}}" /></span>
+		</li>
+		<li class="names" ><span style="background: {{team_x.color}}">{{team_x.subtitle}}</span><hr><span style="background: {{team_y.color}}">{{team_y.subtitle}}</span></li>
+		<li class="scores"><span style="background: {{team_x.color}}">{{team_x.scores}}</span><hr><span style="background: {{team_y.color}}">{{team_y.scores}}</span></li>
+		<li class="touts" fs-if="fields_by_key.touts && fields_by_key.touts.visible">
+			<span fs-if="fields_by_key.touts.x > 0"><span class="touts">T1</span></span>
+			<span fs-if="fields_by_key.touts.x < 1"><span class="touts" style="background: {{team_x.color}}; color:white;">T1</span></span>
+			<span fs-if="fields_by_key.touts.x > 1"><span class="touts">T2</span></span>
+			<span fs-if="fields_by_key.touts.x < 2"><span class="touts" style="background: {{team_x.color}}; color:white;">T2</span></span>
+			<span fs-if="fields_by_key.touts.x > 2"><span class="touts">T3</span></span>
+			<span fs-if="fields_by_key.touts.x < 3"><span class="touts" style="background: {{team_x.color}}; color:white;">T3</span></span>
+			<hr>
+			<span fs-if="fields_by_key.touts.y > 0"><span class="touts">T1</span></span>
+			<span fs-if="fields_by_key.touts.y < 1"><span class="touts" style="background: {{team_y.color}}; color:white;">T1</span></span>
+			<span fs-if="fields_by_key.touts.y > 1"><span class="touts">T2</span></span>
+			<span fs-if="fields_by_key.touts.y < 2"><span class="touts" style="background: {{team_y.color}}; color:white;">T2</span></span>
+			<span fs-if="fields_by_key.touts.y > 2"><span class="touts">T3</span></span>
+			<span fs-if="fields_by_key.touts.y < 3"><span class="touts" style="background: {{team_y.color}}; color:white;">T3</span></span>
+		</li>
+		<li class="two-min-susp"  fs-if="matchStats[4] && matchStats[4].visible && (timers[3] && timers[3].visible || timers[6] && timers[6].visible)">
+			<span class="two-min-susp" fs-if="timers[3] && timers[3].visible && (fields_by_key.f2min.x > 0)"><span style="background: {{team_x.color}}; color:white;">{{fields_by_key.f2min.x}}</span> {{timers[3].mmss}}</span>
+			<span class="two-min-susp" fs-if="timers[4] && timers[4].visible && (fields_by_key.s2min.x > 0)"><span style="background: {{team_x.color}}; color:white;">{{fields_by_key.s2min.x}}</span> {{timers[4].mmss}}</span>
+			<span class="two-min-susp" fs-if="timers[5] && timers[5].visible && (fields_by_key.t2min.x > 0)"><span style="background: {{team_x.color}}; color:white;">{{fields_by_key.t2min.x}}</span> {{timers[5].mmss}}</span>
+			<hr>
+			<span class="two-min-susp" fs-if="timers[6] && timers[6].visible && (fields_by_key.f2min.y > 0)"><span style="background: {{team_y.color}}; color:white;">{{fields_by_key.f2min.y}}</span> {{timers[6].mmss}}</span>
+			<span class="two-min-susp" fs-if="timers[7] && timers[7].visible && (fields_by_key.s2min.y > 0)"><span style="background: {{team_y.color}}; color:white;">{{fields_by_key.s2min.y}}</span> {{timers[7].mmss}}</span>
+			<span class="two-min-susp" fs-if="timers[8] && timers[8].visible && (fields_by_key.t2min.y > 0)"><span style="background: {{team_y.color}}; color:white;">{{fields_by_key.t2min.y}}</span> {{timers[8].mmss}}</span>
+		</li>
+	</ul>
+	<script src="script.js" defer></script>
+
+</body>
+</html>

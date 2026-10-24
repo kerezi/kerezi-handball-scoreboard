@@ -29,16 +29,16 @@ function normalizeIncomingState(payload) {
   return null;
 }
 
-function liveTimerMs(timer) {
+function liveTimerMs(timer, bt) {
   if (!timer) return 0;
 
   const mode = timer.mode || "countdown";
   const running = !!timer.running;
   const baseRemaining = Number(timer.current_moment_ms ?? 0);
-  const lastTick = Number(timer.last_tick_ms ?? 0);
+  const lastTick = Number(bt.last_tick_ms ?? 0);
 
-  // If not running or no tick info, just trust remaining_ms
-  if (!running || !lastTick) {
+  // If not running or no tick info, just trust current_moment_ms
+  if (!running || !lastTick || !bt.running) {
     return baseRemaining;
   }
 
@@ -95,6 +95,12 @@ function isTruthyValue(val) {
   return !!val;
 }
 
+function isValue(val) {
+  if (val === null || val === undefined) return 0;
+  if (typeof val === "number") return true;
+  return !!val;
+}
+
 function intToHex(colorInt) {
   if (colorInt === undefined || colorInt === null) return "#555555";
   const hex = Number(colorInt).toString(16).padStart(6, "0");
@@ -102,7 +108,9 @@ function intToHex(colorInt) {
 }
 
 function fieldKey(label, index) {
+  // const canonical = ["score", "touts", "f2min", "s2min", "t2min", "discq"];
   const canonical = ["score", "fouls", "yellow_cards", "red_cards", "corners"];
+
   if (canonical[index]) return canonical[index];
   const normalized = String(label || "")
     .trim()
@@ -201,12 +209,25 @@ function evaluateCondition(expr, data) {
         continue;
       }
 
+      if (s.startsWith(">", i)) {
+        tokens.push(">");
+        i ++;
+        continue;
+      }
+
+      if (s.startsWith("<", i)) {
+        tokens.push("<");
+        i ++;
+        continue;
+      }
+
       // Path token: read until whitespace or operator/parens
       const start = i;
       while (i < s.length) {
         if (/\s/.test(s[i])) break;
         if (s.startsWith("&&", i) || s.startsWith("||", i)) break;
         if (s[i] === "!" || s[i] === "(" || s[i] === ")") break;
+        if (s[i] === ">" || s[i] === "<") break;
         i++;
       }
       tokens.push(s.slice(start, i));
@@ -220,7 +241,7 @@ function evaluateCondition(expr, data) {
   // ---------------------------
   // Shunting-yard to RPN
   // ---------------------------
-  const prec = { "!": 3, "&&": 2, "||": 1 };
+  const prec = { "!": 3, "&&": 2, "||": 1 , "<": 0 , ">": 0};
   const rightAssoc = { "!": true };
 
   const out = [];
@@ -240,7 +261,7 @@ function evaluateCondition(expr, data) {
       continue;
     }
 
-    if (t === "!" || t === "&&" || t === "||") {
+    if (t === "!" || t === "&&" || t === "||" || t === ">" || t === "<") {
       while (ops.length) {
         const top = ops[ops.length - 1];
         if (!(top in prec)) break;
@@ -281,9 +302,22 @@ function evaluateCondition(expr, data) {
       continue;
     }
 
+    if (tok === ">" || tok === "<") {
+      const b = stack.pop() || false;
+      const a = stack.pop() || false;
+      stack.push(tok === ">" ? (a > b) : (a < b));
+      continue;
+    }
+
     // resolve path -> truthy
-    const val = resolvePath(data, tok);
-    stack.push(isTruthyValue(val));
+	const val = resolvePath(data, tok);
+	if (isValue(tok) && !val && val != 0) {
+		stack.push(parseInt(tok));
+	} else if (!!val || val == 0) {
+		stack.push(val);
+	} else {
+		stack.push(isTruthyValue(val));
+	}
   }
 
   return stack.pop() || false;
@@ -424,9 +458,10 @@ function renderFrame() {
 
   // Compute live timer values (mm:ss)
   for (let i = 0; i < st.timers.length; i++) {
+	var baseT = st.timers[0];
     const t = st.timers[i] || {};
-    const ms = liveTimerMs(t);
-    t.live_ms = ms;
+    const ms = (i < 2) ? liveTimerMs(t, t) : liveTimerMs(t, baseT);
+	t.live_ms = ms;
     t.mmss = mmss(ms);
     t.hhmmss = hhmmss(ms);
     t.total_seconds = Math.floor(ms / 1000);
@@ -435,7 +470,7 @@ function renderFrame() {
     t.seconds = Math.floor((ms % 60000) / 1000);
     st.timers[i] = t;
   }
-
+    
   // ---------------------------------------------------------------------------
   // Build derived view model:
   //   - team_x / team_y: left/right teams based on swap_sides
