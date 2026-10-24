@@ -246,7 +246,9 @@ QJsonObject FlyScoreState::fly_state_to_json_object(const FlyScoreState::FlyStat
 			timersArr.append(FlyScoreState::timerToJson(tm));
 		}
 	}
-	j["timers"] = timersArr;
+	QJsonObject to;
+	to["main"] = timersArr;
+	j["timers"] = to;
 
 	return j;
 }
@@ -417,7 +419,7 @@ bool FlyScoreState::fly_state_from_json_object(const QJsonObject &j, FlyScoreSta
 
 	st.timers.clear();
 
-	const QJsonValue timersVal = j.value("timers");
+	const QJsonValue timersVal = j.value("timers.main");
 	if (timersVal.isArray()) {
 		const QJsonArray timersArr = timersVal.toArray();
 

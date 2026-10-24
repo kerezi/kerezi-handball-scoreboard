@@ -211,13 +211,13 @@ function evaluateCondition(expr, data) {
 
       if (s.startsWith(">", i)) {
         tokens.push(">");
-        i ++;
+        i++;
         continue;
       }
 
       if (s.startsWith("<", i)) {
         tokens.push("<");
-        i ++;
+        i++;
         continue;
       }
 
@@ -241,7 +241,7 @@ function evaluateCondition(expr, data) {
   // ---------------------------
   // Shunting-yard to RPN
   // ---------------------------
-  const prec = { "!": 3, "&&": 2, "||": 1 , "<": 0 , ">": 0};
+  const prec = { "!": 3, "&&": 2, "||": 1, "<": 0, ">": 0 };
   const rightAssoc = { "!": true };
 
   const out = [];
@@ -310,14 +310,14 @@ function evaluateCondition(expr, data) {
     }
 
     // resolve path -> truthy
-	const val = resolvePath(data, tok);
-	if (isValue(tok) && !val && val != 0) {
-		stack.push(parseInt(tok));
-	} else if (!!val || val == 0) {
-		stack.push(val);
-	} else {
-		stack.push(isTruthyValue(val));
-	}
+    const val = resolvePath(data, tok);
+    if (isValue(tok) && !val && val != 0) {
+      stack.push(parseInt(tok));
+    } else if (!!val || val == 0) {
+      stack.push(val);
+    } else {
+      stack.push(isTruthyValue(val));
+    }
   }
 
   return stack.pop() || false;
@@ -451,26 +451,26 @@ function renderFrame() {
   // Deep clone to avoid mutating original
   const st = JSON.parse(JSON.stringify(currentJsonState));
 
-  // Ensure timers array
-  if (!Array.isArray(st.timers)) {
-    st.timers = [];
+  // Ensure timers.main array
+  if (!Array.isArray(st.timers.main)) {
+    st.timers.main = [];
   }
 
   // Compute live timer values (mm:ss)
-  for (let i = 0; i < st.timers.length; i++) {
-	var baseT = st.timers[0];
-    const t = st.timers[i] || {};
-    const ms = (i < 2) ? liveTimerMs(t, t) : liveTimerMs(t, baseT);
-	t.live_ms = ms;
+  for (let i = 0; i < st.timers.main.length; i++) {
+    const t = st.timers.main[i] || {};
+    const ms = liveTimerMs(t, t);
+    t.live_ms = ms;
     t.mmss = mmss(ms);
     t.hhmmss = hhmmss(ms);
     t.total_seconds = Math.floor(ms / 1000);
     t.hours = Math.floor(ms / 3600000);
     t.minutes = Math.floor((ms % 3600000) / 60000);
     t.seconds = Math.floor((ms % 60000) / 1000);
-    st.timers[i] = t;
+    st.timers.main[i] = t;
   }
-    
+  const activeTimer = st.timers.main[0] || {};
+
   // ---------------------------------------------------------------------------
   // Build derived view model:
   //   - team_x / team_y: left/right teams based on swap_sides
@@ -482,6 +482,34 @@ function renderFrame() {
 
   const team_x = swap ? baseGuest : baseHome; // left side
   const team_y = swap ? baseHome : baseGuest; // right side
+
+  for (let tmrs of ["home_2minSusp", "guest_2minSusp"]) {
+    st.timers[tmrs] = [];
+    let timerID = 0;
+    let team = st[tmrs.split("_")[0]];
+
+    for (let pl of team.players.concat(team.officials)) {
+      for (let pl2minSusp of ["fst2minSusp_ms", "snd2minSusp_ms", "trd2minSusp_ms", "disqualification_ms", "blueCard_ms"]) {
+        if (!!pl[pl2minSusp] && ((pl[pl2minSusp] + 120 * 1000) >= activeTimer.current_moment_ms)) {
+          const t = {};
+          t.current_moment_ms = 120000 - (activeTimer.current_moment_ms - pl[pl2minSusp]);
+          t.mode = "countdown";
+          t.running = !!activeTimer.running;
+          const ms = liveTimerMs(t, activeTimer);
+          t.player = (!!pl.playerTshirtNumber) ? pl.playerTshirtNumber : pl.officialLetter;
+          t.live_ms = ms;
+          t.mmss = mmss(ms);
+          t.hhmmss = hhmmss(ms);
+          t.total_seconds = Math.floor(ms / 1000);
+          t.hours = Math.floor(ms / 3600000);
+          t.minutes = Math.floor((ms % 3600000) / 60000);
+          t.seconds = Math.floor((ms % 60000) / 1000);
+          t.visible = true;
+          st.timers[tmrs][timerID++] = t;
+        }
+      }
+    }
+  }
 
   if (team_x.color) team_x.color = intToHex(team_x.color);
   if (team_y.color) team_y.color = intToHex(team_y.color);
