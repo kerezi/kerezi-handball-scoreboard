@@ -2,66 +2,157 @@
 <html lang="en">
 
 <head>
-  <meta charset="utf-8" />
-  <title>БФХ - "А" РХГ, сезон 2026/27</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <link rel="stylesheet" href="bhstyle.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+	<meta charset="utf-8" />
+	<title>БФХ - "А" РХГ, сезон 2026/27</title>
+	<meta name="viewport" content="width=device-width,initial-scale=1" />
+	<link rel="stylesheet" href="bhstyle.css" />
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
 </head>
 
 <body>
 	<ul id="scoreboard" fs-if="show_scoreboard">
 		<li class="bfh-logo"><img alt="" src="logo-color-vertical.png" /></li>
 		<li class="timers" fs-if="timers.main[0] && timers.main[0].visible">
-			<span class="timers" >{{timers.main[0].label}}</span>
+			<span class="timers">{{timers.main[0].label}}</span>
 			<hr>
-			<span class="timers" >{{timers.main[0].mmss}}</span>
+			<span class="timers">{{timers.main[0].mmss}}</span>
 		</li>
 		<li class="logos" fs-if="!!team_x.logo && !!team_y.logo">
 			<span><img alt="" src="{{team_x.logo}}" /></span>
 			<hr>
 			<span><img alt="" src="{{team_y.logo}}" /></span>
 		</li>
-		<li class="names" ><span style="background: {{team_x.color}}">{{team_x.subtitle}}</span><hr><span style="background: {{team_y.color}}">{{team_y.subtitle}}</span></li>
-		<li class="scores"><span style="background: {{team_x.color}}">{{team_x.scores}}</span><hr><span style="background: {{team_y.color}}">{{team_y.scores}}</span></li>
-		<li class="touts" fs-if="fields_by_key.touts && fields_by_key.touts.visible">
-			<span fs-if="fields_by_key.touts.x > 0"><span class="touts">T1</span></span>
-			<span fs-if="fields_by_key.touts.x < 1"><span class="touts" style="background: {{team_x.color}}; color:white;">T1</span></span>
-			<span fs-if="fields_by_key.touts.x > 1"><span class="touts">T2</span></span>
-			<span fs-if="fields_by_key.touts.x < 2"><span class="touts" style="background: {{team_x.color}}; color:white;">T2</span></span>
-			<span fs-if="fields_by_key.touts.x > 2"><span class="touts">T3</span></span>
-			<span fs-if="fields_by_key.touts.x < 3"><span class="touts" style="background: {{team_x.color}}; color:white;">T3</span></span>
-			<hr>
-			<span fs-if="fields_by_key.touts.y > 0"><span class="touts">T1</span></span>
-			<span fs-if="fields_by_key.touts.y < 1"><span class="touts" style="background: {{team_y.color}}; color:white;">T1</span></span>
-			<span fs-if="fields_by_key.touts.y > 1"><span class="touts">T2</span></span>
-			<span fs-if="fields_by_key.touts.y < 2"><span class="touts" style="background: {{team_y.color}}; color:white;">T2</span></span>
-			<span fs-if="fields_by_key.touts.y > 2"><span class="touts">T3</span></span>
-			<span fs-if="fields_by_key.touts.y < 3"><span class="touts" style="background: {{team_y.color}}; color:white;">T3</span></span>
+		<li class="names"><span style="background: {{team_x.color}}">{{team_x.subtitle}}</span>
+			<hr><span style="background: {{team_y.color}}">{{team_y.subtitle}}</span>
 		</li>
-		<li class="two-min-susp"  fs-if="timers.home_2minSusp[0] || timers.guest_2minSusp[0]">
-			<span class="two-min-susp" fs-if="timers.home_2minSusp[0] && timers.home_2minSusp[0].visible"><span style="background: {{team_x.color}}; color:white;">{{timers.home_2minSusp[0].player}}</span> {{timers.home_2minSusp[0].mmss}}</span>
-			<span class="two-min-susp" fs-if="timers.home_2minSusp[1] && timers.home_2minSusp[1].visible"><span style="background: {{team_x.color}}; color:white;">{{timers.home_2minSusp[1].player}}</span> {{timers.home_2minSusp[1].mmss}}</span>
-			<span class="two-min-susp" fs-if="timers.home_2minSusp[2] && timers.home_2minSusp[2].visible"><span style="background: {{team_x.color}}; color:white;">{{timers.home_2minSusp[2].player}}</span> {{timers.home_2minSusp[2].mmss}}</span>
-			<span class="two-min-susp" fs-if="timers.home_2minSusp[3] && timers.home_2minSusp[3].visible"><span style="background: {{team_x.color}}; color:white;">{{timers.home_2minSusp[3].player}}</span> {{timers.home_2minSusp[3].mmss}}</span>
-			<span class="two-min-susp" fs-if="timers.home_2minSusp[4] && timers.home_2minSusp[4].visible"><span style="background: {{team_x.color}}; color:white;">{{timers.home_2minSusp[4].player}}</span> {{timers.home_2minSusp[4].mmss}}</span>
-			<span class="two-min-susp" fs-if="timers.home_2minSusp[5] && timers.home_2minSusp[5].visible"><span style="background: {{team_x.color}}; color:white;">{{timers.home_2minSusp[5].player}}</span> {{timers.home_2minSusp[5].mmss}}</span>
-			<span class="two-min-susp" fs-if="timers.home_2minSusp[6] && timers.home_2minSusp[6].visible"><span style="background: {{team_x.color}}; color:white;">{{timers.home_2minSusp[6].player}}</span> {{timers.home_2minSusp[6].mmss}}</span>
-			<span class="two-min-susp" fs-if="timers.home_2minSusp[7] && timers.home_2minSusp[7].visible"><span style="background: {{team_x.color}}; color:white;">{{timers.home_2minSusp[7].player}}</span> {{timers.home_2minSusp[7].mmss}}</span>
-			<span class="two-min-susp" fs-if="timers.home_2minSusp[8] && timers.home_2minSusp[8].visible"><span style="background: {{team_x.color}}; color:white;">{{timers.home_2minSusp[8].player}}</span> {{timers.home_2minSusp[8].mmss}}</span>
+		<li class="scores"><span style="background: {{team_x.color}}">{{team_x.scores}}</span>
+			<hr><span style="background: {{team_y.color}}">{{team_y.scores}}</span>
+		</li>
+		<li class="touts" fs-if="timers.timeout && timers.timeout.visible">
+			<span>
+				<span style="background: {{team_x.color}};">
+					<span
+						fs-if="!team_x.fstTimeout_ms || !(team_x.fstTimeout_ms < timers.main[0].current_moment_ms)">T1</span>
+					<span
+						fs-if="(team_x.fstTimeout_ms > 0) && !(team_x.fstTimeout_ms < timers.main[0].current_moment_ms)  && timers.timeout.running"><span>{{timers.timeout.ss}}</span></span>
+					<span
+						fs-if="!!team_x.fstTimeout_ms && (team_x.fstTimeout_ms < timers.main[0].current_moment_ms)"><span
+							style="color: {{team_x.color}};">T1</span></span>
+				</span>
+				<span style="background: {{team_x.color}};">
+					<span
+						fs-if="!team_x.sndTimeout_ms || !(team_x.sndTimeout_ms < timers.main[0].current_moment_ms)">T2</span>
+					<span
+						fs-if="(team_x.sndTimeout_ms > 0) && !(team_x.sndTimeout_ms < timers.main[0].current_moment_ms)  && timers.timeout.running"><span>{{timers.timeout.ss}}</span></span>
+					<span
+						fs-if="!!team_x.sndTimeout_ms && (team_x.sndTimeout_ms < timers.main[0].current_moment_ms)"><span
+							style="color: {{team_x.color}};">T2</span></span>
+				</span>
+				<span style="background: {{team_x.color}};">
+					<span
+						fs-if="!team_x.trdTimeout_ms || !(team_x.trdTimeout_ms < timers.main[0].current_moment_ms)">T3</span>
+					<span
+						fs-if="(team_x.trdTimeout_ms > 0) && !(team_x.trdTimeout_ms < timers.main[0].current_moment_ms)  && timers.timeout.running"><span>{{timers.timeout.ss}}</span></span>
+					<span
+						fs-if="!!team_x.trdTimeout_ms && (team_x.trdTimeout_ms < timers.main[0].current_moment_ms)"><span
+							style="color: {{team_x.color}};">T3</span></span>
+				</span>
+			</span>
 			<hr>
-			<span class="two-min-susp" fs-if="timers.guest_2minSusp[0] && timers.guest_2minSusp[0].visible"><span style="background: {{team_y.color}}; color:white;">{{timers.guest_2minSusp[0].player}}</span> {{timers.guest_2minSusp[0].mmss}}</span>
-			<span class="two-min-susp" fs-if="timers.guest_2minSusp[1] && timers.guest_2minSusp[1].visible"><span style="background: {{team_y.color}}; color:white;">{{timers.guest_2minSusp[1].player}}</span> {{timers.guest_2minSusp[1].mmss}}</span>
-			<span class="two-min-susp" fs-if="timers.guest_2minSusp[2] && timers.guest_2minSusp[2].visible"><span style="background: {{team_y.color}}; color:white;">{{timers.guest_2minSusp[2].player}}</span> {{timers.guest_2minSusp[2].mmss}}</span>
-			<span class="two-min-susp" fs-if="timers.guest_2minSusp[3] && timers.guest_2minSusp[3].visible"><span style="background: {{team_y.color}}; color:white;">{{timers.guest_2minSusp[3].player}}</span> {{timers.guest_2minSusp[3].mmss}}</span>
-			<span class="two-min-susp" fs-if="timers.guest_2minSusp[4] && timers.guest_2minSusp[4].visible"><span style="background: {{team_y.color}}; color:white;">{{timers.guest_2minSusp[4].player}}</span> {{timers.guest_2minSusp[4].mmss}}</span>
-			<span class="two-min-susp" fs-if="timers.guest_2minSusp[5] && timers.guest_2minSusp[5].visible"><span style="background: {{team_y.color}}; color:white;">{{timers.guest_2minSusp[5].player}}</span> {{timers.guest_2minSusp[5].mmss}}</span>
-			<span class="two-min-susp" fs-if="timers.guest_2minSusp[6] && timers.guest_2minSusp[6].visible"><span style="background: {{team_y.color}}; color:white;">{{timers.guest_2minSusp[6].player}}</span> {{timers.guest_2minSusp[6].mmss}}</span>
-			<span class="two-min-susp" fs-if="timers.guest_2minSusp[7] && timers.guest_2minSusp[7].visible"><span style="background: {{team_y.color}}; color:white;">{{timers.guest_2minSusp[7].player}}</span> {{timers.guest_2minSusp[7].mmss}}</span>
-			<span class="two-min-susp" fs-if="timers.guest_2minSusp[8] && timers.guest_2minSusp[8].visible"><span style="background: {{team_y.color}}; color:white;">{{timers.guest_2minSusp[8].player}}</span> {{timers.guest_2minSusp[8].mmss}}</span>
+			<span>
+				<span style="background: {{team_y.color}};">
+					<span
+						fs-if="!team_y.fstTimeout_ms || !(team_y.fstTimeout_ms < timers.main[0].current_moment_ms)">T1</span>
+					<span
+						fs-if="(team_y.fstTimeout_ms > 0) && !(team_y.fstTimeout_ms < timers.main[0].current_moment_ms)  && timers.timeout.running"><span>{{timers.timeout.ss}}</span></span>
+					<span
+						fs-if="!!team_y.fstTimeout_ms && (team_y.fstTimeout_ms < timers.main[0].current_moment_ms)"><span
+							style="color: {{team_y.color}};">T1</span></span>
+				</span>
+				<span style="background: {{team_y.color}};">
+					<span
+						fs-if="!team_y.sndTimeout_ms || !(team_y.sndTimeout_ms < timers.main[0].current_moment_ms)">T2</span>
+					<span
+						fs-if="(team_y.sndTimeout_ms > 0) && !(team_y.sndTimeout_ms < timers.main[0].current_moment_ms)  && timers.timeout.running"><span>{{timers.timeout.ss}}</span></span>
+					<span
+						fs-if="!!team_y.sndTimeout_ms && (team_y.sndTimeout_ms < timers.main[0].current_moment_ms)"><span
+							style="color: {{team_y.color}};">T2</span></span>
+				</span>
+				<span style="background: {{team_y.color}};">
+					<span
+						fs-if="!team_y.trdTimeout_ms || !(team_y.trdTimeout_ms < timers.main[0].current_moment_ms)">T3</span>
+					<span
+						fs-if="(team_y.trdTimeout_ms > 0) && !(team_y.trdTimeout_ms < timers.main[0].current_moment_ms)  && timers.timeout.running"><span>{{timers.timeout.ss}}</span></span>
+					<span
+						fs-if="!!team_y.trdTimeout_ms && (team_y.trdTimeout_ms < timers.main[0].current_moment_ms)"><span
+							style="color: {{team_y.color}};">T3</span></span>
+				</span>
+			</span>
+		</li>
+		<li class="two-min-susp" fs-if="timers.home_2minSusp[0] || timers.guest_2minSusp[0]">
+			<span>
+				<span fs-if="timers.home_2minSusp[0] && timers.home_2minSusp[0].visible"><span
+						style="background: {{team_x.color}};">{{timers.home_2minSusp[0].player}}</span>
+					{{timers.home_2minSusp[0].mss}}</span>
+				<span fs-if="timers.home_2minSusp[1] && timers.home_2minSusp[1].visible"><span
+						style="background: {{team_x.color}};">{{timers.home_2minSusp[1].player}}</span>
+					{{timers.home_2minSusp[1].mss}}</span>
+				<span fs-if="timers.home_2minSusp[2] && timers.home_2minSusp[2].visible"><span
+						style="background: {{team_x.color}};">{{timers.home_2minSusp[2].player}}</span>
+					{{timers.home_2minSusp[2].mss}}</span>
+				<span fs-if="timers.home_2minSusp[3] && timers.home_2minSusp[3].visible"><span
+						style="background: {{team_x.color}};">{{timers.home_2minSusp[3].player}}</span>
+					{{timers.home_2minSusp[3].mss}}</span>
+				<span fs-if="timers.home_2minSusp[4] && timers.home_2minSusp[4].visible"><span
+						style="background: {{team_x.color}};">{{timers.home_2minSusp[4].player}}</span>
+					{{timers.home_2minSusp[4].mss}}</span>
+				<span fs-if="timers.home_2minSusp[5] && timers.home_2minSusp[5].visible"><span
+						style="background: {{team_x.color}};">{{timers.home_2minSusp[5].player}}</span>
+					{{timers.home_2minSusp[5].mss}}</span>
+				<span fs-if="timers.home_2minSusp[6] && timers.home_2minSusp[6].visible"><span
+						style="background: {{team_x.color}};">{{timers.home_2minSusp[6].player}}</span>
+					{{timers.home_2minSusp[6].mss}}</span>
+				<span fs-if="timers.home_2minSusp[7] && timers.home_2minSusp[7].visible"><span
+						style="background: {{team_x.color}};">{{timers.home_2minSusp[7].player}}</span>
+					{{timers.home_2minSusp[7].mss}}</span>
+				<span fs-if="timers.home_2minSusp[8] && timers.home_2minSusp[8].visible"><span
+						style="background: {{team_x.color}};">{{timers.home_2minSusp[8].player}}</span>
+					{{timers.home_2minSusp[8].mss}}</span>
+			</span>
+			<hr>
+			<span>
+				<span fs-if="timers.guest_2minSusp[0] && timers.guest_2minSusp[0].visible"><span
+						style="background: {{team_y.color}};">{{timers.guest_2minSusp[0].player}}</span>
+					{{timers.guest_2minSusp[0].mss}}</span>
+				<span fs-if="timers.guest_2minSusp[1] && timers.guest_2minSusp[1].visible"><span
+						style="background: {{team_y.color}};">{{timers.guest_2minSusp[1].player}}</span>
+					{{timers.guest_2minSusp[1].mss}}</span>
+				<span fs-if="timers.guest_2minSusp[2] && timers.guest_2minSusp[2].visible"><span
+						style="background: {{team_y.color}};">{{timers.guest_2minSusp[2].player}}</span>
+					{{timers.guest_2minSusp[2].mss}}</span>
+				<span fs-if="timers.guest_2minSusp[3] && timers.guest_2minSusp[3].visible"><span
+						style="background: {{team_y.color}};">{{timers.guest_2minSusp[3].player}}</span>
+					{{timers.guest_2minSusp[3].mss}}</span>
+				<span fs-if="timers.guest_2minSusp[4] && timers.guest_2minSusp[4].visible"><span
+						style="background: {{team_y.color}};">{{timers.guest_2minSusp[4].player}}</span>
+					{{timers.guest_2minSusp[4].mss}}</span>
+				<span fs-if="timers.guest_2minSusp[5] && timers.guest_2minSusp[5].visible"><span
+						style="background: {{team_y.color}};">{{timers.guest_2minSusp[5].player}}</span>
+					{{timers.guest_2minSusp[5].mss}}</span>
+				<span fs-if="timers.guest_2minSusp[6] && timers.guest_2minSusp[6].visible"><span
+						style="background: {{team_y.color}};">{{timers.guest_2minSusp[6].player}}</span>
+					{{timers.guest_2minSusp[6].mss}}</span>
+				<span fs-if="timers.guest_2minSusp[7] && timers.guest_2minSusp[7].visible"><span
+						style="background: {{team_y.color}};">{{timers.guest_2minSusp[7].player}}</span>
+					{{timers.guest_2minSusp[7].mss}}</span>
+				<span fs-if="timers.guest_2minSusp[8] && timers.guest_2minSusp[8].visible"><span
+						style="background: {{team_y.color}};">{{timers.guest_2minSusp[8].player}}</span>
+					{{timers.guest_2minSusp[8].mss}}</span>
+			</span>
 		</li>
 	</ul>
 	<script src="script.js" defer></script>
 
 </body>
+
 </html>

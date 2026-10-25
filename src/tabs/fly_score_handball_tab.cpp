@@ -58,7 +58,18 @@ void FlyHandballTab::buildUI()
 }
 void FlyHandballTab::connectUi()
 {
-	connect(mt, &QPushButton::clicked, this, [this]() { dock_->toggleTimerRunning(0); });
+	connect(mt, &QPushButton::clicked, this, [this]() {
+		if (!state_.timers[0].running) {
+			qint64 ms = state_.timers[1].initial_ms;
+			if (ms < 0)
+				ms = 0;
+
+			state_.timers[1].current_moment_ms = ms;
+			state_.timers[1].running = false;
+			state_.timers[1].last_tick_ms = 0;
+		}
+		dock_->toggleTimerRunning(0);
+	});
 }
 
 QPushButton *FlyHandballTab::newFlyClickableLabel(QString title, int height, int width, bool isHome, bool isTeam,
@@ -69,6 +80,7 @@ QPushButton *FlyHandballTab::newFlyClickableLabel(QString title, int height, int
 	QString css = "QPushButton { font-weight:bold; } QPushButton[team=\"out\"] { background-color: red; color: " +
 		      c.darker().name() +
 		      "; } QPushButton[team=\"yellow\"] { color: yellow; background-color: " + c.darker().name() +
+		      "; } QPushButton[team=\"2minSusp\"] { color: red; background-color: " + c.darker().name() +
 		      "; }  QPushButton[team=\"true\"] {color : " + FlyQtHelper::getHighContrastColor(c).name() +
 		      "; background-color: " + c.darker().name() +
 		      ";} QPushButton[trun=\"true\"] {color: green; } QPushButton[trun=\"false\"] {color: red; }";
@@ -88,7 +100,8 @@ QLabel *FlyHandballTab::newQLabel(QString title, int height, int width, bool isH
 {
 	QLabel *newQLabel = new QLabel(title);
 	QColor c = FlyQtHelper::colorFromU32(isHome ? state_.home.color : state_.guest.color);
-	QString css = "QLabel { font-weight:bold; } QLabel[team=\"out\"] { background-color: red; color: " +
+	QString css = "QLabel { font-weight:bold; } QLabel[team=\"yellow\"] { color: yellow; background-color: " +
+		      c.darker().name() + "; }  QLabel[team=\"out\"] { background-color: red; color: " +
 		      c.darker().name() + "; } QLabel[team=\"true\"] { background-color: " + c.darker().name() +
 		      "; color: " + FlyQtHelper::getHighContrastColor(c).name() + "; }";
 	newQLabel->setStyleSheet(css);
@@ -125,35 +138,34 @@ void FlyHandballTab::buildUI_matchInfo_Team_FirstLine(bool isHome)
 			newQLabel(fly_i18n("Common.F2MinSusp"), 2, 1, isHome, true, Qt::AlignTop | Qt::AlignHCenter);
 		team->teamTimeout = newFlyClickableLabel(fly_i18n("Common.TimeOut"), 2, 1, isHome, true,
 							 Qt::AlignTop | Qt::AlignHCenter);
-		connect(team->teamTimeout, &QPushButton::clicked, this, [this, isHome]() {
+
+		connect(team->teamTimeout, &QPushButton::clicked, this, [this, isHome, team]() {
 			FlyScoreState::FlyTeam *t = isHome ? &state_.home : &state_.guest;
 			bool tog = false;
-			if (t->fstTimeout_ms == 0) {
-				t->fstTimeout_ms =
-					this->state_.timers[0].current_moment_ms +
-					(this->state_.timers[0].running
-						 ? FlyQtHelper::fly_now_ms() - this->state_.timers[0].last_tick_ms
-						 : 0);
+			if (t->fstTimeout_ms == 0 && !state_.timers[1].running) {
+				t->fstTimeout_ms = state_.timers[0].current_moment_ms +
+						   (state_.timers[0].running
+							    ? FlyQtHelper::fly_now_ms() - state_.timers[0].last_tick_ms
+							    : 0);
 				tog = true;
-			} else if (t->sndTimeout_ms == 0) {
-				t->sndTimeout_ms =
-					this->state_.timers[0].current_moment_ms +
-					(this->state_.timers[0].running
-						 ? FlyQtHelper::fly_now_ms() - this->state_.timers[0].last_tick_ms
-						 : 0);
+			} else if (t->sndTimeout_ms == 0 && !state_.timers[1].running) {
+				t->sndTimeout_ms = state_.timers[0].current_moment_ms +
+						   (state_.timers[0].running
+							    ? FlyQtHelper::fly_now_ms() - state_.timers[0].last_tick_ms
+							    : 0);
 				tog = true;
-			} else if (t->trdTimeout_ms == 0) {
-				t->trdTimeout_ms =
-					this->state_.timers[0].current_moment_ms +
-					(this->state_.timers[0].running
-						 ? FlyQtHelper::fly_now_ms() - this->state_.timers[0].last_tick_ms
-						 : 0);
+			} else if (t->trdTimeout_ms == 0 && !state_.timers[1].running) {
+				t->trdTimeout_ms = state_.timers[0].current_moment_ms +
+						   (state_.timers[0].running
+							    ? FlyQtHelper::fly_now_ms() - state_.timers[0].last_tick_ms
+							    : 0);
 				tog = true;
+				team->teamTimeout->setDisabled(true);
 			}
-			if (tog && this->state_.timers[0].running) {
-				this->dock_->toggleTimerRunning(0);
-				this->dock_->saveState();
-				this->dock_->refreshUiFromState();
+
+			if (tog) {
+				if (state_.timers[0].running) dock_->toggleTimerRunning(0);
+				dock_->toggleTimerRunning(1);
 			}
 		});
 	}
@@ -352,10 +364,9 @@ void FlyHandballTab::buildUI_team_player(int row, bool isHome)
 			for (int i = 0; i < t->players.size(); i++) {
 				if (t->players[i].playerTshirtNumber == pl->teamPlayerTShirtNumber->text().toInt()) {
 					t->players[i].warning_ms =
-						this->state_.timers[0].current_moment_ms +
-						(this->state_.timers[0].running
-							 ? FlyQtHelper::fly_now_ms() -
-								   this->state_.timers[0].last_tick_ms
+						state_.timers[0].current_moment_ms +
+						(state_.timers[0].running
+							 ? FlyQtHelper::fly_now_ms() - state_.timers[0].last_tick_ms
 							 : 0);
 					this->dock_->saveState();
 					this->dock_->refreshUiFromState();
@@ -444,11 +455,10 @@ void FlyHandballTab::buildUI_team_player(int row, bool isHome)
 			for (int i = 0; i < t->players.size(); i++) {
 				if (t->players[i].playerTshirtNumber == pl->teamPlayerTShirtNumber->text().toInt()) {
 					FlyScoreState::FlyGoal g;
-					g.moment_ms = this->state_.timers[0].current_moment_ms +
-						      (this->state_.timers[0].running
-							       ? FlyQtHelper::fly_now_ms() -
-									 this->state_.timers[0].last_tick_ms
-							       : 0);
+					g.moment_ms = state_.timers[0].current_moment_ms +
+						      (state_.timers[0].running ? FlyQtHelper::fly_now_ms() -
+											  state_.timers[0].last_tick_ms
+										: 0);
 					g.goalType = "regular";
 					t->players[i].goals.push_back(g);
 					this->dock_->saveState();
@@ -459,36 +469,45 @@ void FlyHandballTab::buildUI_team_player(int row, bool isHome)
 		});
 	}
 
+	pl->teamPlayerTShirtNumber->setProperty("team", p->warning_ms > 0 ? "yellow" : "true");
 	syncLabelFromState(pl->teamPlayerTShirtNumber, disable, out, QString::number(p->playerTshirtNumber));
 
+	pl->teamPlayerTShirtName->setProperty("team", p->warning_ms > 0 ? "yellow" : "true");
 	syncLabelFromState(pl->teamPlayerTShirtName, disable, out, p->playerTshirtName);
 
 	pl->teamPlayerWarningTime->setProperty("team", p->warning_ms > 0 ? "yellow" : "true");
 	syncButtonFromState(pl->teamPlayerWarningTime, disable, out, FlyQtHelper::fly_format_ms_mmss(p->warning_ms));
 	pl->teamPlayerWarningTime->setDisabled(p->fst2minSusp_ms != 0 || p->warning_ms != 0 || out || disable);
 
+	pl->teamPlayerFrst2minSuspTimer->setProperty("team", p->fst2minSusp_ms > 0 ? "2minSusp" : "true");
 	syncButtonFromState(pl->teamPlayerFrst2minSuspTimer, disable || state_.timers[0].running, out,
 			    FlyQtHelper::fly_format_ms_mmss(p->fst2minSusp_ms));
-	pl->teamPlayerFrst2minSuspTimer->setDisabled(p->fst2minSusp_ms != 0 || out || state_.timers[0].running || disable);
+	pl->teamPlayerFrst2minSuspTimer->setDisabled(p->fst2minSusp_ms != 0 || out || state_.timers[0].running ||
+						     disable);
 
+	pl->teamPlayerScnd2minSuspTimer->setProperty("team", p->snd2minSusp_ms > 0 ? "2minSusp" : "true");
 	syncButtonFromState(pl->teamPlayerScnd2minSuspTimer, disable || state_.timers[0].running, out,
 			    FlyQtHelper::fly_format_ms_mmss(p->snd2minSusp_ms));
 	pl->teamPlayerScnd2minSuspTimer->setDisabled(p->fst2minSusp_ms == 0 || p->snd2minSusp_ms != 0 || out ||
 						     state_.timers[0].running);
 
+	pl->teamPlayerThrd2minSuspTimer->setProperty("team", p->trd2minSusp_ms > 0 ? "2minSusp" : "true");
 	syncButtonFromState(pl->teamPlayerThrd2minSuspTimer, disable || state_.timers[0].running, out,
 			    FlyQtHelper::fly_format_ms_mmss(p->trd2minSusp_ms));
 	pl->teamPlayerThrd2minSuspTimer->setDisabled(p->snd2minSusp_ms == 0 || p->trd2minSusp_ms != 0 || out ||
 						     state_.timers[0].running);
 
+	pl->teamPlayerDisqualificationTime->setProperty("team", p->disqualification_ms > 0 ? "2minSusp" : "true");
 	syncButtonFromState(pl->teamPlayerDisqualificationTime, disable || state_.timers[0].running, out,
 			    FlyQtHelper::fly_format_ms_mmss(p->disqualification_ms));
 	pl->teamPlayerDisqualificationTime->setDisabled(out || state_.timers[0].running || disable);
 
+	pl->teamPlayerBlueCardTime->setProperty("team", p->blueCard_ms > 0 ? "2minSusp" : "true");
 	syncButtonFromState(pl->teamPlayerBlueCardTime, disable || state_.timers[0].running, out,
 			    FlyQtHelper::fly_format_ms_mmss(p->blueCard_ms));
 	pl->teamPlayerBlueCardTime->setDisabled(out || state_.timers[0].running || disable);
 
+	pl->teamPlayerGoals->setProperty("team", p->warning_ms > 0 ? "yellow" : "true");
 	syncButtonFromState(pl->teamPlayerGoals, disable, out, QString::number(p->goals.size()));
 
 	posCol += (isHome ? 0 : 10);
@@ -552,10 +571,9 @@ void FlyHandballTab::buildUI_team_official(int row, bool isHome)
 			for (int i = 0; i < t->officials.size(); i++) {
 				if (t->officials[i].officialLetter == of->teamPlayerTShirtNumber->text().at(0)) {
 					t->officials[i].warning_ms =
-						this->state_.timers[0].current_moment_ms +
-						(this->state_.timers[0].running
-							 ? FlyQtHelper::fly_now_ms() -
-								   this->state_.timers[0].last_tick_ms
+						state_.timers[0].current_moment_ms +
+						(state_.timers[0].running
+							 ? FlyQtHelper::fly_now_ms() - state_.timers[0].last_tick_ms
 							 : 0);
 					this->dock_->saveState();
 					this->dock_->refreshUiFromState();
@@ -614,13 +632,15 @@ void FlyHandballTab::buildUI_team_official(int row, bool isHome)
 
 	syncLabelFromState(of->teamPlayerTShirtName, disable, out, o->officialName);
 
-	of->teamPlayerWarningTime->setProperty("team", o->warning_ms > 0 ? "yellow" : of->teamPlayerWarningTime->property("team"));
+	of->teamPlayerWarningTime->setProperty("team", o->warning_ms > 0 ? "yellow"
+									 : of->teamPlayerWarningTime->property("team"));
 	syncButtonFromState(of->teamPlayerWarningTime, disable, out, FlyQtHelper::fly_format_ms_mmss(o->warning_ms));
 	of->teamPlayerWarningTime->setDisabled(o->fst2minSusp_ms != 0 || o->warning_ms != 0 || out || disable);
 
 	syncButtonFromState(of->teamPlayerFrst2minSuspTimer, disable || state_.timers[0].running, out,
 			    FlyQtHelper::fly_format_ms_mmss(o->fst2minSusp_ms));
-	of->teamPlayerFrst2minSuspTimer->setDisabled(o->fst2minSusp_ms != 0 || out || state_.timers[0].running || disable);
+	of->teamPlayerFrst2minSuspTimer->setDisabled(o->fst2minSusp_ms != 0 || out || state_.timers[0].running ||
+						     disable);
 
 	syncButtonFromState(of->teamPlayerDisqualificationTime, disable || state_.timers[0].running, out,
 			    FlyQtHelper::fly_format_ms_mmss(o->disqualification_ms));

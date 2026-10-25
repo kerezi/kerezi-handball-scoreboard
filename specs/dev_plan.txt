@@ -35,14 +35,15 @@
 --------8.0.*. Move out from tabs and dock related to websocket server
 	8.1. Handball Tab Ui in Fly Dock
 9. Overlay:
-	9.1. Main Overlay (time and results)
+	9.1. Main Overlay (BFH logo, Timer, Teams Short Names, results, 2 min Susp, Teams Timeouts)
 		9.1.1. Main Overlay: BFH logo 
 		9.1.2. Main Overlay: Timer 
 		9.1.3. Main Overlay: Teams Short Names
 		9.1.4. Main Overlay: Teams Scores
+		9.1.5. Main Overlay: Teams 2 min Susp
+		9.1.6. Main Overlay: Teams Timeouts
 ++++
 ----
-		9.1.4. Main Overlay: Teams 2 min Susp
 	9.2. Goals by time Overlay
 	9.3. Team Statistics Overlay
 • Резултат и голове (Goals): Общ брой отбелязани голове и процент на успеваемост на стрелбата (напр. 25/40 или 63%).

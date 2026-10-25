@@ -1,6 +1,5 @@
 #include "config.hpp"
 
-
 #define LOG_TAG "[" PLUGIN_NAME "][state]"
 #include "fly_score_log.hpp"
 
@@ -60,9 +59,24 @@ FlyScoreState::FlyTimer FlyScoreState::makeDefaultMainTimer()
 	t.mode = QStringLiteral("countup");
 	t.running = false;
 	t.initial_ms = 0;
+	t.duration_ms = 1800000;
 	t.current_moment_ms = 0;
 	t.last_tick_ms = 0;
 	t.visible = true;
+	return t;
+}
+
+FlyScoreState::FlyTimer FlyScoreState::makeDefaultTimeoutTimer()
+{
+	FlyScoreState::FlyTimer t;
+	t.label = fly_i18n("Default.Timer.Timeout");
+	t.mode = QStringLiteral("countdown");
+	t.running = false;
+	t.initial_ms = 60000;
+	t.duration_ms = 60000;
+	t.current_moment_ms = 60000;
+	t.last_tick_ms = 0;
+	t.visible = false;
 	return t;
 }
 
@@ -90,7 +104,7 @@ void FlyScoreState::ensureDefaultTeamsStats(FlyScoreState::FlyState &st)
 void FlyScoreState::ensureDefaultMatchStats(FlyScoreState::FlyState &st)
 {
 	if (st.stMatchStats.isEmpty()) {
-	 FlyScoreState::FlyStat ss;
+		FlyScoreState::FlyStat ss;
 		ss.label = fly_i18n("Default.Match.Period");
 		ss.first = 0;
 		ss.visible = true;
@@ -241,12 +255,16 @@ QJsonObject FlyScoreState::fly_state_to_json_object(const FlyScoreState::FlyStat
 	QJsonArray timersArr;
 	if (st.timers.isEmpty()) {
 		timersArr.append(FlyScoreState::timerToJson(FlyScoreState::makeDefaultMainTimer()));
+		timersArr.append(FlyScoreState::timerToJson(FlyScoreState::makeDefaultTimeoutTimer()));
 	} else {
 		for (const auto &tm : st.timers) {
 			timersArr.append(FlyScoreState::timerToJson(tm));
 		}
 	}
 	QJsonObject to;
+	to["timeout"] = timersArr.last();
+	LOGI("Set timeout timer to json file");
+	timersArr.removeLast();
 	to["main"] = timersArr;
 	j["timers"] = to;
 
@@ -405,7 +423,7 @@ bool FlyScoreState::fly_state_from_json_object(const QJsonObject &j, FlyScoreSta
 
 			const QJsonObject o = v.toObject();
 
-		 FlyScoreState::FlyStat ms;
+			FlyScoreState::FlyStat ms;
 			ms.label = o.value("label").toString();
 			ms.first = o.value("value").toInt(0);
 			ms.visible = o.value("visible").toBool(true);
@@ -414,7 +432,7 @@ bool FlyScoreState::fly_state_from_json_object(const QJsonObject &j, FlyScoreSta
 		}
 	}
 
- FlyScoreState::ensureDefaultMatchStats(st);
+	FlyScoreState::ensureDefaultMatchStats(st);
 	FlyScoreState::ensureDefaultTeamsStats(st);
 
 	st.timers.clear();
@@ -439,8 +457,16 @@ bool FlyScoreState::fly_state_from_json_object(const QJsonObject &j, FlyScoreSta
 			st.timers.push_back(FlyScoreState::timerFromJson(tObj));
 	}
 
-	if (st.timers.isEmpty())
+	const QJsonValue timerTimeoutVal = j.value("timers.timeout");
+	if (timerTimeoutVal.isObject()) {
+		LOGI("Push timeout timer to state");
+		st.timers.push_back(FlyScoreState::timerFromJson(timersVal.toObject()));
+	}
+
+	if (st.timers.isEmpty()) {
 		st.timers.push_back(FlyScoreState::makeDefaultMainTimer());
+		st.timers.push_back(FlyScoreState::makeDefaultTimeoutTimer());
+	}
 
 	FlyScoreState::FlyTimer &main = st.timers[0];
 	if (main.mode.isEmpty())
@@ -524,9 +550,10 @@ FlyScoreState::FlyState FlyScoreState::fly_state_make_defaults()
 	st.timers.clear();
 
 	FlyScoreState::ensureDefaultTeamsStats(st);
- FlyScoreState::ensureDefaultMatchStats(st);
+	FlyScoreState::ensureDefaultMatchStats(st);
 
 	st.timers.push_back(FlyScoreState::makeDefaultMainTimer());
+	st.timers.push_back(FlyScoreState::makeDefaultTimeoutTimer());
 
 	return st;
 }
@@ -644,7 +671,6 @@ QString FlyScoreState::selectedTemplateName(QString dataDir)
 	return QFileInfo(dataDir).fileName();
 }
 
-
 QString FlyScoreState::fly_normalize_manifest_key(QString key, const QString &section)
 {
 	key = key.trimmed().toLower();
@@ -701,7 +727,8 @@ void FlyScoreState::fly_read_theme_manifest_text(const QString &manifestPath, Fl
 		    (value.startsWith(QLatin1Char('\'')) && value.endsWith(QLatin1Char('\''))))
 			value = value.mid(1, value.size() - 2).trimmed();
 
-		fly_apply_manifest_value(out, FlyScoreState::fly_normalize_manifest_key(line.left(pos), section), value);
+		fly_apply_manifest_value(out, FlyScoreState::fly_normalize_manifest_key(line.left(pos), section),
+					 value);
 	}
 }
 

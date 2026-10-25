@@ -1,6 +1,19 @@
 // -----------------------------------------------------------------------------
 // Helpers
 // -----------------------------------------------------------------------------
+function ss(ms) {
+  ms = Math.max(0, Math.floor(Number(ms) || 0));
+  const s = Math.floor((ms % 60000) / 1000);
+  return `${String(s).padStart(2, "0")}`;
+}
+
+function mss(ms) {
+  ms = Math.max(0, Math.floor(Number(ms) || 0));
+  const m = Math.floor(ms / 60000);
+  const s = Math.floor((ms % 60000) / 1000);
+  return `${String(m).padStart(1, "0")}:${String(s).padStart(2, "0")}`;
+}
+
 function mmss(ms) {
   ms = Math.max(0, Math.floor(Number(ms) || 0));
   const m = Math.floor(ms / 60000);
@@ -498,6 +511,7 @@ function renderFrame() {
           const ms = liveTimerMs(t, activeTimer);
           t.player = (!!pl.playerTshirtNumber) ? pl.playerTshirtNumber : pl.officialLetter;
           t.live_ms = ms;
+          t.mss = mss(ms);
           t.mmss = mmss(ms);
           t.hhmmss = hhmmss(ms);
           t.total_seconds = Math.floor(ms / 1000);
@@ -507,6 +521,25 @@ function renderFrame() {
           t.visible = true;
           st.timers[tmrs][timerID++] = t;
         }
+      }
+    }
+
+    for (let to_ms of ["fstTimeout_ms", "sndTimeout_ms", "trdTimeout_ms"]) {
+      if (!!team[to_ms] && (team[to_ms] == activeTimer.current_moment_ms)) {
+        const t = !!st.timers.timeout ? st.timers.timeout : {current_moment_ms: 60000};
+        t.mode = "countdown";
+        t.running = !activeTimer.running;
+        const ms = liveTimerMs(t, t);
+        t.live_ms = ms;
+        t.ss = ss(ms);
+        t.mmss = mmss(ms);
+        t.hhmmss = hhmmss(ms);
+        t.total_seconds = Math.floor(ms / 1000);
+        t.hours = Math.floor(ms / 3600000);
+        t.minutes = Math.floor((ms % 3600000) / 60000);
+        t.seconds = Math.floor((ms % 60000) / 1000);
+        t.visible = true;
+        st.timers.timeout = t;
       }
     }
   }

@@ -129,6 +129,7 @@ public:
 	static bool fly_is_valid_theme_folder(const QString &themePath, FlyThemeManifest *manifest = nullptr);
 	static QString fly_normalize_manifest_key(QString key, const QString &section);
 	static FlyScoreState::FlyTimer makeDefaultMainTimer();
+	static FlyScoreState::FlyTimer makeDefaultTimeoutTimer();
 	static void ensureDefaultMatchStats(FlyState &st);
 	static QString moduleBaseDirFromConfigFile();
 	static QString overlay_dir_path(const QString &base_dir);

@@ -2,7 +2,7 @@
 	"guest": {
 		"color": "11162880",
 		"fstTimeout_ms": 0,
-		"logo": "",
+		"logo": "Guest-ff1204dd.png",
 		"officials": [
 			{
 				"blueCard_ms": 0,
@@ -189,7 +189,7 @@
 	"home": {
 		"color": "255",
 		"fstTimeout_ms": 0,
-		"logo": "",
+		"logo": "Home-8e1f6313.png",
 		"officials": [
 			{
 				"blueCard_ms": 0,
@@ -426,7 +426,17 @@
 				"running": false,
 				"visible": true
 			}
-		]
+		],
+		"timeout": {
+			"initial_ms": "60000",
+			"label": "Timeout",
+			"last_tick_ms": "0",
+			"mode": "countdown",
+			"current_moment_ms": "60000",
+			"duration_ms": "60000",
+			"running": false,
+			"visible": false
+		}
 	},
 	"version": 5
 }

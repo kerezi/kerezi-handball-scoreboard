@@ -795,11 +795,8 @@ void FlyConfigTab::toggleTimerRunning(int index)
 	const qint64 now = FlyQtHelper::fly_now_ms();
 
 	if (!tm.running) {
-		if (tm.current_moment_ms < 0) {
-			if (tm.mode == QStringLiteral("countdown"))
-				tm.current_moment_ms = (tm.initial_ms > 0) ? tm.initial_ms : 0;
-			else
-				tm.current_moment_ms = 0;
+		if (tm.current_moment_ms < 0 || tm.current_moment_ms > tm.duration_ms) {
+			tm.current_moment_ms = tm.initial_ms;
 		}
 		tm.last_tick_ms = now;
 		tm.running = true;
@@ -809,12 +806,14 @@ void FlyConfigTab::toggleTimerRunning(int index)
 			if (elapsed < 0)
 				elapsed = 0;
 
-			if (tm.mode == QStringLiteral("countup"))
+			if (tm.mode == QStringLiteral("countup")) {
 				tm.current_moment_ms += elapsed;
-			else {
+				if (tm.current_moment_ms > tm.duration_ms)
+					tm.current_moment_ms = tm.initial_ms;
+			} else {
 				tm.current_moment_ms -= elapsed;
 				if (tm.current_moment_ms < 0)
-					tm.current_moment_ms = 0;
+					tm.current_moment_ms = tm.initial_ms;
 			}
 		}
 		tm.running = false;
