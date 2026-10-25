@@ -500,8 +500,45 @@ function renderFrame() {
     st.timers[tmrs] = [];
     let timerID = 0;
     let team = st[tmrs.split("_")[0]];
+    let goals = {};
+    // const elements = document.querySelectorAll('.goal-item');
+    // elements.forEach(element => element.remove());
 
     for (let pl of team.players.concat(team.officials)) {
+      if (!!pl["goals"]) {
+        for (let g of pl["goals"]) {
+          let id = (g.moment_ms - (g.moment_ms % 1000)) / 1000;
+          id = (id - (id % 60)) / 60;
+          goals[id] = !goals[id] ? [] : goals[id];
+          goals[id].push(g.goalType);
+        }
+
+        for (let i in goals) {
+          for (let j in goals[i]) {
+
+            let r = (tmrs.at(0) === 'h') ? 3 - parseInt(j) : 5 + parseInt(j);
+            let c = parseInt(i) + 3;
+            const element = document.querySelector(".goal-item-" + r + "-" + c);
+            if (!element) {
+              console.log("i = " + i + " j = " + j + " content = " + goals[i][j]);
+              const newLi = document.createElement('li');
+              newLi.textContent = goals[i][j].at(0);
+              newLi.className = "goal-item-" + r + "-" + c; // Опционален клас за стил
+              newLi.style.gridRow = r;
+              newLi.style.gridColumn = c;
+              newLi.style.background = intToHex(team.color);
+
+              const container = document.querySelector('ul.goals-by-time');
+              if (!!container) {
+                container.appendChild(newLi);
+              }
+            } else {
+              console.log("R = " + r + " C = " + c + " element = " + element.textContent);
+            }
+          }
+        }
+      }
+
       for (let pl2minSusp of ["fst2minSusp_ms", "snd2minSusp_ms", "trd2minSusp_ms", "disqualification_ms", "blueCard_ms"]) {
         if (!!pl[pl2minSusp] && ((pl[pl2minSusp] + 120 * 1000) >= activeTimer.current_moment_ms)) {
           const t = {};
@@ -526,7 +563,7 @@ function renderFrame() {
 
     for (let to_ms of ["fstTimeout_ms", "sndTimeout_ms", "trdTimeout_ms"]) {
       if (!!team[to_ms] && (team[to_ms] == activeTimer.current_moment_ms)) {
-        const t = !!st.timers.timeout ? st.timers.timeout : {current_moment_ms: 60000};
+        const t = !!st.timers.timeout ? st.timers.timeout : { current_moment_ms: 60000 };
         t.mode = "countdown";
         t.running = !activeTimer.running;
         const ms = liveTimerMs(t, t);
