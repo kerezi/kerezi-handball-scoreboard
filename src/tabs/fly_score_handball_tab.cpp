@@ -461,8 +461,8 @@ void FlyHandballTab::buildUI_team_player(int row, bool isHome)
 										: 0);
 					g.goalType = "regular";
 					t->players[i].goals.push_back(g);
-					this->dock_->saveState();
-					this->dock_->refreshUiFromState();
+					dock_->saveState();
+					dock_->refreshUiFromState();
 					return;
 				}
 			}

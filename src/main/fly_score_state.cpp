@@ -105,7 +105,7 @@ void FlyScoreState::ensureDefaultMatchStats(FlyScoreState::FlyState &st)
 {
 	if (st.stMatchStats.isEmpty()) {
 		FlyScoreState::FlyStat ss;
-		ss.label = fly_i18n("Default.Match.Period");
+		ss.label = fly_i18n("Default.MatchStat.Period");
 		ss.first = 0;
 		ss.visible = true;
 		st.stMatchStats.push_back(ss);
@@ -113,7 +113,7 @@ void FlyScoreState::ensureDefaultMatchStats(FlyScoreState::FlyState &st)
 	}
 
 	if (st.stMatchStats[0].label.isEmpty())
-		st.stMatchStats[0].label = fly_i18n("Default.Match.Period");
+		st.stMatchStats[0].label = fly_i18n("Default.MatchStat.Period");
 }
 
 QJsonObject FlyScoreState::timerToJson(const FlyScoreState::FlyTimer &t)
@@ -158,11 +158,11 @@ QJsonObject FlyScoreState::fly_state_to_json_object(const FlyScoreState::FlyStat
 		QJsonObject o;
 		o["competition"] = mi.competition;
 		o["competitionRound"] = mi.competitionRound;
-		o["matchNumber"] = mi.matchNumber;
-		o["datetime_ms"] = mi.datetime.toMSecsSinceEpoch();
+		o["matchNumber"] = QString::number(mi.matchNumber);
+		o["datetime_ms"] = QString::number(mi.datetime.toMSecsSinceEpoch());
 		o["city"] = mi.city;
 		o["venue"] = mi.venue;
-		o["spectators"] = mi.spectators;
+		o["spectators"] = QString::number(mi.spectators);
 		return o;
 	};
 
@@ -175,9 +175,9 @@ QJsonObject FlyScoreState::fly_state_to_json_object(const FlyScoreState::FlyStat
 		o["logo"] = tm.logo;
 		o["color"] = QString::number(tm.color);
 
-		o["fstTimeout_ms"] = tm.fstTimeout_ms;
-		o["sndTimeout_ms"] = tm.sndTimeout_ms;
-		o["trdTimeout_ms"] = tm.trdTimeout_ms;
+		o["fstTimeout_ms"] = QString::number(tm.fstTimeout_ms);
+		o["sndTimeout_ms"] = QString::number(tm.sndTimeout_ms);
+		o["trdTimeout_ms"] = QString::number(tm.trdTimeout_ms);
 
 		int scores = 0;
 
@@ -187,10 +187,10 @@ QJsonObject FlyScoreState::fly_state_to_json_object(const FlyScoreState::FlyStat
 			oo["officialLetter"] = QString(of.officialLetter);
 			oo["officialName"] = of.officialName;
 			oo["officialRole"] = of.officialRole;
-			oo["fst2minSusp_ms"] = of.fst2minSusp_ms;
-			oo["warning_ms"] = of.warning_ms;
-			oo["disqualification_ms"] = of.disqualification_ms;
-			oo["blueCard_ms"] = of.blueCard_ms;
+			oo["warning_ms"] = QString::number(of.warning_ms);
+			oo["fst2minSusp_ms"] = QString::number(of.fst2minSusp_ms);
+			oo["disqualification_ms"] = QString::number(of.disqualification_ms);
+			oo["blueCard_ms"] = QString::number(of.blueCard_ms);
 			ofsArr.append(oo);
 		}
 		o["officials"] = ofsArr;
@@ -201,24 +201,24 @@ QJsonObject FlyScoreState::fly_state_to_json_object(const FlyScoreState::FlyStat
 			oo["playerTshirtNumber"] = plr.playerTshirtNumber;
 			oo["playerTshirtName"] = plr.playerTshirtName;
 			oo["playerName"] = plr.playerName;
-			oo["warning_ms"] = plr.warning_ms;
-			oo["fst2minSusp_ms"] = plr.fst2minSusp_ms;
-			oo["snd2minSusp_ms"] = plr.snd2minSusp_ms;
-			oo["trd2minSusp_ms"] = plr.trd2minSusp_ms;
-			oo["disqualification_ms"] = plr.disqualification_ms;
-			oo["blueCard_ms"] = plr.blueCard_ms;
+			oo["warning_ms"] = QString::number(plr.warning_ms);
+			oo["fst2minSusp_ms"] = QString::number(plr.fst2minSusp_ms);
+			oo["snd2minSusp_ms"] = QString::number(plr.snd2minSusp_ms);
+			oo["trd2minSusp_ms"] = QString::number(plr.trd2minSusp_ms);
+			oo["disqualification_ms"] = QString::number(plr.disqualification_ms);
+			oo["blueCard_ms"] = QString::number(plr.blueCard_ms);
 
 			QJsonArray plrgArr;
 			for (const auto &plrg : plr.goals) {
 				scores++;
 				QJsonObject ooo;
-				ooo["moment_ms"] = plrg.moment_ms;
+				ooo["moment_ms"] = QString::number(plrg.moment_ms);
 				ooo["goalType"] = plrg.goalType;
-				plrgArr.append(ooo);
+				plrgArr.push_back(ooo);
 			}
 			oo["goals"] = plrgArr;
 
-			plrsArr.append(oo);
+			plrsArr.push_back(oo);
 		}
 		o["players"] = plrsArr;
 		o["scores"] = scores;
@@ -293,12 +293,12 @@ bool FlyScoreState::fly_state_from_json_object(const QJsonObject &j, FlyScoreSta
 		FlyScoreState::FlyMatchInfo mi;
 		mi.competition = o.value("competition").toString();
 		mi.competitionRound = o.value("competitionRound").toString();
-		mi.matchNumber = o.value("matchNumber").toInt();
-		qint64 datetime_ms = o.value("datetime_ms").toInteger();
+		mi.matchNumber = o.value("matchNumber").toString("0").toInt();
+		qint64 datetime_ms = o.value("datetime_ms").toString("0").toLongLong();
 		mi.datetime = QDateTime::fromMSecsSinceEpoch(datetime_ms);
 		mi.city = o.value("city").toString();
 		mi.venue = o.value("venue").toString();
-		mi.spectators = o.value("spectators").toInteger();
+		mi.spectators = o.value("spectators").toString("0").toInt();
 		return mi;
 	};
 	st.matchInfo = readMatchInfo(j.value("matchInfo").toObject());
@@ -310,9 +310,9 @@ bool FlyScoreState::fly_state_from_json_object(const QJsonObject &j, FlyScoreSta
 		tm.logo = o.value("logo").toString();
 		tm.color = readColor(o, "color", 0xFFFFFF);
 
-		tm.fstTimeout_ms = o.value("fstTimeout_ms").toInteger();
-		tm.sndTimeout_ms = o.value("sndTimeout_ms").toInteger();
-		tm.trdTimeout_ms = o.value("trdTimeout_ms").toInteger();
+		tm.fstTimeout_ms = o.value("fstTimeout_ms").toString("0").toLongLong();
+		tm.sndTimeout_ms = o.value("sndTimeout_ms").toString("0").toLongLong();
+		tm.trdTimeout_ms = o.value("trdTimeout_ms").toString("0").toLongLong();
 
 		const QJsonValue ofVal = o.value("officials");
 		if (ofVal.isArray()) {
@@ -329,10 +329,10 @@ bool FlyScoreState::fly_state_from_json_object(const QJsonObject &j, FlyScoreSta
 				of.officialLetter = QString(ofl++).at(0);
 				of.officialName = oo.value("officialName").toString();
 				of.officialRole = oo.value("officialRole").toString();
-				of.warning_ms = oo.value("warning_ms").toInteger();
-				of.fst2minSusp_ms = oo.value("fst2minSusp_ms").toInteger();
-				of.disqualification_ms = oo.value("disqualification_ms").toInteger();
-				of.blueCard_ms = oo.value("blueCard_ms").toInteger();
+				of.warning_ms = oo.value("warning_ms").toString("0").toLongLong();
+				of.fst2minSusp_ms = oo.value("fst2minSusp_ms").toString("0").toLongLong();
+				of.disqualification_ms = oo.value("disqualification_ms").toString("0").toLongLong();
+				of.blueCard_ms = oo.value("blueCard_ms").toString("0").toLongLong();
 
 				tm.officials.push_back(of);
 			}
@@ -352,12 +352,12 @@ bool FlyScoreState::fly_state_from_json_object(const QJsonObject &j, FlyScoreSta
 				op.playerTshirtNumber = oo.value("playerTshirtNumber").toInt();
 				op.playerTshirtName = oo.value("playerTshirtName").toString();
 				op.playerName = oo.value("playerName").toString();
-				op.warning_ms = oo.value("warning_ms").toInteger();
-				op.fst2minSusp_ms = oo.value("fst2minSusp_ms").toInteger();
-				op.snd2minSusp_ms = oo.value("snd2minSusp_ms").toInteger();
-				op.trd2minSusp_ms = oo.value("trd2minSusp_ms").toInteger();
-				op.disqualification_ms = oo.value("disqualification_ms").toInteger();
-				op.blueCard_ms = oo.value("blueCard_ms").toInteger();
+				op.warning_ms = oo.value("warning_ms").toString("0").toLongLong();
+				op.fst2minSusp_ms = oo.value("fst2minSusp_ms").toString("0").toLongLong();
+				op.snd2minSusp_ms = oo.value("snd2minSusp_ms").toString("0").toLongLong();
+				op.trd2minSusp_ms = oo.value("trd2minSusp_ms").toString("0").toLongLong();
+				op.disqualification_ms = oo.value("disqualification_ms").toString("0").toLongLong();
+				op.blueCard_ms = oo.value("blueCard_ms").toString("0").toLongLong();
 
 				const QJsonValue opgVal = oo.value("goals");
 				if (opgVal.isArray()) {
@@ -367,10 +367,9 @@ bool FlyScoreState::fly_state_from_json_object(const QJsonObject &j, FlyScoreSta
 					for (const QJsonValue vv : opgArr) {
 						if (!vv.isObject())
 							continue;
-						const QJsonObject ooo = v.toObject();
+						const QJsonObject ooo = vv.toObject();
 						FlyScoreState::FlyGoal opg;
-
-						opg.moment_ms = ooo.value("moment_ms").toInt();
+						opg.moment_ms = ooo.value("moment_ms").toString("0").toLongLong();
 						opg.goalType = ooo.value("goalType").toString();
 						op.goals.push_back(opg);
 					}
@@ -513,12 +512,14 @@ bool FlyScoreState::fly_state_load(const QString &base_dir, FlyScoreState::FlySt
 {
 	const QString path = FlyScoreState::overlay_plugin_json(base_dir);
 	QFile f(path);
-	if (!f.exists() || !f.open(QIODevice::ReadOnly))
+	if (!f.exists() || !f.open(QIODevice::ReadOnly)) {
 		return false;
+	}
 
 	const auto doc = QJsonDocument::fromJson(f.readAll());
-	if (!doc.isObject())
+	if (!doc.isObject()) {
 		return false;
+	}
 
 	return fly_state_from_json_object(doc.object(), out);
 }

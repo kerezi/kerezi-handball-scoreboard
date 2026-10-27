@@ -42,9 +42,9 @@
 		9.1.4. Main Overlay: Teams Scores
 		9.1.5. Main Overlay: Teams 2 min Susp
 		9.1.6. Main Overlay: Teams Timeouts
+	9.2. Goals by time Overlay
 ++++
 ----
-	9.2. Goals by time Overlay
 	9.3. Team Statistics Overlay
 • Резултат и голове (Goals): Общ брой отбелязани голове и процент на успеваемост на стрелбата (напр. 25/40 или 63%).
 • Ефективност на атаката (Attack Efficiency): Процентът на атаките, завършили с гол, спрямо общия брой владения на топката.

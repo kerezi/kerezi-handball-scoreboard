@@ -517,7 +517,7 @@ function renderFrame() {
           for (let j in goals[i]) {
 
             let r = (tmrs.at(0) === 'h') ? 3 - parseInt(j) : 5 + parseInt(j);
-            let c = parseInt(i) + 3;
+            let c = parseInt(i) + 2;
             const element = document.querySelector(".goal-item-" + r + "-" + c);
             if (!element) {
               console.log("i = " + i + " j = " + j + " content = " + goals[i][j]);

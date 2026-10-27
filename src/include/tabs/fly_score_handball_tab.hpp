@@ -40,9 +40,6 @@ public:
 	void syncUiFromState() override;
 	void syncStateFromUi() override;
 
-private slots:
-	void onClearTeamsAndReset();
-
 private:
 	struct FlyTeamPlayerUI {
 		QLabel *teamPlayerTShirtNumber = nullptr;
