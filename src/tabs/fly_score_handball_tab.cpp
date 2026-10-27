@@ -101,8 +101,9 @@ QLabel *FlyHandballTab::newQLabel(QString title, int height, int width, bool isH
 	QLabel *newQLabel = new QLabel(title);
 	QColor c = FlyQtHelper::colorFromU32(isHome ? state_.home.color : state_.guest.color);
 	QString css = "QLabel { font-weight:bold; } QLabel[team=\"yellow\"] { color: yellow; background-color: " +
-		      c.darker().name() + "; }  QLabel[team=\"out\"] { background-color: red; color: " +
-		      c.darker().name() + "; } QLabel[team=\"true\"] { background-color: " + c.darker().name() +
+		      c.darker().name() +
+		      "; }  QLabel[team=\"out\"] { background-color: red; color: " + c.darker().name() +
+		      "; } QLabel[team=\"true\"] { background-color: " + c.darker().name() +
 		      "; color: " + FlyQtHelper::getHighContrastColor(c).name() + "; }";
 	newQLabel->setStyleSheet(css);
 	newQLabel->setToolTip(title);
@@ -124,11 +125,11 @@ void FlyHandballTab::buildUI_matchInfo_Team_FirstLine(bool isHome)
 
 	FlyScoreState::FlyTeam *t = (isHome ? &state_.home : &state_.guest);
 
-	posCol += (isHome ? 0 : 8);
+	posCol += (isHome ? 0 : 9);
 
 	if (makeNew) {
 		team->teamLongName =
-			newQLabel(fly_i18n("Common.Home"), 2, 4, isHome, true, Qt::AlignTop | Qt::AlignHCenter);
+			newQLabel(fly_i18n("Common.Home"), 2, 5, isHome, true, Qt::AlignTop | Qt::AlignHCenter);
 		team->teamLongName->setWordWrap(true);
 		team->teamFrst2minSuspTimer =
 			newQLabel(fly_i18n("Common.F2MinSusp"), 2, 1, isHome, true, Qt::AlignTop | Qt::AlignHCenter);
@@ -164,7 +165,8 @@ void FlyHandballTab::buildUI_matchInfo_Team_FirstLine(bool isHome)
 			}
 
 			if (tog) {
-				if (state_.timers[0].running) dock_->toggleTimerRunning(0);
+				if (state_.timers[0].running)
+					dock_->toggleTimerRunning(0);
 				dock_->toggleTimerRunning(1);
 			}
 		});
@@ -231,11 +233,12 @@ void FlyHandballTab::buildUI_matchInfo_Team_SecondLine(bool isHome)
 	makeNew = team->teamShrtName == nullptr;
 
 	FlyScoreState::FlyTeam *t = (isHome ? &state_.home : &state_.guest);
-	posCol += (isHome ? 0 : 9);
+	posCol += (isHome ? 0 : 10);
 
 	if (makeNew) {
 		team->teamShrtName =
 			newQLabel(fly_i18n("Common.Home") + " " + fly_i18n("Dock.Players"), 1, 3, isHome, true);
+		team->teamScores = newQLabel(fly_i18n("Common.MatchResult"), 1, 1, isHome, true);
 		team->teamNumOfYllCard = newQLabel(fly_i18n("Common.NumberOfYellow"), 1, 1, isHome, true);
 		team->teamNumOfFrst2minSup = newQLabel(fly_i18n("Common.NumberOfFirst2minSusp"), 1, 1, isHome, true);
 		team->teamNumOfScnd2minSup = newQLabel(fly_i18n("Common.NumberOfSecond2minSusp"), 1, 1, isHome, true);
@@ -247,6 +250,14 @@ void FlyHandballTab::buildUI_matchInfo_Team_SecondLine(bool isHome)
 	team->teamShrtName->setText(t->subtitle);
 
 	int numOf = 0;
+	for (FlyScoreState::FlyPlayer p : t->players) {
+		for (FlyScoreState::FlyGoal g : p.goals) {
+			numOf++;
+		}
+	}
+	team->teamScores->setText(QString::number(numOf));
+
+	numOf = 0;
 	for (int i = 0; i < t->players.size(); i++) {
 		numOf += (t->players[i].warning_ms > 0) ? 1 : 0;
 	}
@@ -298,7 +309,7 @@ void FlyHandballTab::buildUI_matchInfo()
 		buildUI_matchInfo_Team_FirstLine(true);
 
 		if (mt == nullptr) {
-			mt = newFlyClickableLabel(fly_i18n("Common.MatchTimer"), 2, 4, true);
+			mt = newFlyClickableLabel(fly_i18n("Common.MatchTimer"), 2, 2, true);
 			QString css = mt->styleSheet() + QStringLiteral(" QPushButton {font-size: 24pt;}");
 			mt->setStyleSheet(css);
 		}
@@ -319,22 +330,6 @@ void FlyHandballTab::buildUI_matchInfo()
 	// 2nd row
 	{
 		buildUI_matchInfo_Team_SecondLine(true);
-
-		mr = (mr == nullptr) ? newQLabel(fly_i18n("Common.MatchResult"), 1, 2, true) : mr;
-		int homeScore = 0;
-		for (FlyScoreState::FlyPlayer p : state_.home.players) {
-			for (FlyScoreState::FlyGoal g : p.goals) {
-				homeScore++;
-			}
-		}
-		int guestScore = 0;
-		for (FlyScoreState::FlyPlayer p : state_.guest.players) {
-			for (FlyScoreState::FlyGoal g : p.goals) {
-				guestScore++;
-			}
-		}
-		mr->setText(QString::asprintf("%02d:%02d", homeScore, guestScore));
-
 		buildUI_matchInfo_Team_SecondLine(false);
 	}
 }
@@ -358,6 +353,26 @@ void FlyHandballTab::buildUI_team_player(int row, bool isHome)
 		pl->teamPlayerTShirtNumber = newQLabel(fly_i18n("Common.PlayerNumber"), 1, 1, isHome, !disable);
 		pl->teamPlayerTShirtName = newQLabel(fly_i18n("Players.PlayerName"), 1, 2, isHome, !disable,
 						     (isHome ? Qt::AlignLeft : Qt::AlignRight) | Qt::AlignVCenter);
+
+		pl->teamPlayerGoals = newFlyClickableLabel(fly_i18n("Common.MatchTimer"), 1, 1, isHome, !disable);
+		connect(pl->teamPlayerGoals, &QPushButton::clicked, this, [this, isHome, pl]() {
+			FlyScoreState::FlyTeam *t = isHome ? &state_.home : &state_.guest;
+			for (int i = 0; i < t->players.size(); i++) {
+				if (t->players[i].playerTshirtNumber == pl->teamPlayerTShirtNumber->text().toInt()) {
+					FlyScoreState::FlyGoal g;
+					g.moment_ms = state_.timers[0].current_moment_ms +
+						      (state_.timers[0].running ? FlyQtHelper::fly_now_ms() -
+											  state_.timers[0].last_tick_ms
+										: 0);
+					g.goalType = "regular";
+					t->players[i].goals.push_back(g);
+					dock_->saveState();
+					dock_->refreshUiFromState();
+					return;
+				}
+			}
+		});
+
 		pl->teamPlayerWarningTime = newFlyClickableLabel(fly_i18n("Common.MatchTimer"), 1, 1, isHome, !disable);
 		connect(pl->teamPlayerWarningTime, &QPushButton::clicked, this, [this, isHome, pl]() {
 			FlyScoreState::FlyTeam *t = isHome ? &state_.home : &state_.guest;
@@ -448,25 +463,6 @@ void FlyHandballTab::buildUI_team_player(int row, bool isHome)
 				}
 			}
 		});
-
-		pl->teamPlayerGoals = newFlyClickableLabel(fly_i18n("Common.MatchTimer"), 1, 1, isHome, !disable);
-		connect(pl->teamPlayerGoals, &QPushButton::clicked, this, [this, isHome, pl]() {
-			FlyScoreState::FlyTeam *t = isHome ? &state_.home : &state_.guest;
-			for (int i = 0; i < t->players.size(); i++) {
-				if (t->players[i].playerTshirtNumber == pl->teamPlayerTShirtNumber->text().toInt()) {
-					FlyScoreState::FlyGoal g;
-					g.moment_ms = state_.timers[0].current_moment_ms +
-						      (state_.timers[0].running ? FlyQtHelper::fly_now_ms() -
-											  state_.timers[0].last_tick_ms
-										: 0);
-					g.goalType = "regular";
-					t->players[i].goals.push_back(g);
-					dock_->saveState();
-					dock_->refreshUiFromState();
-					return;
-				}
-			}
-		});
 	}
 
 	pl->teamPlayerTShirtNumber->setProperty("team", p->warning_ms > 0 ? "yellow" : "true");
@@ -474,6 +470,9 @@ void FlyHandballTab::buildUI_team_player(int row, bool isHome)
 
 	pl->teamPlayerTShirtName->setProperty("team", p->warning_ms > 0 ? "yellow" : "true");
 	syncLabelFromState(pl->teamPlayerTShirtName, disable, out, p->playerTshirtName);
+
+	pl->teamPlayerGoals->setProperty("team", p->warning_ms > 0 ? "yellow" : "true");
+	syncButtonFromState(pl->teamPlayerGoals, disable, out, QString::number(p->goals.size()));
 
 	pl->teamPlayerWarningTime->setProperty("team", p->warning_ms > 0 ? "yellow" : "true");
 	syncButtonFromState(pl->teamPlayerWarningTime, disable, out, FlyQtHelper::fly_format_ms_mmss(p->warning_ms));
@@ -506,9 +505,6 @@ void FlyHandballTab::buildUI_team_player(int row, bool isHome)
 	syncButtonFromState(pl->teamPlayerBlueCardTime, disable || state_.timers[0].running, out,
 			    FlyQtHelper::fly_format_ms_mmss(p->blueCard_ms));
 	pl->teamPlayerBlueCardTime->setDisabled(out || state_.timers[0].running || disable);
-
-	pl->teamPlayerGoals->setProperty("team", p->warning_ms > 0 ? "yellow" : "true");
-	syncButtonFromState(pl->teamPlayerGoals, disable, out, QString::number(p->goals.size()));
 
 	posCol += (isHome ? 0 : 10);
 
@@ -563,7 +559,7 @@ void FlyHandballTab::buildUI_team_official(int row, bool isHome)
 
 	if (makeNew) {
 		of->teamPlayerTShirtNumber = newQLabel(fly_i18n("Common.OfficialChar"), 1, 1, isHome, !disable);
-		of->teamPlayerTShirtName = newQLabel(fly_i18n("Players.PlayerName"), 1, 2, isHome, !disable,
+		of->teamPlayerTShirtName = newQLabel(fly_i18n("Players.PlayerName"), 1, 3, isHome, !disable,
 						     (isHome ? Qt::AlignLeft : Qt::AlignRight) | Qt::AlignVCenter);
 		of->teamPlayerWarningTime = newFlyClickableLabel(fly_i18n("Common.MatchTimer"), 1, 1, isHome, !disable);
 		connect(of->teamPlayerWarningTime, &QPushButton::clicked, this, [this, isHome, of]() {
@@ -583,7 +579,7 @@ void FlyHandballTab::buildUI_team_official(int row, bool isHome)
 		});
 
 		of->teamPlayerFrst2minSuspTimer =
-			newFlyClickableLabel(fly_i18n("Common.MatchTimer"), 1, 2, isHome, !disable);
+			newFlyClickableLabel(fly_i18n("Common.MatchTimer"), 1, 3, isHome, !disable);
 		connect(of->teamPlayerFrst2minSuspTimer, &QPushButton::clicked, this, [this, isHome, of]() {
 			FlyScoreState::FlyTeam *t = isHome ? &state_.home : &state_.guest;
 			for (int i = 0; i < t->officials.size(); i++) {
@@ -598,7 +594,7 @@ void FlyHandballTab::buildUI_team_official(int row, bool isHome)
 		});
 
 		of->teamPlayerDisqualificationTime =
-			newFlyClickableLabel(fly_i18n("Common.MatchTimer"), 1, 2, isHome, !disable);
+			newFlyClickableLabel(fly_i18n("Common.MatchTimer"), 1, 1, isHome, !disable);
 		connect(of->teamPlayerDisqualificationTime, &QPushButton::clicked, this, [this, isHome, of]() {
 			FlyScoreState::FlyTeam *t = isHome ? &state_.home : &state_.guest;
 			for (int i = 0; i < t->officials.size(); i++) {
@@ -613,7 +609,7 @@ void FlyHandballTab::buildUI_team_official(int row, bool isHome)
 		});
 
 		of->teamPlayerBlueCardTime =
-			newFlyClickableLabel(fly_i18n("Common.MatchTimer"), 1, 2, isHome, !disable);
+			newFlyClickableLabel(fly_i18n("Common.MatchTimer"), 1, 1, isHome, !disable);
 		connect(of->teamPlayerBlueCardTime, &QPushButton::clicked, this, [this, isHome, of]() {
 			FlyScoreState::FlyTeam *t = isHome ? &state_.home : &state_.guest;
 			for (int i = 0; i < t->officials.size(); i++) {
@@ -705,15 +701,15 @@ void FlyHandballTab::buildUI_matchOfficialInfo(bool isHome)
 	posCol += (isHome ? 0 : 10);
 
 	if (makeNew) {
-		team->teamOfficials = newQLabel(fly_i18n("Teams.Officials"), 1, 3, isHome, true);
+		team->teamOfficials = newQLabel(fly_i18n("Teams.Officials"), 1, 4, isHome, true);
 		team->teamOfficialsNumOfYllCard = newQLabel(fly_i18n("Common.NumberOfYellow"), 1, 1, isHome, true,
 							    Qt::AlignTop | Qt::AlignHCenter);
-		team->teamOfficialsNumOf2minSup = newQLabel(fly_i18n("Common.NumberOfFirst2minSusp"), 1, 2, isHome,
+		team->teamOfficialsNumOf2minSup = newQLabel(fly_i18n("Common.NumberOfFirst2minSusp"), 1, 3, isHome,
 							    true, Qt::AlignTop | Qt::AlignHCenter);
 		team->teamOfficialsNumOfRedCard =
-			newQLabel(fly_i18n("Common.NumberOfDisq"), 1, 2, isHome, true, Qt::AlignTop | Qt::AlignHCenter);
+			newQLabel(fly_i18n("Common.NumberOfDisq"), 1, 1, isHome, true, Qt::AlignTop | Qt::AlignHCenter);
 		team->teamOfficialsNumOfBluCard =
-			newQLabel(fly_i18n("Common.NumberOfBlue"), 1, 2, isHome, true, Qt::AlignTop | Qt::AlignHCenter);
+			newQLabel(fly_i18n("Common.NumberOfBlue"), 1, 1, isHome, true, Qt::AlignTop | Qt::AlignHCenter);
 	}
 	team->teamOfficialsNumOfYllCard->setText("");
 	team->teamOfficialsNumOf2minSup->setText("");

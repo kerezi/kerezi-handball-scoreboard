@@ -61,6 +61,7 @@ private:
 		QLabel *teamThrd2minSuspTimer = nullptr;
 
 		QLabel *teamShrtName = nullptr;
+		QLabel *teamScores = nullptr;
 		QLabel *teamNumOfYllCard = nullptr;
 		QLabel *teamNumOfFrst2minSup = nullptr;
 		QLabel *teamNumOfScnd2minSup = nullptr;
