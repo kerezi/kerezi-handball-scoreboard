@@ -220,8 +220,6 @@ void FlyStatsTab::syncUiFromState()
 		};
 
 		connect(firstSpin, qOverload<int>(&QSpinBox::valueChanged), this, [sync](int) { sync(); });
-		if (secondSpin != nullptr)
-			connect(secondSpin, qOverload<int>(&QSpinBox::valueChanged), this, [sync](int) { sync(); });
 		connect(visibleCheck, &QCheckBox::toggled, this, [sync](bool) { sync(); });
 
 		connect(minusFirstSpin, &QToolButton::clicked, this, [firstSpin, sync]() {
@@ -234,6 +232,8 @@ void FlyStatsTab::syncUiFromState()
 		});
 
 		if (!isMatchStat) {
+			connect(secondSpin, qOverload<int>(&QSpinBox::valueChanged), this, [sync](int) { sync(); });
+
 			connect(minusSecondSpin, &QToolButton::clicked, this, [secondSpin, sync]() {
 				secondSpin->setValue(std::max(0, secondSpin->value() - 1));
 				sync();
@@ -263,7 +263,7 @@ void FlyStatsTab::syncStateFromUi()
 		st.first = ui.firstSpin ? ui.firstSpin->value() : 0;
 		st.second = ui.secondSpin ? ui.secondSpin->value() : 0;
 		st.visible = ui.visibleCheck ? ui.visibleCheck->isChecked() : true;
-		state_.stTeamsStats.push_back(st);
+		stStats->push_back(st);
 	}
 
 	dock_->saveState();
