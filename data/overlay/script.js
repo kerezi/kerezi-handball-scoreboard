@@ -484,6 +484,9 @@ function renderFrame() {
   }
   const activeTimer = st.timers.main[0] || {};
 
+  let cur_moment = activeTimer.minutes + 1;
+  cur_moment = (cur_moment > 30) ? cur_moment - 30 : cur_moment;
+
   // ---------------------------------------------------------------------------
   // Build derived view model:
   //   - team_x / team_y: left/right teams based on swap_sides
@@ -520,10 +523,10 @@ function renderFrame() {
             let c = parseInt(i) + 2;
             const element = document.querySelector(".goal-item-" + r + "-" + c);
             if (!element) {
-              console.log("i = " + i + " j = " + j + " content = " + goals[i][j]);
+              // console.log("i = " + i + " j = " + j + " content = " + goals[i][j]);
               const newLi = document.createElement('li');
               newLi.textContent = goals[i][j].at(0);
-              newLi.className = "goal-item-" + r + "-" + c; // Опционален клас за стил
+              newLi.className = "scores goal-item-" + r + "-" + c; // Опционален клас за стил
               newLi.style.gridRow = r;
               newLi.style.gridColumn = c;
               newLi.style.background = intToHex(team.color);
@@ -533,7 +536,7 @@ function renderFrame() {
                 container.appendChild(newLi);
               }
             } else {
-              console.log("R = " + r + " C = " + c + " element = " + element.textContent);
+              // console.log("R = " + r + " C = " + c + " element = " + element.textContent);
             }
           }
         }
@@ -557,6 +560,77 @@ function renderFrame() {
           t.seconds = Math.floor((ms % 60000) / 1000);
           t.visible = true;
           st.timers[tmrs][timerID++] = t;
+        }
+      }
+    }
+
+    const element = document.querySelector(".current-moment");
+    const curMomentElm = !!element ? element : document.createElement('li');
+
+    curMomentElm.className = "scores current-moment";
+    curMomentElm.style.gridRow = 4;
+    curMomentElm.style.gridColumn = "" + (3 + (cur_moment < 9 ? 0 : cur_moment < 19 ? 10 : 20)) + " / span " + (cur_moment % 10);
+
+
+    if (cur_moment > 0) {
+      const numElm = document.querySelector(".min-0");
+      numElm.style.background = "black";
+
+      const line1 = document.querySelector(".line-1");
+      if (cur_moment < 9) {
+        line1.style.gridColumn = "" + (3 + cur_moment) + "/ span " + (9 - cur_moment);
+      } else if (cur_moment >= 9) {
+        line1.style.gridColumn = "3 / span 9";
+        line1.style.background = "black";
+        if (cur_moment == 9) {
+          const container = document.querySelector('ul.goals-by-time');
+          if (!!container && !!element) {
+            container.removeChild(curMomentElm);
+          }
+        } else if (cur_moment >= 10) {
+          const numElm = document.querySelector(".min-10");
+          numElm.style.background = "black";
+        }
+      }
+      const line2 = document.querySelector(".line-2");
+      if (cur_moment > 10 && cur_moment < 19) {
+        line2.style.gridColumn = "" + (3 + cur_moment) + "/ span " + (19 - cur_moment);
+      } else if (cur_moment >= 19) {
+        line2.style.gridColumn = "13 / span 9";
+        line2.style.background = "black";
+        if (cur_moment == 19) {
+          const container = document.querySelector('ul.goals-by-time');
+          if (!!container && !!element) {
+            container.removeChild(curMomentElm);
+          }
+        } else if (cur_moment >= 20) {
+          const numElm = document.querySelector(".min-20");
+          numElm.style.background = "black";
+        }
+      }
+      const line3 = document.querySelector(".line-3");
+      if (cur_moment > 20 && cur_moment < 29) {
+        line3.style.gridColumn = "" + (3 + cur_moment) + "/ span " + (29 - cur_moment);
+      } else if (cur_moment >= 29) {
+        line3.style.gridColumn = "23 / span 9";
+        line3.style.background = "black";
+        if (cur_moment == 29) {
+          const container = document.querySelector('ul.goals-by-time');
+          if (!!container && !!element) {
+            container.removeChild(curMomentElm);
+          }
+        } else if (cur_moment >= 30) {
+          const numElm = document.querySelector(".min-30");
+          numElm.style.background = "black";
+        }
+      }
+      curMomentElm.style.background = "black";
+      if (!element && cur_moment != 10 && cur_moment != 20 && cur_moment != 30) {
+        const hrElm = document.createElement('hr');
+        curMomentElm.appendChild(hrElm);
+        const container = document.querySelector('ul.goals-by-time');
+        if (!!container) {
+          container.appendChild(curMomentElm);
         }
       }
     }

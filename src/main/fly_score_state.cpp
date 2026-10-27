@@ -55,7 +55,7 @@ bool FlyScoreState::fly_ensure_webroot(QString *outBaseDir)
 FlyScoreState::FlyTimer FlyScoreState::makeDefaultMainTimer()
 {
 	FlyScoreState::FlyTimer t;
-	t.label = fly_i18n("Default.Timer.FirstHalf");
+	t.label = fly_i18n("Default.Timer.HalfTime");
 	t.mode = QStringLiteral("countup");
 	t.running = false;
 	t.initial_ms = 0;
