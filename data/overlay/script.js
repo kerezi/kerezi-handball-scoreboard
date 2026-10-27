@@ -553,7 +553,7 @@ function renderFrame() {
 
       curMomentElm.className = "scores current-moment";
       curMomentElm.style.gridRow = 4;
-      curMomentElm.style.gridColumn = "" + (3 + (cur_moment < 9 ? 0 : cur_moment < 19 ? 10 : 20)) + " / span " + ((cur_moment - 1) % 10);
+      curMomentElm.style.gridColumn = "" + (3 + (cur_moment < 9 ? 0 : cur_moment < 19 ? 9 : 19)) + " / span " + (cur_moment < 9 ? (cur_moment - 1) % 10 : cur_moment % 10);
 
       if (cur_moment > 0) {
         const numElm = document.querySelector(".min-1");
@@ -578,7 +578,7 @@ function renderFrame() {
 
         const line2 = document.querySelector(".line-2");
         if (cur_moment > 10 && cur_moment < 19) {
-          line2.style.gridColumn = "" + (3 + cur_moment) + "/ span " + (19 - cur_moment);
+          line2.style.gridColumn = "" + (2 + cur_moment) + "/ span " + (19 - cur_moment);
         } else if (cur_moment >= 19) {
           line2.style.gridColumn = "13 / span 9";
           line2.style.background = "black";
@@ -595,7 +595,7 @@ function renderFrame() {
 
         const line3 = document.querySelector(".line-3");
         if (cur_moment > 20 && cur_moment < 29) {
-          line3.style.gridColumn = "" + (3 + cur_moment) + "/ span " + (29 - cur_moment);
+          line3.style.gridColumn = "" + (2 + cur_moment) + "/ span " + (29 - cur_moment);
         } else if (cur_moment >= 29) {
           line3.style.gridColumn = "23 / span 9";
           line3.style.background = "black";
