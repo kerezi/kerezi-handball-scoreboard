@@ -512,7 +512,7 @@ function renderFrame() {
         for (let i in goals) {
           for (let j in goals[i]) {
             let r = (tmrs.at(0) === 'h') ? 3 - parseInt(j) : 5 + parseInt(j);
-            let c = parseInt(i) + 2;
+            let c = parseInt(i) + 1;
             const element = document.querySelector(".goal-item-" + r + "-" + c);
             if (!element) {
               // console.log("i = " + i + " j = " + j + " content = " + goals[i][j]);
@@ -553,7 +553,7 @@ function renderFrame() {
 
       curMomentElm.className = "scores current-moment";
       curMomentElm.style.gridRow = 4;
-      curMomentElm.style.gridColumn = "" + (3 + (cur_moment < 9 ? 0 : cur_moment < 19 ? 9 : 19)) + " / span " + (cur_moment < 9 ? (cur_moment - 1) % 10 : cur_moment % 10);
+      curMomentElm.style.gridColumn = "" + (cur_moment < 9 ? 2 : cur_moment < 19 ? 11 : 21) + " / span " + (cur_moment < 9 ? (cur_moment - 1) % 10 : cur_moment % 10);
 
       if (cur_moment > 0) {
         const numElm = document.querySelector(".min-1");
@@ -561,9 +561,9 @@ function renderFrame() {
 
         const line1 = document.querySelector(".line-1");
         if (cur_moment < 9) {
-          line1.style.gridColumn = "" + (2 + cur_moment) + "/ span " + (9 - cur_moment);
-        } else if (cur_moment >= 10) {
-          line1.style.gridColumn = "3 / span 8";
+          line1.style.gridColumn = "" + (cur_moment + 1) + "/ span " + (9 - cur_moment);
+        } else if (cur_moment >= 9) {
+          line1.style.gridColumn = "2 / span 8";
           line1.style.background = "black";
           if (cur_moment == 9) {
             const container = document.querySelector('ul.goals-by-time');
@@ -578,9 +578,9 @@ function renderFrame() {
 
         const line2 = document.querySelector(".line-2");
         if (cur_moment > 10 && cur_moment < 19) {
-          line2.style.gridColumn = "" + (2 + cur_moment) + "/ span " + (19 - cur_moment);
+          line2.style.gridColumn = "" + (1 + cur_moment) + "/ span " + (19 - cur_moment);
         } else if (cur_moment >= 19) {
-          line2.style.gridColumn = "13 / span 9";
+          line2.style.gridColumn = "11 / span 9";
           line2.style.background = "black";
           if (cur_moment == 19) {
             const container = document.querySelector('ul.goals-by-time');
@@ -595,9 +595,9 @@ function renderFrame() {
 
         const line3 = document.querySelector(".line-3");
         if (cur_moment > 20 && cur_moment < 29) {
-          line3.style.gridColumn = "" + (2 + cur_moment) + "/ span " + (29 - cur_moment);
+          line3.style.gridColumn = "" + (1 + cur_moment) + "/ span " + (29 - cur_moment);
         } else if (cur_moment >= 29) {
-          line3.style.gridColumn = "23 / span 9";
+          line3.style.gridColumn = "21 / span 9";
           line3.style.background = "black";
           if (cur_moment == 29) {
             const container = document.querySelector('ul.goals-by-time');

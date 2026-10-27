@@ -11,25 +11,6 @@
 
 <body>
 	<ul class="goals-by-time" id="scoreboard" fs-if="show_scoreboard">
-		<!-- <li class="bfh-logo"><img alt="" src="logo-color-vertical.png" /></li> -->
-		<li class="logos place-1-2" fs-if="!!team_x.logo && !!team_y.logo">
-			<span>
-				<img alt="" src="{{team_x.logo}}" />
-				<span style="background: {{team_x.color}}">{{team_x.scores}}</span>
-			</span>
-		</li>
-		<li class="logos place-2-2" fs-if="!!team_x.logo && !!team_y.logo">
-			<span>
-				<img alt="" src="{{team_y.logo}}" />
-				<span style="background: {{team_y.color}}">{{team_y.scores}}</span>
-			</span>
-		</li>
-		<li class="logos line-0">
-			{{matchStats[0].value}}
-			{{timers.main[0].label}}
-		</li>
-		<!-- <li class="names place-1-3" style="background: {{team_x.color}}"><span>{{team_x.subtitle}}</span></li>
-		<li class="names place-2-3" style="background: {{team_y.color}}"><span>{{team_y.subtitle}}</span></li> -->
 		<li class="scores min-1">1'</li>
 		<li class="scores line-1">
 			<hr>

@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8" />
+	<title>БФХ - "А" РХГ, сезон 2026/27</title>
+	<meta name="viewport" content="width=device-width,initial-scale=1" />
+	<link rel="stylesheet" href="bghndllogoresult.css" />
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+
+<body>
+	<ul class="logo-result" id="scoreboard" fs-if="show_scoreboard">
+		<!-- <li class="bfh-logo"><img alt="" src="logo-color-vertical.png" /></li> -->
+		<li class="logos place-1-2" fs-if="!!team_x.logo && !!team_y.logo">
+			<span>
+				<img alt="" src="{{team_x.logo}}" />
+				<span style="background: {{team_x.color}}">{{team_x.scores}}</span>
+			</span>
+		</li>
+		<li class="logos place-2-2" fs-if="!!team_x.logo && !!team_y.logo">
+			<span>
+				<img alt="" src="{{team_y.logo}}" />
+				<span style="background: {{team_y.color}}">{{team_y.scores}}</span>
+			</span>
+		</li>
+		<li class="logos line-0">
+			{{matchStats[0].value}}
+			{{timers.main[0].label}}
+		</li>
+		<li class="timer place-2-1" fs-if="!!timers.main[0]">
+			<span>{{timers.main[0].mmss}}</span>
+		</li>
+		<li class="two-min-susp home" fs-if="timers.home_2minSusp[0] || timers.guest_2minSusp[0]">
+			<span>
+				<span fs-if="timers.home_2minSusp[0] && timers.home_2minSusp[0].visible"><span
+						style="background: {{team_x.color}};">{{timers.home_2minSusp[0].player}}</span>
+					{{timers.home_2minSusp[0].mss}}</span>
+				<span fs-if="timers.home_2minSusp[1] && timers.home_2minSusp[1].visible"><span
+						style="background: {{team_x.color}};">{{timers.home_2minSusp[1].player}}</span>
+					{{timers.home_2minSusp[1].mss}}</span>
+				<span fs-if="timers.home_2minSusp[2] && timers.home_2minSusp[2].visible"><span
+						style="background: {{team_x.color}};">{{timers.home_2minSusp[2].player}}</span>
+					{{timers.home_2minSusp[2].mss}}</span>
+			</span>
+		</li>
+
+		<li class="two-min-susp guest" fs-if="timers.home_2minSusp[0] || timers.guest_2minSusp[0]">
+			<span>
+				<span fs-if="timers.guest_2minSusp[0] && timers.guest_2minSusp[0].visible"><span
+						style="background: {{team_y.color}};">{{timers.guest_2minSusp[0].player}}</span>
+					{{timers.guest_2minSusp[0].mss}}</span>
+				<span fs-if="timers.guest_2minSusp[1] && timers.guest_2minSusp[1].visible"><span
+						style="background: {{team_y.color}};">{{timers.guest_2minSusp[1].player}}</span>
+					{{timers.guest_2minSusp[1].mss}}</span>
+				<span fs-if="timers.guest_2minSusp[2] && timers.guest_2minSusp[2].visible"><span
+						style="background: {{team_y.color}};">{{timers.guest_2minSusp[2].player}}</span>
+					{{timers.guest_2minSusp[2].mss}}</span>
+			</span>
+		</li>
+	</ul>
+	<script src="script.js" defer></script>
+
+</body>
+
+</html>
