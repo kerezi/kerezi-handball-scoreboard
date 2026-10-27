@@ -472,20 +472,10 @@ function renderFrame() {
   // Compute live timer values (mm:ss)
   for (let i = 0; i < st.timers.main.length; i++) {
     const t = st.timers.main[i] || {};
-    const ms = liveTimerMs(t, t);
-    t.live_ms = ms;
-    t.mmss = mmss(ms);
-    t.hhmmss = hhmmss(ms);
-    t.total_seconds = Math.floor(ms / 1000);
-    t.hours = Math.floor(ms / 3600000);
-    t.minutes = Math.floor((ms % 3600000) / 60000);
-    t.seconds = Math.floor((ms % 60000) / 1000);
+    setTimer(t, t);
     st.timers.main[i] = t;
   }
   const activeTimer = st.timers.main[0] || {};
-
-  let cur_moment = activeTimer.minutes + 1;
-  cur_moment = (cur_moment > 30) ? cur_moment - 30 : cur_moment;
 
   // ---------------------------------------------------------------------------
   // Build derived view model:
@@ -499,10 +489,12 @@ function renderFrame() {
   const team_x = swap ? baseGuest : baseHome; // left side
   const team_y = swap ? baseHome : baseGuest; // right side
 
+  // --------------- Time, Result Overlay --- start
   for (let tmrs of ["home_2minSusp", "guest_2minSusp"]) {
     st.timers[tmrs] = [];
     let timerID = 0;
     let team = st[tmrs.split("_")[0]];
+    let teamGoalsCount = 0;
     let goals = {};
     // const elements = document.querySelectorAll('.goal-item');
     // elements.forEach(element => element.remove());
@@ -510,6 +502,7 @@ function renderFrame() {
     for (let pl of team.players.concat(team.officials)) {
       if (!!pl["goals"]) {
         for (let g of pl["goals"]) {
+          teamGoalsCount++;
           let id = (g.moment_ms - (g.moment_ms % 1000)) / 1000;
           id = (id - (id % 60)) / 60;
           goals[id] = !goals[id] ? [] : goals[id];
@@ -518,7 +511,6 @@ function renderFrame() {
 
         for (let i in goals) {
           for (let j in goals[i]) {
-
             let r = (tmrs.at(0) === 'h') ? 3 - parseInt(j) : 5 + parseInt(j);
             let c = parseInt(i) + 2;
             const element = document.querySelector(".goal-item-" + r + "-" + c);
@@ -543,114 +535,96 @@ function renderFrame() {
       }
 
       for (let pl2minSusp of ["fst2minSusp_ms", "snd2minSusp_ms", "trd2minSusp_ms", "disqualification_ms", "blueCard_ms"]) {
-        if (!!pl[pl2minSusp] && ((pl[pl2minSusp] + 120 * 1000) >= activeTimer.current_moment_ms)) {
-          const t = {};
-          t.current_moment_ms = 120000 - (activeTimer.current_moment_ms - pl[pl2minSusp]);
-          t.mode = "countdown";
-          t.running = !!activeTimer.running;
-          const ms = liveTimerMs(t, activeTimer);
-          t.player = (!!pl.playerTshirtNumber) ? pl.playerTshirtNumber : pl.officialLetter;
-          t.live_ms = ms;
-          t.mss = mss(ms);
-          t.mmss = mmss(ms);
-          t.hhmmss = hhmmss(ms);
-          t.total_seconds = Math.floor(ms / 1000);
-          t.hours = Math.floor(ms / 3600000);
-          t.minutes = Math.floor((ms % 3600000) / 60000);
-          t.seconds = Math.floor((ms % 60000) / 1000);
-          t.visible = true;
-          st.timers[tmrs][timerID++] = t;
+        if (!!parseInt(pl[pl2minSusp]) && ((parseInt(pl[pl2minSusp]) + 120 * 1000) >= activeTimer.current_moment_ms)) {
+          st.timers[tmrs][timerID++] = set2minSuspTimer(activeTimer, pl, pl2minSusp);
         }
       }
     }
 
-    const element = document.querySelector(".current-moment");
-    const curMomentElm = !!element ? element : document.createElement('li');
+    team.scores = teamGoalsCount;
 
-    curMomentElm.className = "scores current-moment";
-    curMomentElm.style.gridRow = 4;
-    curMomentElm.style.gridColumn = "" + (3 + (cur_moment < 9 ? 0 : cur_moment < 19 ? 10 : 20)) + " / span " + (cur_moment % 10);
+    const goalsByTimeOverlay = document.querySelector(".goals-by-time");
+    if (!!goalsByTimeOverlay) {
+      let cur_moment = activeTimer.minutes + 1;
+      cur_moment = (cur_moment > 30) ? cur_moment - 30 : cur_moment;
 
+      const element = document.querySelector(".current-moment");
+      const curMomentElm = !!element ? element : document.createElement('li');
 
-    if (cur_moment > 0) {
-      const numElm = document.querySelector(".min-0");
-      numElm.style.background = "black";
+      curMomentElm.className = "scores current-moment";
+      curMomentElm.style.gridRow = 4;
+      curMomentElm.style.gridColumn = "" + (3 + (cur_moment < 9 ? 0 : cur_moment < 19 ? 10 : 20)) + " / span " + ((cur_moment - 1) % 10);
 
-      const line1 = document.querySelector(".line-1");
-      if (cur_moment < 9) {
-        line1.style.gridColumn = "" + (3 + cur_moment) + "/ span " + (9 - cur_moment);
-      } else if (cur_moment >= 9) {
-        line1.style.gridColumn = "3 / span 9";
-        line1.style.background = "black";
-        if (cur_moment == 9) {
-          const container = document.querySelector('ul.goals-by-time');
-          if (!!container && !!element) {
-            container.removeChild(curMomentElm);
-          }
+      if (cur_moment > 0) {
+        const numElm = document.querySelector(".min-1");
+        numElm.style.background = "black";
+
+        const line1 = document.querySelector(".line-1");
+        if (cur_moment < 9) {
+          line1.style.gridColumn = "" + (2 + cur_moment) + "/ span " + (9 - cur_moment);
         } else if (cur_moment >= 10) {
-          const numElm = document.querySelector(".min-10");
-          numElm.style.background = "black";
-        }
-      }
-      const line2 = document.querySelector(".line-2");
-      if (cur_moment > 10 && cur_moment < 19) {
-        line2.style.gridColumn = "" + (3 + cur_moment) + "/ span " + (19 - cur_moment);
-      } else if (cur_moment >= 19) {
-        line2.style.gridColumn = "13 / span 9";
-        line2.style.background = "black";
-        if (cur_moment == 19) {
-          const container = document.querySelector('ul.goals-by-time');
-          if (!!container && !!element) {
-            container.removeChild(curMomentElm);
+          line1.style.gridColumn = "3 / span 8";
+          line1.style.background = "black";
+          if (cur_moment == 9) {
+            const container = document.querySelector('ul.goals-by-time');
+            if (!!container && !!element) {
+              container.removeChild(curMomentElm);
+            }
+          } else if (cur_moment >= 10) {
+            const numElm = document.querySelector(".min-10");
+            numElm.style.background = "black";
           }
-        } else if (cur_moment >= 20) {
-          const numElm = document.querySelector(".min-20");
-          numElm.style.background = "black";
         }
-      }
-      const line3 = document.querySelector(".line-3");
-      if (cur_moment > 20 && cur_moment < 29) {
-        line3.style.gridColumn = "" + (3 + cur_moment) + "/ span " + (29 - cur_moment);
-      } else if (cur_moment >= 29) {
-        line3.style.gridColumn = "23 / span 9";
-        line3.style.background = "black";
-        if (cur_moment == 29) {
-          const container = document.querySelector('ul.goals-by-time');
-          if (!!container && !!element) {
-            container.removeChild(curMomentElm);
+
+        const line2 = document.querySelector(".line-2");
+        if (cur_moment > 10 && cur_moment < 19) {
+          line2.style.gridColumn = "" + (3 + cur_moment) + "/ span " + (19 - cur_moment);
+        } else if (cur_moment >= 19) {
+          line2.style.gridColumn = "13 / span 9";
+          line2.style.background = "black";
+          if (cur_moment == 19) {
+            const container = document.querySelector('ul.goals-by-time');
+            if (!!container && !!element) {
+              container.removeChild(curMomentElm);
+            }
+          } else if (cur_moment >= 20) {
+            const numElm = document.querySelector(".min-20");
+            numElm.style.background = "black";
           }
-        } else if (cur_moment >= 30) {
-          const numElm = document.querySelector(".min-30");
-          numElm.style.background = "black";
         }
-      }
-      curMomentElm.style.background = "black";
-      if (!element && cur_moment != 10 && cur_moment != 20 && cur_moment != 30) {
-        const hrElm = document.createElement('hr');
-        curMomentElm.appendChild(hrElm);
-        const container = document.querySelector('ul.goals-by-time');
-        if (!!container) {
-          container.appendChild(curMomentElm);
+
+        const line3 = document.querySelector(".line-3");
+        if (cur_moment > 20 && cur_moment < 29) {
+          line3.style.gridColumn = "" + (3 + cur_moment) + "/ span " + (29 - cur_moment);
+        } else if (cur_moment >= 29) {
+          line3.style.gridColumn = "23 / span 9";
+          line3.style.background = "black";
+          if (cur_moment == 29) {
+            const container = document.querySelector('ul.goals-by-time');
+            if (!!container && !!element) {
+              container.removeChild(curMomentElm);
+            }
+          } else if (cur_moment >= 30) {
+            const numElm = document.querySelector(".min-30");
+            numElm.style.background = "black";
+          }
+        }
+
+        curMomentElm.style.background = "black";
+        if (!element && cur_moment != 1 && cur_moment != 10 && cur_moment != 20 && cur_moment != 30) {
+          const hrElm = document.createElement('hr');
+          curMomentElm.appendChild(hrElm);
+          const container = document.querySelector('ul.goals-by-time');
+          if (!!container) {
+            container.appendChild(curMomentElm);
+          }
         }
       }
     }
 
     for (let to_ms of ["fstTimeout_ms", "sndTimeout_ms", "trdTimeout_ms"]) {
       if (!!team[to_ms] && (team[to_ms] == activeTimer.current_moment_ms)) {
-        const t = !!st.timers.timeout ? st.timers.timeout : { current_moment_ms: 60000 };
-        t.mode = "countdown";
-        t.running = !activeTimer.running;
-        const ms = liveTimerMs(t, t);
-        t.live_ms = ms;
-        t.ss = ss(ms);
-        t.mmss = mmss(ms);
-        t.hhmmss = hhmmss(ms);
-        t.total_seconds = Math.floor(ms / 1000);
-        t.hours = Math.floor(ms / 3600000);
-        t.minutes = Math.floor((ms % 3600000) / 60000);
-        t.seconds = Math.floor((ms % 60000) / 1000);
-        t.visible = true;
-        st.timers.timeout = t;
+        st.timers.timeout = setTimeoutTimer(st, activeTimer);
       }
     }
   }
@@ -687,6 +661,38 @@ function renderFrame() {
   // First apply fs-if (visibility), then template bindings (text/attrs)
   applyIfBindings(view);
   applyTemplateBindings(view);
+}
+
+function setTimeoutTimer(st, activeTimer) {
+  const t = !!st.timers.timeout ? st.timers.timeout : { current_moment_ms: 60000 };
+  t.mode = "countdown";
+  t.running = !activeTimer.running;
+  setTimer(t, t);
+  t.ss = ss(t.live_ms);
+  return t;
+}
+
+function set2minSuspTimer(activeTimer, pl, pl2minSusp) {
+  const t = {};
+  t.current_moment_ms = 120000 - (activeTimer.current_moment_ms - parseInt(pl[pl2minSusp]));
+  t.mode = "countdown";
+  t.running = !!activeTimer.running;
+  setTimer(t, activeTimer);
+  t.player = (!!pl.playerTshirtNumber) ? pl.playerTshirtNumber : pl.officialLetter;
+  t.mss = mss(t.live_ms);
+  t.visible = true;
+  return t;
+}
+
+function setTimer(t, bt) {
+  const ms = liveTimerMs(t, bt);
+  t.live_ms = ms;
+  t.mmss = mmss(ms);
+  t.hhmmss = hhmmss(ms);
+  t.total_seconds = Math.floor(ms / 1000);
+  t.hours = Math.floor(ms / 3600000);
+  t.minutes = Math.floor((ms % 3600000) / 60000);
+  t.seconds = Math.floor((ms % 60000) / 1000);
 }
 
 // -----------------------------------------------------------------------------

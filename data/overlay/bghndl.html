@@ -13,8 +13,7 @@
 	<ul id="scoreboard" fs-if="show_scoreboard">
 		<li class="bfh-logo"><img alt="" src="logo-color-vertical.png" /></li>
 		<li class="timers" fs-if="timers.main[0] && timers.main[0].visible">
-			<span class="timers"> {{matchStats[0].value}} -
-				{{timers.main[0].label}}</span>
+			<span class="timers"> {{matchStats[0].value}} {{timers.main[0].label}}</span>
 			<hr>
 			<span class="timers">{{timers.main[0].mmss}}</span>
 		</li>
