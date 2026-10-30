@@ -10,6 +10,7 @@
 #include "fly_score_state.hpp"
 #include "fly_score_dock.hpp"
 #include "fly_score_clickable_label.hpp"
+#include "fly_score_player_stat_dialog.hpp"
 
 #include <Qt>
 #include <QVBoxLayout>
@@ -359,6 +360,8 @@ void FlyHandballTab::buildUI_team_player(int row, bool isHome)
 			FlyScoreState::FlyTeam *t = isHome ? &state_.home : &state_.guest;
 			for (int i = 0; i < t->players.size(); i++) {
 				if (t->players[i].playerTshirtNumber == pl->teamPlayerTShirtNumber->text().toInt()) {
+					FlyPlayerStatDialog * dlg = new FlyPlayerStatDialog(dataDir_, &(t->players[i]), isHome, state_, this);
+					dlg->exec();
 					FlyScoreState::FlyGoal g;
 					g.moment_ms = state_.timers[0].current_moment_ms +
 						      (state_.timers[0].running ? FlyQtHelper::fly_now_ms() -

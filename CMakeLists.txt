@@ -169,6 +169,8 @@ list(
   ${FS_IDI_DIR}/fly_score_teams_dialog.hpp
   ${FS_DIA_DIR}/fly_score_players_dialog.cpp
   ${FS_IDI_DIR}/fly_score_players_dialog.hpp
+  ${FS_DIA_DIR}/fly_score_player_stat_dialog.cpp
+  ${FS_IDI_DIR}/fly_score_player_stat_dialog.hpp
   ${FS_DIA_DIR}/fly_score_stats_dialog.cpp
   ${FS_IDI_DIR}/fly_score_stats_dialog.hpp
   ${FS_DIA_DIR}/fly_score_timers_dialog.cpp

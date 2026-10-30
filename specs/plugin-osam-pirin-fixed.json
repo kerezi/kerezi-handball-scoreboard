@@ -1,0 +1,400 @@
+{
+    "guest": {
+        "color": "16768019",
+        "fstTimeout_ms": "1490425",
+        "logo": "Guest-98542d6b.png",
+        "officials": [{
+                "blueCard_ms": "0",
+                "disqualification_ms": "0",
+                "fst2minSusp_ms": "0",
+                "officialLetter": "A",
+                "officialName": "Теодор Русков",
+                "officialRole": "Старши Треньор",
+                "warning_ms": "0"
+            }
+        ],
+        "players": [{
+                "blueCard_ms": "0",
+                "disqualification_ms": "0",
+                "fst2minSusp_ms": "0",
+                "goals": [],
+                "playerName": "Александър Заемджиков",
+                "playerTshirtName": "А. Заемджиков",
+                "playerTshirtNumber": 1,
+                "snd2minSusp_ms": "0",
+                "trd2minSusp_ms": "0",
+                "warning_ms": "0"
+            }, {
+                "blueCard_ms": "0",
+                "disqualification_ms": "0",
+                "fst2minSusp_ms": "0",
+                "goals": [],
+                "playerName": "Ангел Сучев",
+                "playerTshirtName": "А. Сучев",
+                "playerTshirtNumber": 2,
+                "snd2minSusp_ms": "0",
+                "trd2minSusp_ms": "0",
+                "warning_ms": "0"
+            }, {
+                "blueCard_ms": "0",
+                "disqualification_ms": "0",
+                "fst2minSusp_ms": "1203000",
+                "goals": [],
+                "playerName": "Ивайло Рачев",
+                "playerTshirtName": "И. Рачев",
+                "playerTshirtNumber": 5,
+                "snd2minSusp_ms": "0",
+                "trd2minSusp_ms": "0",
+                "warning_ms": "0"
+            }, {
+                "blueCard_ms": "0",
+                "disqualification_ms": "0",
+                "fst2minSusp_ms": "0",
+                "goals": [],
+                "playerName": "Кристиян Петков",
+                "playerTshirtName": "К. Петков",
+                "playerTshirtNumber": 11,
+                "snd2minSusp_ms": "0",
+                "trd2minSusp_ms": "0",
+                "warning_ms": "0"
+            }, {
+                "blueCard_ms": "0",
+                "disqualification_ms": "0",
+                "fst2minSusp_ms": "0",
+                "goals": [],
+                "playerName": "Антоан Лазаров",
+                "playerTshirtName": "А. Лазаров",
+                "playerTshirtNumber": 16,
+                "snd2minSusp_ms": "0",
+                "trd2minSusp_ms": "0",
+                "warning_ms": "0"
+            }, {
+                "blueCard_ms": "0",
+                "disqualification_ms": "0",
+                "fst2minSusp_ms": "0",
+                "goals": [],
+                "playerName": "Мартин Боянов",
+                "playerTshirtName": "М. Боянов",
+                "playerTshirtNumber": 23,
+                "snd2minSusp_ms": "0",
+                "trd2minSusp_ms": "0",
+                "warning_ms": "0"
+            }, {
+                "blueCard_ms": "0",
+                "disqualification_ms": "0",
+                "fst2minSusp_ms": "0",
+                "goals": [],
+                "playerName": "Петър Митаковски",
+                "playerTshirtName": "П. Митаковски",
+                "playerTshirtNumber": 26,
+                "snd2minSusp_ms": "0",
+                "trd2minSusp_ms": "0",
+                "warning_ms": "0"
+            }, {
+                "blueCard_ms": "0",
+                "disqualification_ms": "0",
+                "fst2minSusp_ms": "0",
+                "goals": [],
+                "playerName": "Борис Маринов",
+                "playerTshirtName": "Б. Маринов",
+                "playerTshirtNumber": 33,
+                "snd2minSusp_ms": "0",
+                "trd2minSusp_ms": "0",
+                "warning_ms": "0"
+            }, {
+                "blueCard_ms": "0",
+                "disqualification_ms": "0",
+                "fst2minSusp_ms": "0",
+                "goals": [],
+                "playerName": "Александър Янев",
+                "playerTshirtName": "А. Янев",
+                "playerTshirtNumber": 55,
+                "snd2minSusp_ms": "0",
+                "trd2minSusp_ms": "0",
+                "warning_ms": "0"
+            }, {
+                "blueCard_ms": "0",
+                "disqualification_ms": "0",
+                "fst2minSusp_ms": "0",
+                "goals": [],
+                "playerName": "Нейко Комитски",
+                "playerTshirtName": "Н. Комитски",
+                "playerTshirtNumber": 5,
+                "snd2minSusp_ms": "0",
+                "trd2minSusp_ms": "0",
+                "warning_ms": "0"
+            }, {
+                "blueCard_ms": "0",
+                "disqualification_ms": "0",
+                "fst2minSusp_ms": "0",
+                "goals": [],
+                "playerName": "Борис Георгиев",
+                "playerTshirtName": "Б. Георгиев",
+                "playerTshirtNumber": 5,
+                "snd2minSusp_ms": "0",
+                "trd2minSusp_ms": "0",
+                "warning_ms": "0"
+            }, {
+                "blueCard_ms": "0",
+                "disqualification_ms": "0",
+                "fst2minSusp_ms": "0",
+                "goals": [],
+                "playerName": "Виктор Стоянов",
+                "playerTshirtName": "В. Стоянов",
+                "playerTshirtNumber": 24,
+                "snd2minSusp_ms": "0",
+                "trd2minSusp_ms": "0",
+                "warning_ms": "0"
+            }, {
+                "blueCard_ms": "0",
+                "disqualification_ms": "0",
+                "fst2minSusp_ms": "0",
+                "goals": [],
+                "playerName": "Денислав Иванов",
+                "playerTshirtName": "Д. Иванов",
+                "playerTshirtNumber": 37,
+                "snd2minSusp_ms": "0",
+                "trd2minSusp_ms": "0",
+                "warning_ms": "0"
+            }
+        ],
+        "scores": 0,
+        "sndTimeout_ms": "0",
+        "subtitle": "Пирин-64",
+        "title": "Хандбален клуб \"Пирин-64\" гр. Гоце Делчев",
+        "trdTimeout_ms": "0"
+    },
+    "home": {
+        "color": "255",
+        "fstTimeout_ms": "0",
+        "logo": "Home-8e1f6313.png",
+        "officials": [{
+                "blueCard_ms": "0",
+                "disqualification_ms": "0",
+                "fst2minSusp_ms": "0",
+                "officialLetter": "A",
+                "officialName": "Борислав Борисов",
+                "officialRole": "Старши Треньор",
+                "warning_ms": "0"
+            }
+        ],
+        "players": [{
+                "blueCard_ms": "0",
+                "disqualification_ms": "0",
+                "fst2minSusp_ms": "0",
+                "goals": [],
+                "playerName": "Теодор Георгиев",
+                "playerTshirtName": "Т. Георгиев",
+                "playerTshirtNumber": 1,
+                "snd2minSusp_ms": "0",
+                "trd2minSusp_ms": "0",
+                "warning_ms": "0"
+            }, {
+                "blueCard_ms": "0",
+                "disqualification_ms": "0",
+                "fst2minSusp_ms": "0",
+                "goals": [],
+                "playerName": "Николай Красимиров",
+                "playerTshirtName": "Н. Красимиров",
+                "playerTshirtNumber": 2,
+                "snd2minSusp_ms": "0",
+                "trd2minSusp_ms": "0",
+                "warning_ms": "0"
+            }, {
+                "blueCard_ms": "0",
+                "disqualification_ms": "0",
+                "fst2minSusp_ms": "0",
+                "goals": [],
+                "playerName": "Александър Калчев",
+                "playerTshirtName": "А. Калчев",
+                "playerTshirtNumber": 4,
+                "snd2minSusp_ms": "0",
+                "trd2minSusp_ms": "0",
+                "warning_ms": "0"
+            }, {
+                "blueCard_ms": "0",
+                "disqualification_ms": "0",
+                "fst2minSusp_ms": "0",
+                "goals": [],
+                "playerName": "Диан Василев",
+                "playerTshirtName": "Д. Василев",
+                "playerTshirtNumber": 7,
+                "snd2minSusp_ms": "0",
+                "trd2minSusp_ms": "0",
+                "warning_ms": "0"
+            }, {
+                "blueCard_ms": "0",
+                "disqualification_ms": "0",
+                "fst2minSusp_ms": "0",
+                "goals": [],
+                "playerName": "Кристиян Тодоров",
+                "playerTshirtName": "К. Тодоров",
+                "playerTshirtNumber": 9,
+                "snd2minSusp_ms": "0",
+                "trd2minSusp_ms": "0",
+                "warning_ms": "0"
+            }, {
+                "blueCard_ms": "0",
+                "disqualification_ms": "0",
+                "fst2minSusp_ms": "0",
+                "goals": [],
+                "playerName": "Николай Георгиев",
+                "playerTshirtName": "Н. Георгиев",
+                "playerTshirtNumber": 10,
+                "snd2minSusp_ms": "0",
+                "trd2minSusp_ms": "0",
+                "warning_ms": "0"
+            }, {
+                "blueCard_ms": "0",
+                "disqualification_ms": "0",
+                "fst2minSusp_ms": "0",
+                "goals": [],
+                "playerName": "Мариан Вечев",
+                "playerTshirtName": "М. Вечев",
+                "playerTshirtNumber": 11,
+                "snd2minSusp_ms": "0",
+                "trd2minSusp_ms": "0",
+                "warning_ms": "0"
+            }, {
+                "blueCard_ms": "0",
+                "disqualification_ms": "0",
+                "fst2minSusp_ms": "0",
+                "goals": [],
+                "playerName": "Владимир Атанасов",
+                "playerTshirtName": "В. Атанасов",
+                "playerTshirtNumber": 15,
+                "snd2minSusp_ms": "0",
+                "trd2minSusp_ms": "0",
+                "warning_ms": "0"
+            }, {
+                "blueCard_ms": "0",
+                "disqualification_ms": "0",
+                "fst2minSusp_ms": "0",
+                "goals": [],
+                "playerName": "Иван Боянов",
+                "playerTshirtName": "И. Боянов",
+                "playerTshirtNumber": 17,
+                "snd2minSusp_ms": "0",
+                "trd2minSusp_ms": "0",
+                "warning_ms": "0"
+            }, {
+                "blueCard_ms": "0",
+                "disqualification_ms": "0",
+                "fst2minSusp_ms": "0",
+                "goals": [],
+                "playerName": "Никола Прокопиев",
+                "playerTshirtName": "Н. Прокопиев",
+                "playerTshirtNumber": 18,
+                "snd2minSusp_ms": "0",
+                "trd2minSusp_ms": "0",
+                "warning_ms": "0"
+            }, {
+                "blueCard_ms": "0",
+                "disqualification_ms": "0",
+                "fst2minSusp_ms": "0",
+                "goals": [],
+                "playerName": "Пресиан Милков",
+                "playerTshirtName": "П. Милков",
+                "playerTshirtNumber": 22,
+                "snd2minSusp_ms": "0",
+                "trd2minSusp_ms": "0",
+                "warning_ms": "0"
+            }, {
+                "blueCard_ms": "0",
+                "disqualification_ms": "0",
+                "fst2minSusp_ms": "0",
+                "goals": [],
+                "playerName": "Светлин Гаврилов",
+                "playerTshirtName": "С. Гаврилов",
+                "playerTshirtNumber": 77,
+                "snd2minSusp_ms": "0",
+                "trd2minSusp_ms": "0",
+                "warning_ms": "0"
+            }, {
+                "blueCard_ms": "0",
+                "disqualification_ms": "0",
+                "fst2minSusp_ms": "0",
+                "goals": [],
+                "playerName": "Николай Цветанов",
+                "playerTshirtName": "Н. Цветанов",
+                "playerTshirtNumber": 88,
+                "snd2minSusp_ms": "0",
+                "trd2minSusp_ms": "0",
+                "warning_ms": "0"
+            }
+        ],
+        "scores": 0,
+        "sndTimeout_ms": "0",
+        "subtitle": "Левски",
+        "title": "Хандбален клуб \"Левски\" гр. Левски",
+        "trdTimeout_ms": "0"
+    },
+    "matchInfo": {
+        "city": "Българене",
+        "competition": "\"А\" РХГ",
+        "competitionRound": "Кръг №5",
+        "datetime_ms": "0",
+        "matchNumber": "0",
+        "spectators": "0",
+        "venue": "Спортна Зала \"Христо Ботев\""
+    },
+    "matchStats": [{
+            "label": "Default.MatchStats.Period",
+            "value": 0,
+            "visible": true
+        }
+    ],
+    "show_scoreboard": true,
+    "swap_sides": false,
+    "teamsStats": [{
+            "guest": 0,
+            "home": 0,
+            "label": "Score",
+            "visible": true
+        }, {
+            "guest": 0,
+            "home": 0,
+            "label": "Fouls",
+            "visible": true
+        }, {
+            "guest": 0,
+            "home": 0,
+            "label": "Yellow Cards",
+            "visible": true
+        }, {
+            "guest": 0,
+            "home": 0,
+            "label": "Red Cards",
+            "visible": true
+        }, {
+            "guest": 0,
+            "home": 0,
+            "label": "Corners",
+            "visible": true
+        }
+    ],
+    "timers": {
+        "main": [{
+                "current_moment_ms": "0",
+                "duration_ms": "1800000",
+                "initial_ms": "0",
+                "label": "First Half",
+                "last_tick_ms": "0",
+                "mode": "countup",
+                "running": false,
+                "visible": true
+            }
+        ],
+        "timeout": {
+            "current_moment_ms": "60000",
+            "duration_ms": "60000",
+            "initial_ms": "60000",
+            "label": "Timeout",
+            "last_tick_ms": "0",
+            "mode": "countdown",
+            "running": false,
+            "visible": false
+        }
+    },
+    "version": 5
+}

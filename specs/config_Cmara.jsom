@@ -1,0 +1,53 @@
+{
+	cameraMatch: {
+		quality: "1080p",
+		resolution: "1920x1080",
+		fps: 30,
+		audio: "custom",
+		id: "USB Video", // Sony HDR PJ530
+		transform: {
+			x: 0,
+			y: 0,
+			width: 1920,
+			height: 1080
+		}
+	},
+	cameraResult: {
+		quality: "QVGA",
+		resolution: "640x480",
+		fps: 30,
+		audio: "custom",
+		id: "USB2.0 PC CAMERA", samsung
+		transform: {
+			x: 1600, // 1920 - 640 / 2 = 1920 - 320 = 1600 (screen.width - camera.width.scaledBy(2)
+			y: 0, // top right corner
+			width: 320,
+			height: 240
+		}
+	},
+	cameraTimeoutAndPenaltyTeamA: {
+		quality: "1080p",
+		resolution: "1920x1080",
+		fps: 30,
+		audio: "custom",
+		id: "USB Video", // Nikon
+		transform: {
+			x: 980,
+			y: 290,
+			width: 890,
+			height: 500
+		}
+	},
+	cameraTimeoutAndPenaltyTeamB: {
+		quality: "1080p",
+		resolution: "1920x1080",
+		fps: 30,
+		audio: "custom",
+		id: "USB Video",  // Viktor CAMERA
+		transform: {
+			x: 50,
+			y: 290,
+			width: 890,
+			height: 500
+		}
+	},

@@ -1,0 +1,239 @@
+<!DOCTYPE html><html><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="author" content="dev47apps">
+  <title>DroidCam Video Feed</title>
+  <link rel="stylesheet" href="/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/css/bootstrap-theme.min.css">
+  <style type="text/css">
+	body { background:#222222; }
+	.modal-body img{ max-width: 100%; position: relative; }
+	.btn{border-radius:0;} .ctrls{display: none;}
+	#feedimg {overflow:hidden;float:left;}
+  </style>
+</head>
+<body style="background-color: rgb(0, 0, 0);">
+<nav class="navbar navbar-inverse" style="margin-bottom:0;border-radius:0;">
+  <div class="container" style="margin:0px;">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar1" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="#" onclick="return false;">DroidCam</a>
+    </div>
+    <div id="navbar1" class="collapse navbar-collapse">
+      <ul class="nav navbar-nav">
+        <li><a href="#" onclick="infoModalShow(); return false;" title="Info"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></a></li>
+        <li><a href="#" onclick="reload(); return false;" data-toggle="tooltip" title="" data-original-title="Refresh"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></a></li>
+        <li><a href="#" onclick="window.open('https://play.google.com/store/apps/details?id=com.dev47apps.droidcamx', '_blank').focus(); return false;">
+            <span class="glyphicon glyphicon-heart" aria-hidden="true"></span>&nbsp;PRO</a>
+        </li>
+        <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Size<span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li sz="1"><a href="#" onclick="somefn(this); return false;">240p</a></li>
+            <li sz="1" class="active"><a href="#" onclick="somefn(this); return false;">480p</a></li>
+            <li role="separator" class="divider"></li>
+            <li class="disabled"><a href="#" onclick="return false;">720p (pro)</a></li>
+            <li class="disabled"><a href="#" onclick="return false;">1080p (pro)</a></li>
+          </ul>
+        </li>
+        <li class="disabled">
+          <a href="#" onclick="return false;" data-toggle="tooltip" title="" data-original-title="Rotate (pro)">
+          <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span>
+          </a>
+        </li>
+        <li class="disabled">
+          <a href="#" onclick="return false;" data-toggle="tooltip" title="" data-original-title="Flip (pro)">
+          <span class="glyphicon glyphicon-resize-horizontal" aria-hidden="true"></span>
+          </a>
+        </li>
+        <li>
+          <a href="#" onclick="es(0);return false;">
+          <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+          </a>
+        </li>
+        <li>
+          <a href="#" onclick="es(1);return false;">
+          <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+          </a>
+        </li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+           <span class="glyphicon glyphicon-option-vertical" aria-hidden="true"></span>
+          </a>
+          <ul class="dropdown-menu">
+          <li class="disabled"><p class="navbar-text">Exposure Lock</p></li>
+          <li id="el0"><a href="#" onclick="$.get('/cam/1/set_exposure_lock');  $('#el0').addClass('active'); $('#el1').removeClass('active');">ON</a></li>
+          <li id="el1"><a href="#" onclick="$.get('/cam/1/unset_exposure_lock'); $('#el1').addClass('active'); $('#el0').removeClass('active');">OFF</a></li>
+          <li role="separator" class="divider"></li>
+          <li class="disabled"><p class="navbar-text">White balance</p></li>
+          <li class="wb"><a href="#" onclick="set_wb(this, 'auto'); return false;">Automatic</a></li>
+          <li class="wb"><a href="#" onclick="set_wb(this, 'incandescent'); return false;">Incandescent</a></li>
+          <li class="wb"><a href="#" onclick="set_wb(this, 'warm-fluorescent'); return false;">Warm Fluorescent</a></li>
+          <li class="wb"><a href="#" onclick="set_wb(this, 'twilight'); return false;">Twilight</a></li>
+          <li class="wb"><a href="#" onclick="set_wb(this, 'fluorescent'); return false;">Fluorescent</a></li>
+          <li class="wb"><a href="#" onclick="set_wb(this, 'daylight'); return false;">Daylight</a></li>
+          <li class="wb"><a href="#" onclick="set_wb(this, 'cloudy-daylight'); return false;">Cloudy Daylight</a></li>
+          <li class="wb"><a href="#" onclick="set_wb(this, 'shade'); return false;">Shade</a></li>
+          </ul>
+        </li>
+        <li>
+          <p class="navbar-text" style="margin-right:4px;"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span></p>
+          <p class="navbar-text" style="margin-left:0;" id="batteryInfo">37%</p>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+<div class="ctrls btn-group" role="group" style="display: inline-block;">
+  <button type="button" class="btn btn-default" onclick="$(this).toggleClass('active'); $.get('/cam/1/fpslimit', remoteReqBadge);">
+      <span class="glyphicon glyphicon-leaf" style="color:green" aria-hidden="true"></span>&nbsp;Ограничи броя на кадрите в секунда
+  </button>
+  <button type="button" class="btn btn-default" onclick="window.open('/cam/1/frame.jpg', '_blank').focus();">
+      <span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span>&nbsp;Запази снимката тук
+  </button>
+  <button type="button" class="btn btn-default" onclick="$.get('/cam/1/af');">
+      <span class="glyphicon glyphicon-screenshot" aria-hidden="true"></span>&nbsp;Автофокус
+  </button>
+  <button type="button" class="btn btn-default" onclick="$(this).toggleClass('active'); $.get('/cam/1/led_toggle');">
+      <span class="glyphicon glyphicon-flash" aria-hidden="true"></span>&nbsp;Светкавица
+  </button>
+  <button type="button" class="btn btn-default" onclick="$.get('/cam/1/zoomout');">
+      <span class="glyphicon glyphicon-zoom-out" aria-hidden="true"></span>&nbsp;Намаляване
+  </button>
+  <button type="button" class="btn btn-default" onclick="$.get('/cam/1/zoomin');">
+      <span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span>&nbsp;Приближаване
+  </button>
+</div>
+<p></p><div id="feedimg"><img width="640" height="480" src="/video?640x480"></div><p></p>
+<script src="/js/jquery.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/ie10-viewport-bug-workaround.js"></script>
+<script type="text/javascript">
+var popup = null;
+var polltimer = null;
+var feedimg = $('#feedimg');
+var currimg = null;
+var aspect = 1, angle = 0;
+function somefn(link) {
+ cursz = link.innerHTML;
+ reload();
+}
+function reload() {
+  currimg.src = "/override";
+  setTimeout(startfeed,1000);
+}
+function startfeed() {
+  feedimg.empty();
+  feedimg.width("");
+  feedimg.height("");
+  aspect = sizes[cursz][0] / sizes[cursz][1];
+  currimg = new Image(sizes[cursz][0], sizes[cursz][1]);
+  currimg.src="/video?" + currimg.width + "x" + currimg.height;
+  currimg.onload = showctls;
+  feedimg.append(currimg);
+  var t = $('[type="button"]');
+  for (var i = 0; i< t.length; i++) $(t[i]).removeClass('active');
+  t = $("[sz=1]");
+  for (var i = 0; i< t.length; i++) {
+      if (t[i].childNodes[0].innerHTML == cursz) $(t[i]).addClass("active");
+      else $(t[i]).removeClass("active");
+  }
+  if(typeof(Storage) !== "undefined") {
+      localStorage.setItem("cursz", cursz);
+  }
+}
+function fullscreen() {
+  if (popup != null) {
+   popup.close();
+   return;
+  };
+  var params = [
+    'width='+sizes[cursz][0],
+    'height='+sizes[cursz][1],
+    'location=no'
+  ].join(',');
+  currimg.src = "/override";
+  setTimeout(function() {
+    currimg.src = "ic_expand.png";
+    hidectls();
+    currimg.width=50; currimg.height=50;
+    popup = window.open('fullscreen.htm', 'full_screen_video', params);
+    popup.moveTo(0,0);
+    polltimer = window.setInterval(function() {
+     if (popup.closed !== false) {
+        window.clearInterval(polltimer);
+        polltimer = null; popup.close(); popup = null;
+        startfeed();
+    }
+   }, 500);
+  }, 1000);
+}
+function set_wb(el, option) {
+  $.get('/cam/1/set_wb/' + option);
+
+  var w = $(".wb");
+  for (var i = 0; i< w.length; i++) {
+    if ($(w[i])[0] == el.parentNode) $(w[i]).addClass('active');
+    else $(w[i]).removeClass('active');
+  }
+}
+function showctls() { var li = $(".ctrls"); for (var i = 0; i < li.length; i++) { li[i].style.display='inline-block';  }}
+function hidectls() { var li = $(".ctrls"); for (var i = 0; i < li.length; i++) { li[i].style.display='none';  }}
+function adjust(inv) {
+ if (inv) {
+  feedimg.width(currimg.height);
+  feedimg.height(currimg.width);
+ } else {
+  feedimg.width(currimg.width);
+  feedimg.height(currimg.height);
+ }
+}
+function es(e) {
+  var i = e ? 64 : -64;
+  currimg.width += i;
+  currimg.height = currimg.width / aspect;
+  adjust(0);
+}
+function getBattery() {
+  $.get('/battery', function(result){
+    $("#batteryInfo").html(result + "%");
+  });
+}
+function remoteReqBadge(data) {
+    $('#remote-req').show();
+    setTimeout(function(){ $('#remote-req').hide(); }, 1024);
+}
+function infoModalShow() {
+ $('#dirlink').html(document.location + 'video?'+sizes[cursz][0]+'x'+sizes[cursz][1]);
+ $('#infoModal').modal('show');
+}
+$(document).ready(function() {
+ $('[data-toggle="tooltip"]').tooltip({'placement': 'bottom'});
+ startfeed();
+ setTimeout(getBattery, 5000);
+ setTimeout(getBattery, 9000);
+ setInterval(getBattery, 90000);
+});
+</script>
+<div class="modal fade" id="infoModal" tabindex="-1" role="dialog" aria-labelledby="infoModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+        <h4 class="modal-title" id="infoLabel">Помощ</h4>
+      </div>
+      <div class="modal-body">
+          Линк към видео предаване: <b id="dirlink"></b><br><br>Използвайте този линк в приложения като VLC Player, които възпроизвеждат HTTP MJPEG предавания:<br><br><img src="vlc-example.png">
+      </div>
+    </div>
+  </div>
+</div>
+
+
+</body></html>

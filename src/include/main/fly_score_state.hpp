@@ -6,6 +6,20 @@
 #include <QByteArray>
 #include <string>
 
+
+
+struct FlyThemeManifest;
+struct FlyThemeInfo;
+struct FlyMatchInfo;
+struct FlyOfficial;
+struct FlyGoal;
+struct FlyPlayer;
+struct FlyPlayerStat;
+struct FlyTeam;
+struct FlyTimer;
+struct FlyStat;
+struct FlyState;
+
 class FlyScoreState {
 
 public:
@@ -52,6 +66,14 @@ public:
 		QString goalType;
 	};
 
+	struct FlyPlayerStat {
+		long long moment_ms;
+		QString statType;
+		QString pitchPosition;
+		QString goalPosition;
+		FlyPlayer *otherPlayer;
+	};
+
 	struct FlyPlayer {
 		int playerTshirtNumber = 0;
 		QString playerTshirtName = "";
@@ -63,6 +85,10 @@ public:
 		long long disqualification_ms = 0;
 		long long blueCard_ms = 0;
 		QVector<FlyGoal> goals;
+		QVector<FlyPlayerStat> shots;
+		QVector<FlyPlayerStat> assists;
+		QVector<FlyPlayerStat> blocks;
+		QVector<FlyPlayerStat> steals;
 	};
 
 	struct FlyTeam {
