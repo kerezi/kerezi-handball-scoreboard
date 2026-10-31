@@ -17,7 +17,7 @@
                 "blueCard_ms": "0",
                 "disqualification_ms": "0",
                 "fst2minSusp_ms": "0",
-                "goals": [],
+                "stats": [],
                 "playerName": "Александър Заемджиков",
                 "playerTshirtName": "А. Заемджиков",
                 "playerTshirtNumber": 1,
@@ -28,7 +28,7 @@
                 "blueCard_ms": "0",
                 "disqualification_ms": "0",
                 "fst2minSusp_ms": "0",
-                "goals": [],
+                "stats": [],
                 "playerName": "Ангел Сучев",
                 "playerTshirtName": "А. Сучев",
                 "playerTshirtNumber": 2,
@@ -39,7 +39,7 @@
                 "blueCard_ms": "0",
                 "disqualification_ms": "0",
                 "fst2minSusp_ms": "1203000",
-                "goals": [],
+                "stats": [],
                 "playerName": "Ивайло Рачев",
                 "playerTshirtName": "И. Рачев",
                 "playerTshirtNumber": 5,
@@ -50,8 +50,13 @@
                 "blueCard_ms": "0",
                 "disqualification_ms": "0",
                 "fst2minSusp_ms": "0",
-                "goals": [{
-                        "goalType": "REGULAR",
+                "stats": [{
+                        "statType": "shoot - free throw",
+                        "pitchPosition": "0",
+                        "goalPosition": "1",
+                        "assistPlayerNumber": "1",
+                        "blockPlayerNumber": "0",
+                        "success": true,
                         "moment_ms": "90000"
                     }
                 ],
@@ -65,8 +70,13 @@
                 "blueCard_ms": "0",
                 "disqualification_ms": "0",
                 "fst2minSusp_ms": "0",
-                "goals": [{
-                        "goalType": "REGULAR",
+                "stats": [{
+                        "statType": "shoot - free throw",
+                        "pitchPosition": "0",
+                        "goalPosition": "1",
+                        "assistPlayerNumber": "1",
+                        "blockPlayerNumber": "0",
+                        "success": true,
                         "moment_ms": "1290000"
                     }
                 ],
@@ -80,7 +90,7 @@
                 "blueCard_ms": "0",
                 "disqualification_ms": "0",
                 "fst2minSusp_ms": "0",
-                "goals": [],
+                "stats": [],
                 "playerName": "Георги Баймаков",
                 "playerTshirtName": "Г. Баймаков",
                 "playerTshirtNumber": 15,
@@ -91,8 +101,13 @@
                 "blueCard_ms": "0",
                 "disqualification_ms": "0",
                 "fst2minSusp_ms": "0",
-                "goals": [{
-                        "goalType": "REGULAR",
+                "stats": [{
+                        "statType": "shoot - free throw",
+                        "pitchPosition": "0",
+                        "goalPosition": "1",
+                        "assistPlayerNumber": "1",
+                        "blockPlayerNumber": "0",
+                        "success": true,
                         "moment_ms": "810000"
                     }
                 ],
@@ -106,7 +121,7 @@
                 "blueCard_ms": "0",
                 "disqualification_ms": "0",
                 "fst2minSusp_ms": "0",
-                "goals": [],
+                "stats": [],
                 "playerName": "Калоян Крънчев",
                 "playerTshirtName": "К. Крънчев",
                 "playerTshirtNumber": 18,
@@ -117,11 +132,21 @@
                 "blueCard_ms": "0",
                 "disqualification_ms": "0",
                 "fst2minSusp_ms": "0",
-                "goals": [{
-                        "goalType": "REGULAR",
+                "stats": [{
+                        "statType": "shoot - free throw",
+                        "pitchPosition": "0",
+                        "goalPosition": "1",
+                        "assistPlayerNumber": "1",
+                        "blockPlayerNumber": "0",
+                        "success": true,
                         "moment_ms": "210000"
                     }, {
-                        "goalType": "REGULAR",
+                        "statType": "shoot - free throw",
+                        "pitchPosition": "0",
+                        "goalPosition": "1",
+                        "assistPlayerNumber": "1",
+                        "blockPlayerNumber": "0",
+                        "success": true,
                         "moment_ms": "870000"
                     }
                 ],
@@ -135,20 +160,45 @@
                 "blueCard_ms": "0",
                 "disqualification_ms": "0",
                 "fst2minSusp_ms": "0",
-                "goals": [{
-                        "goalType": "REGULAR",
+                "stats": [{
+                        "statType": "shoot - free throw",
+                        "pitchPosition": "0",
+                        "goalPosition": "1",
+                        "assistPlayerNumber": "1",
+                        "blockPlayerNumber": "0",
+                        "success": true,
                         "moment_ms": "330000"
                     }, {
-                        "goalType": "REGULAR",
+                        "statType": "shoot - free throw",
+                        "pitchPosition": "0",
+                        "goalPosition": "1",
+                        "assistPlayerNumber": "1",
+                        "blockPlayerNumber": "0",
+                        "success": true,
                         "moment_ms": "750000"
                     }, {
-                        "goalType": "REGULAR",
+                        "statType": "shoot - free throw",
+                        "pitchPosition": "0",
+                        "goalPosition": "1",
+                        "assistPlayerNumber": "1",
+                        "blockPlayerNumber": "0",
+                        "success": true,
                         "moment_ms": "1110000"
                     }, {
-                        "goalType": "REGULAR",
+                        "statType": "shoot - free throw",
+                        "pitchPosition": "0",
+                        "goalPosition": "1",
+                        "assistPlayerNumber": "1",
+                        "blockPlayerNumber": "0",
+                        "success": true,
                         "moment_ms": "1410000"
                     }, {
-                        "goalType": "REGULAR",
+                        "statType": "shoot - free throw",
+                        "pitchPosition": "0",
+                        "goalPosition": "1",
+                        "assistPlayerNumber": "1",
+                        "blockPlayerNumber": "0",
+                        "success": true,
                         "moment_ms": "1470000"
                     }
                 ],
@@ -162,7 +212,7 @@
                 "blueCard_ms": "0",
                 "disqualification_ms": "0",
                 "fst2minSusp_ms": "0",
-                "goals": [],
+                "stats": [],
                 "playerName": "Георги Николов",
                 "playerTshirtName": "Г. Николов",
                 "playerTshirtNumber": 22,
@@ -173,7 +223,7 @@
                 "blueCard_ms": "0",
                 "disqualification_ms": "0",
                 "fst2minSusp_ms": "0",
-                "goals": [],
+                "stats": [],
                 "playerName": "Даниел Павлов",
                 "playerTshirtName": "Д. Павлов",
                 "playerTshirtNumber": 42,
@@ -184,7 +234,7 @@
                 "blueCard_ms": "0",
                 "disqualification_ms": "0",
                 "fst2minSusp_ms": "0",
-                "goals": [],
+                "stats": [],
                 "playerName": "Атанас Пелтеков",
                 "playerTshirtName": "А. Пелтеков",
                 "playerTshirtNumber": 97,
@@ -195,8 +245,13 @@
                 "blueCard_ms": "0",
                 "disqualification_ms": "0",
                 "fst2minSusp_ms": "0",
-                "goals": [{
-                        "goalType": "REGULAR",
+                "stats": [{
+                        "statType": "shoot - free throw",
+                        "pitchPosition": "0",
+                        "goalPosition": "1",
+                        "assistPlayerNumber": "1",
+                        "blockPlayerNumber": "0",
+                        "success": true,
                         "moment_ms": "930000"
                     }
                 ],
@@ -240,20 +295,45 @@
                 "blueCard_ms": "0",
                 "disqualification_ms": "0",
                 "fst2minSusp_ms": "0",
-                "goals": [{
-                        "goalType": "REGULAR",
+                "stats": [{
+                        "statType": "shoot - free throw",
+                        "pitchPosition": "0",
+                        "goalPosition": "1",
+                        "assistPlayerNumber": "1",
+                        "blockPlayerNumber": "0",
+                        "success": true,
                         "moment_ms": "330000"
                     }, {
-                        "goalType": "REGULAR",
+                        "statType": "shoot - free throw",
+                        "pitchPosition": "0",
+                        "goalPosition": "1",
+                        "assistPlayerNumber": "1",
+                        "blockPlayerNumber": "0",
+                        "success": true,
                         "moment_ms": "510000"
                     }, {
-                        "goalType": "REGULAR",
+                        "statType": "shoot - free throw",
+                        "pitchPosition": "0",
+                        "goalPosition": "1",
+                        "assistPlayerNumber": "1",
+                        "blockPlayerNumber": "0",
+                        "success": true,
                         "moment_ms": "690000"
                     }, {
-                        "goalType": "REGULAR",
+                        "statType": "shoot - free throw",
+                        "pitchPosition": "0",
+                        "goalPosition": "1",
+                        "assistPlayerNumber": "1",
+                        "blockPlayerNumber": "0",
+                        "success": true,
                         "moment_ms": "1290000"
                     }, {
-                        "goalType": "REGULAR",
+                        "statType": "shoot - free throw",
+                        "pitchPosition": "0",
+                        "goalPosition": "1",
+                        "assistPlayerNumber": "1",
+                        "blockPlayerNumber": "0",
+                        "success": true,
                         "moment_ms": "1770000"
                     }
                 ],
@@ -267,11 +347,21 @@
                 "blueCard_ms": "0",
                 "disqualification_ms": "0",
                 "fst2minSusp_ms": "0",
-                "goals": [{
-                        "goalType": "REGULAR",
+                "stats": [{
+                        "statType": "shoot - free throw",
+                        "pitchPosition": "0",
+                        "goalPosition": "1",
+                        "assistPlayerNumber": "1",
+                        "blockPlayerNumber": "0",
+                        "success": true,
                         "moment_ms": "1230000"
                     }, {
-                        "goalType": "REGULAR",
+                        "statType": "shoot - free throw",
+                        "pitchPosition": "0",
+                        "goalPosition": "1",
+                        "assistPlayerNumber": "1",
+                        "blockPlayerNumber": "0",
+                        "success": true,
                         "moment_ms": "1350000"
                     }
                 ],
@@ -285,7 +375,7 @@
                 "blueCard_ms": "0",
                 "disqualification_ms": "0",
                 "fst2minSusp_ms": "0",
-                "goals": [],
+                "stats": [],
                 "playerName": "Николай Марков",
                 "playerTshirtName": "Н. Марков",
                 "playerTshirtNumber": 1,
@@ -296,7 +386,7 @@
                 "blueCard_ms": "0",
                 "disqualification_ms": "0",
                 "fst2minSusp_ms": "0",
-                "goals": [],
+                "stats": [],
                 "playerName": "Кристиян Петков",
                 "playerTshirtName": "К. Петков",
                 "playerTshirtNumber": 11,
@@ -307,7 +397,7 @@
                 "blueCard_ms": "0",
                 "disqualification_ms": "0",
                 "fst2minSusp_ms": "0",
-                "goals": [],
+                "stats": [],
                 "playerName": "Мартин Боянов",
                 "playerTshirtName": "М. Боянов",
                 "playerTshirtNumber": 23,
@@ -318,7 +408,7 @@
                 "blueCard_ms": "0",
                 "disqualification_ms": "0",
                 "fst2minSusp_ms": "0",
-                "goals": [],
+                "stats": [],
                 "playerName": "Петър Митаковски",
                 "playerTshirtName": "П. Митаковски",
                 "playerTshirtNumber": 26,
@@ -329,11 +419,21 @@
                 "blueCard_ms": "0",
                 "disqualification_ms": "0",
                 "fst2minSusp_ms": "0",
-                "goals": [{
-                        "goalType": "REGULAR",
+                "stats": [{
+                        "statType": "shoot - free throw",
+                        "pitchPosition": "0",
+                        "goalPosition": "1",
+                        "assistPlayerNumber": "1",
+                        "blockPlayerNumber": "0",
+                        "success": true,
                         "moment_ms": "510000"
                     }, {
-                        "goalType": "REGULAR",
+                        "statType": "shoot - free throw",
+                        "pitchPosition": "0",
+                        "goalPosition": "1",
+                        "assistPlayerNumber": "1",
+                        "blockPlayerNumber": "0",
+                        "success": true,
                         "moment_ms": "930000"
                     }
                 ],
@@ -347,7 +447,7 @@
                 "blueCard_ms": "0",
                 "disqualification_ms": "0",
                 "fst2minSusp_ms": "0",
-                "goals": [],
+                "stats": [],
                 "playerName": "Нейко Комитски",
                 "playerTshirtName": "Н. Комитски",
                 "playerTshirtNumber": 5,
@@ -358,7 +458,7 @@
                 "blueCard_ms": "0",
                 "disqualification_ms": "0",
                 "fst2minSusp_ms": "0",
-                "goals": [],
+                "stats": [],
                 "playerName": "Виктор Стоянов",
                 "playerTshirtName": "В. Стоянов",
                 "playerTshirtNumber": 24,
@@ -369,14 +469,29 @@
                 "blueCard_ms": "0",
                 "disqualification_ms": "0",
                 "fst2minSusp_ms": "0",
-                "goals": [{
-                        "goalType": "REGULAR",
+                "stats": [{
+                        "statType": "shoot - free throw",
+                        "pitchPosition": "0",
+                        "goalPosition": "1",
+                        "assistPlayerNumber": "1",
+                        "blockPlayerNumber": "0",
+                        "success": true,
                         "moment_ms": "570000"
                     }, {
-                        "goalType": "REGULAR",
+                        "statType": "shoot - free throw",
+                        "pitchPosition": "0",
+                        "goalPosition": "1",
+                        "assistPlayerNumber": "1",
+                        "blockPlayerNumber": "0",
+                        "success": true,
                         "moment_ms": "870000"
                     }, {
-                        "goalType": "REGULAR",
+                        "statType": "shoot - free throw",
+                        "pitchPosition": "0",
+                        "goalPosition": "1",
+                        "assistPlayerNumber": "1",
+                        "blockPlayerNumber": "0",
+                        "success": true,
                         "moment_ms": "1530000"
                     }
                 ],
@@ -390,8 +505,13 @@
                 "blueCard_ms": "0",
                 "disqualification_ms": "0",
                 "fst2minSusp_ms": "0",
-                "goals": [{
-                        "goalType": "REGULAR",
+                "stats": [{
+                        "statType": "shoot - free throw",
+                        "pitchPosition": "0",
+                        "goalPosition": "1",
+                        "assistPlayerNumber": "1",
+                        "blockPlayerNumber": "0",
+                        "success": true,
                         "moment_ms": "90000"
                     }
                 ],
@@ -405,11 +525,21 @@
                 "blueCard_ms": "0",
                 "disqualification_ms": "0",
                 "fst2minSusp_ms": "0",
-                "goals": [{
-                        "goalType": "REGULAR",
+                "stats": [{
+                        "statType": "shoot - free throw",
+                        "pitchPosition": "0",
+                        "goalPosition": "1",
+                        "assistPlayerNumber": "1",
+                        "blockPlayerNumber": "0",
+                        "success": true,
                         "moment_ms": "450000"
                     }, {
-                        "goalType": "REGULAR",
+                        "statType": "shoot - free throw",
+                        "pitchPosition": "0",
+                        "goalPosition": "1",
+                        "assistPlayerNumber": "1",
+                        "blockPlayerNumber": "0",
+                        "success": true,
                         "moment_ms": "451000"
                     }
                 ],
@@ -423,7 +553,7 @@
                 "blueCard_ms": "0",
                 "disqualification_ms": "0",
                 "fst2minSusp_ms": "0",
-                "goals": [],
+                "stats": [],
                 "playerName": "Александър Бояджиев",
                 "playerTshirtName": "А. Бояджиев",
                 "playerTshirtNumber": 15,
@@ -434,7 +564,7 @@
                 "blueCard_ms": "0",
                 "disqualification_ms": "0",
                 "fst2minSusp_ms": "0",
-                "goals": [],
+                "stats": [],
                 "playerName": "Антон Ангелов",
                 "playerTshirtName": "А. Ангелов",
                 "playerTshirtNumber": 16,
@@ -445,7 +575,7 @@
                 "blueCard_ms": "0",
                 "disqualification_ms": "0",
                 "fst2minSusp_ms": "0",
-                "goals": [],
+                "stats": [],
                 "playerName": "Георги Георгиев",
                 "playerTshirtName": "Г. Георгиев",
                 "playerTshirtNumber": 20,

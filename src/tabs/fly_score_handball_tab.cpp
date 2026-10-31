@@ -252,8 +252,10 @@ void FlyHandballTab::buildUI_matchInfo_Team_SecondLine(bool isHome)
 
 	int numOf = 0;
 	for (FlyScoreState::FlyPlayer p : t->players) {
-		for (FlyScoreState::FlyGoal g : p.goals) {
-			numOf++;
+		for (FlyScoreState::FlyPlayerStat ps : p.stats) {
+			if (ps.statType.startsWith("shoot") && ps.success) {
+				numOf++;
+			}
 		}
 	}
 	team->teamScores->setText(QString::number(numOf));
@@ -360,15 +362,9 @@ void FlyHandballTab::buildUI_team_player(int row, bool isHome)
 			FlyScoreState::FlyTeam *t = isHome ? &state_.home : &state_.guest;
 			for (int i = 0; i < t->players.size(); i++) {
 				if (t->players[i].playerTshirtNumber == pl->teamPlayerTShirtNumber->text().toInt()) {
-					FlyPlayerStatDialog * dlg = new FlyPlayerStatDialog(dataDir_, &(t->players[i]), isHome, state_, this);
+					FlyPlayerStatDialog *dlg = new FlyPlayerStatDialog(dataDir_, &(t->players[i]),
+											   isHome, state_, this);
 					dlg->exec();
-					FlyScoreState::FlyGoal g;
-					g.moment_ms = state_.timers[0].current_moment_ms +
-						      (state_.timers[0].running ? FlyQtHelper::fly_now_ms() -
-											  state_.timers[0].last_tick_ms
-										: 0);
-					g.goalType = "regular";
-					t->players[i].goals.push_back(g);
 					dock_->saveState();
 					dock_->refreshUiFromState();
 					return;
@@ -474,8 +470,14 @@ void FlyHandballTab::buildUI_team_player(int row, bool isHome)
 	pl->teamPlayerTShirtName->setProperty("team", p->warning_ms > 0 ? "yellow" : "true");
 	syncLabelFromState(pl->teamPlayerTShirtName, disable, out, p->playerTshirtName);
 
+	int numOfGoals = 0;
+	for (FlyScoreState::FlyPlayerStat s : p->stats) {
+		if (s.statType.startsWith("shoot") && s.success) {
+			numOfGoals++;
+		}
+	}
 	pl->teamPlayerGoals->setProperty("team", p->warning_ms > 0 ? "yellow" : "true");
-	syncButtonFromState(pl->teamPlayerGoals, disable, out, QString::number(p->goals.size()));
+	syncButtonFromState(pl->teamPlayerGoals, disable, out, QString::number(numOfGoals));
 
 	pl->teamPlayerWarningTime->setProperty("team", p->warning_ms > 0 ? "yellow" : "true");
 	syncButtonFromState(pl->teamPlayerWarningTime, disable, out, FlyQtHelper::fly_format_ms_mmss(p->warning_ms));

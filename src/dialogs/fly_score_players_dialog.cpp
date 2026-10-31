@@ -98,7 +98,7 @@ void FlyPlayersDialog::addPlayersUI(QTabWidget *tabs, FlyPlayersUI *playersUI, c
 void FlyPlayersDialog::onAddPlayer(FlyPlayersUI *playersUI)
 {
 	FlyScoreState::FlyPlayer fp;
-	fp.goals = QVector<FlyScoreState::FlyGoal>();
+	fp.stats = QVector<FlyScoreState::FlyPlayerStat>();
 
 	addPlayerUI(playersUI, fp, playersUI->playersRows->size() > 10);
 	playersUI->addPlayersBtn->setDisabled(playersUI->playersRows->size() > 15);

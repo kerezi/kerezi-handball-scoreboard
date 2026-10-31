@@ -207,13 +207,18 @@ QJsonObject FlyScoreState::fly_state_to_json_object(const FlyScoreState::FlyStat
 			oo["blueCard_ms"] = QString::number(plr.blueCard_ms);
 
 			QJsonArray plrgArr;
-			for (const auto &plrg : plr.goals) {
+			for (const auto &plrg : plr.stats) {
 				QJsonObject ooo;
 				ooo["moment_ms"] = QString::number(plrg.moment_ms);
-				ooo["goalType"] = plrg.goalType;
+				ooo["success"] = plrg.success;
+				ooo["statType"] = plrg.statType;
+				ooo["goalPosition"] = QString::number(plrg.goalPosition);
+				ooo["pitchPosition"] = QString::number(plrg.pitchPosition);
+				ooo["assistPlayerNumber"] = QString::number(plrg.assistPlayerNumber);
+				ooo["blockPlayerNumber"] = QString::number(plrg.blockPlayerNumber);
 				plrgArr.push_back(ooo);
 			}
-			oo["goals"] = plrgArr;
+			oo["stats"] = plrgArr;
 
 			plrsArr.push_back(oo);
 		}
@@ -355,19 +360,25 @@ bool FlyScoreState::fly_state_from_json_object(const QJsonObject &j, FlyScoreSta
 				op.disqualification_ms = oo.value("disqualification_ms").toString("0").toLongLong();
 				op.blueCard_ms = oo.value("blueCard_ms").toString("0").toLongLong();
 
-				const QJsonValue opgVal = oo.value("goals");
+				const QJsonValue opgVal = oo.value("stats");
 				if (opgVal.isArray()) {
 					const QJsonArray opgArr = opgVal.toArray();
-					op.goals.reserve(opgArr.size());
+					op.stats.reserve(opgArr.size());
 
 					for (const QJsonValue vv : opgArr) {
 						if (!vv.isObject())
 							continue;
 						const QJsonObject ooo = vv.toObject();
-						FlyScoreState::FlyGoal opg;
-						opg.moment_ms = ooo.value("moment_ms").toString("0").toLongLong();
-						opg.goalType = ooo.value("goalType").toString();
-						op.goals.push_back(opg);
+						FlyScoreState::FlyPlayerStat ps;
+						ps.moment_ms = ooo.value("moment_ms").toString("0").toLongLong();
+						ps.success = ooo.value("success").toBool(true);
+						ps.statType = ooo.value("statType").toString();
+						ps.pitchPosition = ooo.value("pitchPosition").toString("0").toInt();
+						ps.goalPosition = ooo.value("goalPosition").toString("0").toInt();
+						ps.assistPlayerNumber = ooo.value("assistPlayerNumber").toString("0").toInt();
+						ps.blockPlayerNumber = ooo.value("blockPlayerNumber").toString("0").toInt();
+
+						op.stats.push_back(ps);
 					}
 				}
 

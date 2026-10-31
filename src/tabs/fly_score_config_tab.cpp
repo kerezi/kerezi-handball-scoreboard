@@ -264,7 +264,7 @@ void FlyConfigTab::onClearTeamsAndReset()
 			t->players[i].trd2minSusp_ms = 0;
 			t->players[i].disqualification_ms = 0;
 			t->players[i].blueCard_ms = 0;
-			t->players[i].goals.clear();
+			t->players[i].stats.clear();
 		}
 		for (int i = 0; i < t->officials.size(); i++) {
 			t->officials[i].warning_ms = 0;

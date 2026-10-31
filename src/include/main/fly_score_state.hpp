@@ -24,54 +24,51 @@ class FlyScoreState {
 
 public:
 	struct FlyThemeManifest {
-		QString title;
-		QString author;
-		QString authorUrl;
-		QString description;
-		QString version;
+		QString title = "";
+		QString author = "";
+		QString authorUrl = "";
+		QString description = "";
+		QString version = "";
 	};
 
 	struct FlyThemeInfo {
 		FlyThemeManifest manifest;
-		QString path;
-		QString folderName;
-		QString error;
+		QString path = "";
+		QString folderName = "";
+		QString error = "";
 		bool hasIndex = false;
 		bool hasManifest = false;
 		bool valid = false;
 	};
 
 	struct FlyMatchInfo {
-		QString competition;
-		QString competitionRound;
-		int matchNumber;
+		QString competition = "";
+		QString competitionRound = "";
+		int matchNumber = 0;
 		QDateTime datetime;
-		QString city;
-		QString venue;
-		int spectators;
+		QString city = "";
+		QString venue = "";
+		int spectators = 0;
 	};
 
 	struct FlyOfficial {
 		QChar officialLetter;
-		QString officialName;
-		QString officialRole;
+		QString officialName = "";
+		QString officialRole = "";
 		long long warning_ms = 0;
 		long long fst2minSusp_ms = 0;
 		long long disqualification_ms = 0;
 		long long blueCard_ms = 0;
 	};
 
-	struct FlyGoal {
-		long long moment_ms;
-		QString goalType;
-	};
-
 	struct FlyPlayerStat {
-		long long moment_ms;
-		QString statType;
-		QString pitchPosition;
-		QString goalPosition;
-		FlyPlayer *otherPlayer;
+		long long moment_ms = 0;
+		bool success = false;
+		QString statType = ""; // shoot - penalty, shoot - free throw, shoot - free shoot, steal
+		int pitchPosition = -1; // [0 -> 13]
+		int goalPosition = 0; // [1 -> 6]
+		int assistPlayerNumber = 0;
+		int blockPlayerNumber = 0;
 	};
 
 	struct FlyPlayer {
@@ -84,11 +81,7 @@ public:
 		long long trd2minSusp_ms = 0;
 		long long disqualification_ms = 0;
 		long long blueCard_ms = 0;
-		QVector<FlyGoal> goals;
-		QVector<FlyPlayerStat> shots;
-		QVector<FlyPlayerStat> assists;
-		QVector<FlyPlayerStat> blocks;
-		QVector<FlyPlayerStat> steals;
+		QVector<FlyPlayerStat> stats;
 	};
 
 	struct FlyTeam {

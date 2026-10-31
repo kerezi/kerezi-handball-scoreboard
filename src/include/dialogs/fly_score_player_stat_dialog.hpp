@@ -13,6 +13,7 @@ class QTabWidget;
 class QLabel;
 class QSpinBox;
 class FlyHorizontalTabWidget;
+class QCheckBox;
 
 struct FlyTeam;
 struct FlyScoreState::FlyPlayer;
@@ -24,19 +25,24 @@ public:
 				     FlyScoreState::FlyState &state, QWidget *parent = nullptr);
 	~FlyPlayerStatDialog() override;
 
-// private slots:
-// 	void onAddHomePlayer();
-// 	void onAddGuestPlayer();
+protected:
+	void syncUiFromState() override;
+	void syncStateFromUi() override;
 
 private:
 	struct FlyPlayerStatUIRow {
+		QWidget *row;
 		bool canRemove = true;
-		QWidget *row = nullptr;
-		QSpinBox *playerTshirtNumberSB = nullptr;
-		QLineEdit *playerTshirtNameEdit = nullptr;
-		QLineEdit *playerNameEdit = nullptr;
+		QLabel *moment = nullptr;
+		QCheckBox *statRes = nullptr;
+		QLabel *plStatType = nullptr;
+		QLabel *goalPos = nullptr;
+		QLabel *pitchPos = nullptr;
+		QLabel *assistPlTSnum = nullptr;
+		QLabel *blockPlTSnum = nullptr;
 		QPushButton *remove = nullptr;
 	};
+
 	struct FlyPlayerStatTabUI {
 		QString title = "";
 		QVBoxLayout *playerStatLayout = nullptr;
@@ -44,26 +50,24 @@ private:
 		QVector<FlyPlayerStatUIRow> *playerStatRows = nullptr;
 	};
 
-	void syncUiFromState() override;
-	void syncStateFromUi() override;
+	void syncPlayerStatsUiFromState();
+	void syncStateFromPlayerStatsUi();
 
-	// void onAddPlayerStat(FlyPlayerStatUI *playerStatUI);
-	void refreshRemoveButtons(QVector<FlyPlayerStatUIRow> *rows);
-	// FlyPlayerStatUIRow addPlayerStatUI(const FlyPlayerStatUI *playerStats, const FlyScoreState::FlyPlayerStat &ps, bool canRemove);
-	void addPlayerStatTabUI(FlyHorizontalTabWidget *tabs, FlyPlayerStatDialog::FlyPlayerStatTabUI *statTab,
-				QWidget *playerStatTab);
-	// void syncTeamUiFromState(FlyPlayerStatUI *playerStatUI, FlyScoreState::FlyTeam *team);
-	// void syncStateFromTeamUi(FlyPlayerStatUI *playerStatUI, FlyScoreState::FlyTeam *team);
-
-private:
 	bool isHome_ = true;
 	FlyScoreState::FlyPlayer *player_ = nullptr;
-	FlyPlayerStatTabUI *shot_ = nullptr;
+	FlyPlayerStatTabUI *stat_ = nullptr;
+	FlyPlayerStatTabUI *pitch_ = nullptr;
 	FlyPlayerStatTabUI *assist_ = nullptr;
 	FlyPlayerStatTabUI *block_ = nullptr;
-	FlyPlayerStatTabUI *steal_ = nullptr;
+	FlyPlayerStatTabUI *stats_ = nullptr;
+	FlyScoreState::FlyPlayerStat *nStat_ = nullptr;
 
-	FlyPlayerStatTabUI *playerShotStatWidget(QWidget *playerShotTabWidget);
-	FlyPlayerStatTabUI *playerAssistStatWidget(QWidget *playerAssistTabWidget);
+	FlyPlayerStatTabUI *playerStatWidget(QWidget *playerStatTabWidget);
+	FlyPlayerStatTabUI *playerPitchWidget(QWidget *playerPitchTabWidget);
+	FlyPlayerStatTabUI *playerListWidget(QWidget *playerAssistTabWidget, bool isHome);
+	FlyPlayerStatTabUI *playerStatsWidget(QWidget *playerStatsTabWidget);
 
+	void setProp(QWidget *w, const char *prop, QVariant &&val);
+	void setPropPlStatType(QWidget *w, bool val);
+	FlyPlayerStatUIRow addPlayerStatUI(const FlyScoreState::FlyPlayerStat &ps, bool canRemove);
 };

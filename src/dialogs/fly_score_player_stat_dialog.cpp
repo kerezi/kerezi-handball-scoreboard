@@ -25,15 +25,18 @@
 #include <QColorDialog>
 #include <QTabWidget>
 #include <QSpinBox>
-#include <QComboBox>
+#include <QCheckBox>
 
 FlyPlayerStatDialog::FlyPlayerStatDialog(const QString &dataDir, FlyScoreState::FlyPlayer *player, bool isHome,
 					 FlyScoreState::FlyState &state, QWidget *parent)
-	: FlyBaseDialog(fly_i18n("Players.Title"), fly_i18n("Players.Hint"), fly_i18n("Dock.Players"), dataDir, state,
-			parent),
+	: FlyBaseDialog(fly_i18n("Dock.Players"), fly_i18n("Players.Hint"),
+			QString::number(player->playerTshirtNumber) + " " + player->playerName, dataDir, state, parent),
 	  player_(player),
 	  isHome_(isHome)
 {
+	nStat_ = new FlyScoreState::FlyPlayerStat{};
+	nStat_->moment_ms = state_.timers[0].current_moment_ms +
+			    (state_.timers[0].running ? FlyQtHelper::fly_now_ms() - state_.timers[0].last_tick_ms : 0);
 	resize(660, 820);
 
 	auto *tabs = new FlyHorizontalTabWidget();
@@ -46,13 +49,20 @@ FlyPlayerStatDialog::FlyPlayerStatDialog(const QString &dataDir, FlyScoreState::
 	tabs->setUsesScrollButtons(true);
 
 	std::vector<std::function<FlyPlayerStatTabUI *(QWidget * statTabWidget)>> playerStatsTabs = {
-		[this](QWidget *statTabWidget) -> FlyPlayerStatTabUI * { return playerShotStatWidget(statTabWidget); },
-		[this](QWidget *statTabWidget) -> FlyPlayerStatTabUI * { return playerAssistStatWidget(statTabWidget); }};
+		[this](QWidget *statTabWidget) -> FlyPlayerStatTabUI * { return playerStatWidget(statTabWidget); },
+		[this](QWidget *statTabWidget) -> FlyPlayerStatTabUI * { return playerPitchWidget(statTabWidget); },
+		[this](QWidget *statTabWidget) -> FlyPlayerStatTabUI * {
+			return playerListWidget(statTabWidget, true);
+		},
+		[this](QWidget *statTabWidget) -> FlyPlayerStatTabUI * {
+			return playerListWidget(statTabWidget, false);
+		},
+		[this](QWidget *statTabWidget) -> FlyPlayerStatTabUI * { return playerStatsWidget(statTabWidget); }};
 
 	for (const auto &getWidget : playerStatsTabs) {
 		QWidget *statTabWidget = new QWidget();
 		FlyPlayerStatDialog::FlyPlayerStatTabUI *statTab = getWidget(statTabWidget);
-		addPlayerStatTabUI(tabs, statTab, statTabWidget);
+		tabs->addTab(statTabWidget, statTab->title);
 	}
 
 	gl_->addWidget(tabs);
@@ -65,300 +75,417 @@ FlyPlayerStatDialog::FlyPlayerStatDialog(const QString &dataDir, FlyScoreState::
 
 FlyPlayerStatDialog::~FlyPlayerStatDialog() = default;
 
-FlyPlayerStatDialog::FlyPlayerStatTabUI *FlyPlayerStatDialog::playerShotStatWidget(QWidget *playerShotTabWidget)
+FlyPlayerStatDialog::FlyPlayerStatTabUI *FlyPlayerStatDialog::playerStatWidget(QWidget *playerStatTabWidget)
 {
-	shot_ = new FlyPlayerStatTabUI{};
-	shot_->playerStatRows = new QVector<FlyPlayerStatUIRow>();
-	shot_->title = fly_i18n("Players.Stat.Shot");
+	stat_ = new FlyPlayerStatTabUI{};
+	stat_->playerStatRows = new QVector<FlyPlayerStatUIRow>();
+	stat_->title = fly_i18n("Players.Stat");
 
-	shot_->playerStatLayout = new QVBoxLayout(playerShotTabWidget);
-	shot_->playerStatLayout->setContentsMargins(0, 4, 0, 0);
-	shot_->playerStatLayout->setSpacing(6);
-	shot_->playerStatLayout->setAlignment(Qt::AlignTop);
+	stat_->playerStatLayout = new QVBoxLayout(playerStatTabWidget);
+	stat_->playerStatLayout->setContentsMargins(0, 4, 0, 0);
+	stat_->playerStatLayout->setSpacing(6);
+	stat_->playerStatLayout->setAlignment(Qt::AlignTop);
 
 	QColor c = FlyQtHelper::colorFromU32(isHome_ ? state_.home.color : state_.guest.color);
 	QColor cc = FlyQtHelper::getHighContrastColor(c);
-	QString css = "background-color: " + c.name() + "; color: " + cc.name() + ";";
+	QString css = "QPushButton { font-weight:bold; } QPushButton[plStatType=\"true\"] { background-color: " +
+		      c.name() + "; color: " + cc.name() + "; }";
 
-	auto *playerShotWidget = new QWidget();
-	QGridLayout *l = new QGridLayout(playerShotWidget);
+	auto *playerStatWidget = new QWidget();
+	QGridLayout *l = new QGridLayout(playerStatWidget);
 
-	playerShotWidget->resize(881, 569);
+	playerStatWidget->resize(881, 569);
 
-	playerShotWidget->setStyleSheet(
+	playerStatWidget->setStyleSheet(
 		"QWidget {"
 		"   background-image: url('C:\\Users\\gamer\\Documents\\ws\\ls\\dev\\kerezi-handball-scoreboard\\specs\\goal.png');"
 		"   background-repeat: no-repeat;"
 		"   background-position: center;"
 		"}");
 
-	QPushButton *btn1 = new QPushButton("Бутон 1");
-	QPushButton *btn2 = new QPushButton("Бутон 2");
-	QPushButton *btn3 = new QPushButton("Бутон 3");
-	QPushButton *btn4 = new QPushButton("Бутон 4");
-	QPushButton *btn5 = new QPushButton("Бутон 5");
-	QPushButton *btn6 = new QPushButton("Бутон 6");
+	QPushButton *stealBtn = new QPushButton(fly_i18n("Players.Stat.Steal"));
+	stealBtn->setStyleSheet(css);
+	QPushButton *goalBtn = new QPushButton(fly_i18n("Players.Stat.Goal"));
+	goalBtn->setStyleSheet(css);
+	QPushButton *penBtn = new QPushButton(fly_i18n("Players.Stat.Shoot.Pen"));
+	penBtn->setStyleSheet(css);
+	QPushButton *freeBtn = new QPushButton(fly_i18n("Players.Stat.Shoot.Free"));
+	freeBtn->setStyleSheet(css);
+	QPushButton *gk1Btn = new QPushButton(fly_i18n("Players.Stat.GK_1"));
+	QPushButton *gk2Btn = new QPushButton(fly_i18n("Players.Stat.GK_2"));
+	QPushButton *gk3Btn = new QPushButton(fly_i18n("Players.Stat.GK_3"));
+	QPushButton *gk4Btn = new QPushButton(fly_i18n("Players.Stat.GK_4"));
+	QPushButton *gk5Btn = new QPushButton(fly_i18n("Players.Stat.GK_5"));
+	QPushButton *gk6Btn = new QPushButton(fly_i18n("Players.Stat.GK_6"));
 
-	l->addWidget(btn1, 0, 0);
-	l->addWidget(btn2, 0, 1);
-	l->addWidget(btn3, 0, 2);
-	l->addWidget(btn4, 1, 0);
-	l->addWidget(btn5, 1, 1);
-	l->addWidget(btn6, 1, 2);
+	l->addWidget(stealBtn, 0, 0, 1, 3);
+	l->addWidget(goalBtn, 1, 0, 1, 1);
+	l->addWidget(penBtn, 1, 1, 1, 1);
+	l->addWidget(freeBtn, 1, 2, 1, 1);
+	l->addWidget(gk1Btn, 2, 0);
+	l->addWidget(gk2Btn, 2, 1);
+	l->addWidget(gk3Btn, 2, 2);
+	l->addWidget(gk4Btn, 3, 0);
+	l->addWidget(gk5Btn, 3, 1);
+	l->addWidget(gk6Btn, 3, 2);
 
-	shot_->playerStatLayout->addWidget(playerShotWidget, 1);
+	stat_->playerStatLayout->addWidget(playerStatWidget, 1);
 
-	playerShotTabWidget->setLayout(shot_->playerStatLayout);
+	playerStatTabWidget->setLayout(stat_->playerStatLayout);
 
-	return shot_;
-}
+	connect(stealBtn, &QPushButton::clicked, this,
+		[this, stealBtn, goalBtn, penBtn, freeBtn, gk1Btn, gk2Btn, gk3Btn, gk4Btn, gk5Btn, gk6Btn]() {
+			setPropPlStatType(stealBtn, true);
+			for (QPushButton *btn :
+			     {goalBtn, penBtn, freeBtn, gk1Btn, gk2Btn, gk3Btn, gk4Btn, gk5Btn, gk6Btn}) {
+				setPropPlStatType(btn, false);
+			}
+			nStat_->statType = "steal";
+		});
 
-FlyPlayerStatDialog::FlyPlayerStatTabUI *FlyPlayerStatDialog::playerAssistStatWidget(QWidget *playerAssistTabWidget)
-{
-	assist_ = new FlyPlayerStatTabUI{};
-	assist_->playerStatRows = new QVector<FlyPlayerStatUIRow>();
-	assist_->title = fly_i18n("Players.Stat.Assist");
+	connect(goalBtn, &QPushButton::clicked, this, [this, stealBtn, goalBtn]() {
+		setPropPlStatType(stealBtn, false);
+		nStat_->success = !nStat_->success;
+		setProp(goalBtn, "plStatType", nStat_->success);
+	});
 
-	assist_->playerStatLayout = new QVBoxLayout(playerAssistTabWidget);
-	assist_->playerStatLayout->setContentsMargins(0, 4, 0, 0);
-	assist_->playerStatLayout->setSpacing(6);
-	assist_->playerStatLayout->setAlignment(Qt::AlignTop);
+	connect(penBtn, &QPushButton::clicked, this, [this, stealBtn, penBtn, freeBtn]() {
+		setPropPlStatType(stealBtn, false);
+		setPropPlStatType(penBtn, true);
+		setPropPlStatType(freeBtn, false);
+		nStat_->statType = "shoot - penalty";
+	});
 
-	QColor c = FlyQtHelper::colorFromU32(isHome_ ? state_.home.color : state_.guest.color);
-	QColor cc = FlyQtHelper::getHighContrastColor(c);
-	QString css = "background-color: " + c.name() + "; color: " + cc.name() + ";";
+	connect(freeBtn, &QPushButton::clicked, this, [this, stealBtn, penBtn, freeBtn]() {
+		setPropPlStatType(stealBtn, false);
+		setPropPlStatType(penBtn, false);
+		setPropPlStatType(freeBtn, true);
+		nStat_->statType = "shoot - free throw";
+	});
 
-	auto *playerAssistWidget = new QWidget();
-	QGridLayout *l = new QGridLayout(playerAssistWidget);
+	int i = 0;
+	for (QPushButton *btn : {gk1Btn, gk2Btn, gk3Btn, gk4Btn, gk5Btn, gk6Btn}) {
+		const int p = ++i;
+		btn->setStyleSheet(css);
 
-	playerAssistWidget->resize(881, 569);
+		if (!nStat_->statType.startsWith("shoot")) {
+			nStat_->statType = "shoot - free throw";
+		}
 
-	QComboBox *selectPlayer = new QComboBox();
-	QVector<FlyScoreState::FlyPlayer>(*plrs) = (isHome_ ? &state_.home.players : &state_.guest.players);
-	for (FlyScoreState::FlyPlayer p : *plrs) {
-		selectPlayer->addItem(p.playerTshirtName);
+		connect(btn, &QPushButton::clicked, this,
+			[this, p, stealBtn, btn, gk1Btn, gk2Btn, gk3Btn, gk4Btn, gk5Btn, gk6Btn]() {
+				setPropPlStatType(stealBtn, false);
+				for (QPushButton *ibtn : {gk1Btn, gk2Btn, gk3Btn, gk4Btn, gk5Btn, gk6Btn}) {
+					if (ibtn != btn)
+						setPropPlStatType(ibtn, false);
+				}
+				setPropPlStatType(btn, true);
+				nStat_->goalPosition = p;
+			});
 	}
 
-	assist_->playerStatLayout->addWidget(playerAssistWidget, 1);
-
-	playerAssistTabWidget->setLayout(assist_->playerStatLayout);
-
-	return assist_;
+	return stat_;
 }
 
-void FlyPlayerStatDialog::addPlayerStatTabUI(FlyHorizontalTabWidget *tabs,
-					     FlyPlayerStatDialog::FlyPlayerStatTabUI *statTab, QWidget *playerStatTab)
+FlyPlayerStatDialog::FlyPlayerStatTabUI *FlyPlayerStatDialog::playerStatsWidget(QWidget *playerStatsTabWidget)
 {
+	stats_ = new FlyPlayerStatTabUI{};
+	stats_->playerStatRows = new QVector<FlyPlayerStatUIRow>();
+	stats_->title = fly_i18n("Players.Stats");
+
+	stats_->playerStatLayout = new QVBoxLayout(playerStatsTabWidget);
+	stats_->playerStatLayout->setContentsMargins(0, 4, 0, 0);
+	stats_->playerStatLayout->setSpacing(6);
+	stats_->playerStatLayout->setAlignment(Qt::AlignTop);
+
 	QColor c = FlyQtHelper::colorFromU32(isHome_ ? state_.home.color : state_.guest.color);
 	QColor cc = FlyQtHelper::getHighContrastColor(c);
-	QString css = "background-color: " + c.name() + "; color: " + cc.name() + ";";
+	QString css = "QPushButton { font-weight:bold; } QPushButton[plStatType=\"true\"] { background-color: " +
+		      c.name() + "; color: " + cc.name() + "; }";
 
-	auto *plrStatHdr = new QWidget();
-	auto *plrStatHdrLay = new QHBoxLayout(plrStatHdr);
-	QLabel *lbl = new QLabel(fly_i18n("Players.PlayerTshirtNumber"), plrStatHdr);
-	lbl->setStyleSheet("QLabel {font-size: 20pt;min-width: 60px;min-width: 65px; " + css + "}");
-	plrStatHdrLay->addWidget(lbl, 1, Qt::AlignVCenter | Qt::AlignLeft);
-	plrStatHdrLay->addWidget(new QLabel(fly_i18n("Players.PlayerTshirtName"), plrStatHdr), 2, Qt::AlignCenter);
-	plrStatHdrLay->addWidget(new QLabel(fly_i18n("Players.PlayerName"), plrStatHdr), 2, Qt::AlignCenter);
-	statTab->addPlayerStatBtn = new QPushButton(fly_i18n("Players.PlayerAdd"));
+	playerStatsTabWidget->resize(881, 569);
 
-	statTab->addPlayerStatBtn->setCursor(Qt::PointingHandCursor);
-	statTab->addPlayerStatBtn->setStyleSheet("QPushButton {font-size: 18pt; min-width: 60px;min-width: 65px; " +
-						 css + ";}");
-	plrStatHdrLay->addWidget(statTab->addPlayerStatBtn, 1, Qt::AlignVCenter | Qt::AlignRight);
-	plrStatHdr->setLayout(plrStatHdrLay);
-	statTab->playerStatLayout->addWidget(plrStatHdr);
+	playerStatsTabWidget->setStyleSheet(
+		"QWidget {"
+		"   background-image: url('C:\\Users\\gamer\\Documents\\ws\\ls\\dev\\kerezi-handball-scoreboard\\specs\\goal.png');"
+		"   background-repeat: no-repeat;"
+		"   background-position: center;"
+		"}");
 
-	tabs->addTab(playerStatTab, statTab->title);
-	QString fcss = "FlyHorizontalTabBar::tab";
-	if (isHome_)
-		fcss = fcss + "";
-	else
-		fcss = fcss + ":last";
-	fcss = fcss + ":selected { " + css + ";}";
-	tabs->setStyleSheet(fcss);
-};
+	stats_->playerStatLayout->addWidget(playerStatsTabWidget, 1);
 
-// void FlyPlayerStatDialog::onAddPlayer(FlyPlayersUI *playersUI)
-// {
-	// FlyScoreState::FlyPlayer fp;
-	// fp.goals = QVector<FlyScoreState::FlyGoal>();
-// 
-	// addPlayerUI(playersUI, fp, playersUI->playersRows->size() > 10);
-	// playersUI->addPlayersBtn->setDisabled(playersUI->playersRows->size() > 15);
-	// refreshRemoveButtons(playersUI->playersRows);
-// }
+	playerStatsTabWidget->setLayout(stat_->playerStatLayout);
 
-// void FlyPlayerStatDialog::onAddHomePlayer()
-// {
-	// onAddPlayer(home_);
-// }
+	return stats_;
+}
 
-// void FlyPlayerStatDialog::onAddGuestPlayer()
-// {
-	// onAddPlayer(guest_);
-// }
-
-void FlyPlayerStatDialog::refreshRemoveButtons(QVector<FlyPlayerStatUIRow> *rows)
+FlyPlayerStatDialog::FlyPlayerStatTabUI *FlyPlayerStatDialog::playerListWidget(QWidget *playerAssistTabWidget,
+									       bool isHome)
 {
-	const bool canRemove = rows->size() > 10;
-	for (auto &r : *rows) {
-		r.canRemove = canRemove;
-		if (r.remove) {
-			r.remove->setDisabled(!canRemove);
-			r.remove->setCursor(canRemove ? Qt::PointingHandCursor : Qt::ArrowCursor);
-			r.remove->setToolTip(canRemove ? fly_i18n("Stats.RemoveStat")
-						       : fly_i18n("Stats.OneTeamStatRequired"));
+	FlyPlayerStatTabUI **st = isHome ? &assist_ : &block_;
+	(*st) = new FlyPlayerStatTabUI{};
+	(*st)->playerStatRows = new QVector<FlyPlayerStatUIRow>();
+	(*st)->title = fly_i18n(isHome ? "Players.Stat.Assist" : "Players.Stat.Block");
+
+	(*st)->playerStatLayout = new QVBoxLayout(playerAssistTabWidget);
+	(*st)->playerStatLayout->setContentsMargins(0, 4, 0, 0);
+	(*st)->playerStatLayout->setSpacing(6);
+	(*st)->playerStatLayout->setAlignment(Qt::AlignTop);
+
+	QColor c = FlyQtHelper::colorFromU32(isHome ? state_.home.color : state_.guest.color);
+	QColor cc = FlyQtHelper::getHighContrastColor(c);
+	QString css = "QPushButton { font-weight:bold; } QPushButton[plStatType=\"true\"] { background-color: " +
+		      c.name() + "; color: " + cc.name() + "; }";
+
+	auto *playerListWidget = new QWidget();
+	QGridLayout *l = new QGridLayout(playerListWidget);
+
+	playerListWidget->resize(881, 569);
+
+	QVector<FlyScoreState::FlyPlayer>(*plrs) = (isHome ? &state_.home.players : &state_.guest.players);
+	int row = 0;
+	for (FlyScoreState::FlyPlayer p : *plrs) {
+		QPushButton *plBtn = new QPushButton(QString::number(p.playerTshirtNumber) + " " + p.playerTshirtName);
+		plBtn->setStyleSheet(css);
+
+		connect(plBtn, &QPushButton::clicked, this, [this, plBtn, p, isHome]() {
+			setPropPlStatType(plBtn, true);
+			if (isHome)
+				nStat_->assistPlayerNumber = p.playerTshirtNumber;
+			else
+				nStat_->blockPlayerNumber = p.playerTshirtNumber;
+		});
+		l->addWidget(plBtn, row++, 0);
+	}
+
+	(*st)->playerStatLayout->addWidget(playerListWidget, 1);
+
+	playerAssistTabWidget->setLayout((*st)->playerStatLayout);
+
+	return (*st);
+}
+
+FlyPlayerStatDialog::FlyPlayerStatTabUI *FlyPlayerStatDialog::playerPitchWidget(QWidget *playerPitchTabWidget)
+{
+	pitch_ = new FlyPlayerStatTabUI{};
+	pitch_->playerStatRows = new QVector<FlyPlayerStatUIRow>();
+	pitch_->title = fly_i18n("Players.Stat.Pitch");
+
+	pitch_->playerStatLayout = new QVBoxLayout(playerPitchTabWidget);
+	pitch_->playerStatLayout->setContentsMargins(0, 4, 0, 0);
+	pitch_->playerStatLayout->setSpacing(6);
+	pitch_->playerStatLayout->setAlignment(Qt::AlignTop);
+
+	QColor c = FlyQtHelper::colorFromU32(isHome_ ? state_.home.color : state_.guest.color);
+	QColor cc = FlyQtHelper::getHighContrastColor(c);
+	QString css = "QPushButton { font-weight:bold; } QPushButton[plStatType=\"true\"] { background-color: " +
+		      c.name() + "; color: " + cc.name() + "; }";
+
+	auto *playerPitchWidget = new QWidget();
+	QGridLayout *l = new QGridLayout(playerPitchWidget);
+
+	playerPitchWidget->resize(881, 569);
+
+	QPushButton *pitch00btn = new QPushButton(fly_i18n("Players.Stat.Pitch_00"));
+	QPushButton *pitch01btn = new QPushButton(fly_i18n("Players.Stat.Pitch_01"));
+	QPushButton *pitch02btn = new QPushButton(fly_i18n("Players.Stat.Pitch_02"));
+	QPushButton *pitch03btn = new QPushButton(fly_i18n("Players.Stat.Pitch_03"));
+	QPushButton *pitch04btn = new QPushButton(fly_i18n("Players.Stat.Pitch_04"));
+	QPushButton *pitch05btn = new QPushButton(fly_i18n("Players.Stat.Pitch_05"));
+	QPushButton *pitch06btn = new QPushButton(fly_i18n("Players.Stat.Pitch_06"));
+	QPushButton *pitch07btn = new QPushButton(fly_i18n("Players.Stat.Pitch_07"));
+	QPushButton *pitch08btn = new QPushButton(fly_i18n("Players.Stat.Pitch_08"));
+	QPushButton *pitch09btn = new QPushButton(fly_i18n("Players.Stat.Pitch_09"));
+	QPushButton *pitch10btn = new QPushButton(fly_i18n("Players.Stat.Pitch_10"));
+	QPushButton *pitch11btn = new QPushButton(fly_i18n("Players.Stat.Pitch_11"));
+	QPushButton *pitch12btn = new QPushButton(fly_i18n("Players.Stat.Pitch_12"));
+	QPushButton *pitch13btn = new QPushButton(fly_i18n("Players.Stat.Pitch_13"));
+
+	l->addWidget(pitch01btn, 0, 0, 1, 1);
+	l->addWidget(pitch00btn, 0, 1, 1, 1);
+	l->addWidget(pitch05btn, 0, 2, 1, 1);
+
+	l->addWidget(pitch02btn, 1, 0, 1, 1);
+	l->addWidget(pitch03btn, 1, 1, 1, 1);
+	l->addWidget(pitch04btn, 1, 2, 1, 1);
+
+	l->addWidget(pitch08btn, 2, 0, 1, 1);
+	l->addWidget(pitch07btn, 2, 1, 1, 1);
+	l->addWidget(pitch06btn, 2, 2, 1, 1);
+
+	l->addWidget(pitch09btn, 3, 0, 1, 1);
+	l->addWidget(pitch10btn, 3, 1, 1, 1);
+	l->addWidget(pitch11btn, 3, 2, 1, 1);
+
+	l->addWidget(pitch12btn, 4, 1, 1, 1);
+
+	l->addWidget(pitch13btn, 5, 1, 1, 1);
+
+	pitch_->playerStatLayout->addWidget(playerPitchWidget, 1);
+
+	playerPitchTabWidget->setLayout(pitch_->playerStatLayout);
+
+	int i = 0;
+	for (QPushButton *btn : {pitch00btn, pitch01btn, pitch02btn, pitch03btn, pitch04btn, pitch05btn, pitch06btn,
+				 pitch07btn, pitch08btn, pitch09btn, pitch10btn, pitch11btn, pitch12btn, pitch13btn}) {
+		const int p = i;
+		i++;
+		btn->setStyleSheet(css);
+		connect(btn, &QPushButton::clicked, this,
+			[this, p, btn, pitch00btn, pitch01btn, pitch02btn, pitch03btn, pitch04btn, pitch05btn,
+			 pitch06btn, pitch07btn, pitch08btn, pitch09btn, pitch10btn, pitch11btn, pitch12btn,
+			 pitch13btn]() {
+				setPropPlStatType(btn, true);
+				for (QPushButton *ibtn : {pitch00btn, pitch01btn, pitch02btn, pitch03btn, pitch04btn,
+							  pitch05btn, pitch06btn, pitch07btn, pitch08btn, pitch09btn,
+							  pitch10btn, pitch11btn, pitch12btn, pitch13btn}) {
+					setPropPlStatType(ibtn, false);
+				}
+				nStat_->pitchPosition = p;
+				// LOGI("Clicked :: " + QString::number(p).toUtf8());
+			});
+	}
+	return pitch_;
+}
+
+FlyPlayerStatDialog::FlyPlayerStatUIRow FlyPlayerStatDialog::addPlayerStatUI(const FlyScoreState::FlyPlayerStat &ps,
+									     bool canRemove)
+{
+	FlyPlayerStatUIRow r;
+	r.canRemove = canRemove;
+
+	auto *row = new QWidget();
+	auto *lay = new QHBoxLayout(row);
+	lay->setContentsMargins(0, 0, 0, 0);
+	lay->setSpacing(8);
+
+	auto *removeBtn = new QPushButton(row);
+	removeBtn->setText(fly_i18n("Players.PlayerRemove"));
+	removeBtn->setToolTip(canRemove ? fly_i18n("Stats.RemoveStat") : fly_i18n("Stats.StatCannotBeRemoved"));
+	removeBtn->setCursor(canRemove ? Qt::PointingHandCursor : Qt::ArrowCursor);
+
+	r.moment = new QLabel(row);
+	r.moment->setText(FlyQtHelper::fly_format_ms_mmss(ps.moment_ms));
+	r.statRes = new QCheckBox(row);
+	r.statRes->setDisabled(true);
+	r.statRes->setChecked(ps.success);
+	r.plStatType = new QLabel(row);
+	r.plStatType->setText(ps.statType);
+	r.goalPos = new QLabel(row);
+	r.goalPos->setText(QString::number(ps.goalPosition));
+	r.pitchPos = new QLabel(row);
+	r.pitchPos->setText(QString::number(ps.pitchPosition));
+	r.assistPlTSnum = new QLabel(row);
+	r.assistPlTSnum->setText(QString::number(ps.assistPlayerNumber));
+	r.blockPlTSnum = new QLabel(row);
+	r.blockPlTSnum->setText(QString::number(ps.blockPlayerNumber));
+	r.row = row;
+	const int btnSize = r.moment->sizeHint().height();
+	removeBtn->setFixedSize(btnSize, btnSize);
+	removeBtn->setDisabled(!canRemove);
+	removeBtn->setStyleSheet("QPushButton {"
+				 "  font-size:18px;"
+				 "  padding:0;"
+				 "  min-width:60px;"
+				 "  max-width:65px;"
+				 "}");
+
+	r.remove = removeBtn;
+
+	lay->addWidget(r.moment, 1, Qt::AlignVCenter | Qt::AlignLeft);
+	lay->addWidget(r.statRes, 1, Qt::AlignCenter);
+	lay->addWidget(r.plStatType, 1, Qt::AlignCenter);
+	lay->addWidget(r.goalPos, 1, Qt::AlignCenter);
+	lay->addWidget(r.pitchPos, 1, Qt::AlignCenter);
+	lay->addWidget(r.assistPlTSnum, 1, Qt::AlignCenter);
+	lay->addWidget(r.blockPlTSnum, 1, Qt::AlignCenter);
+	lay->addWidget(r.blockPlTSnum, 1, Qt::AlignCenter);
+	lay->addWidget(r.remove, 1, Qt::AlignCenter);
+
+	row->setLayout(lay);
+
+	stats_->playerStatLayout->addWidget(row, Qt::AlignTop | Qt::AlignCenter);
+
+	stats_->playerStatRows->push_back(r);
+
+	if (canRemove) {
+		connect(removeBtn, &QPushButton::clicked, this, [this, row]() {
+			for (int i = 0; i < stats_->playerStatRows->size(); ++i) {
+				if (stats_->playerStatRows->at(i).row == row) {
+					auto rr = stats_->playerStatRows->at(i);
+					stats_->playerStatRows->removeAt(i);
+					if (stats_->playerStatLayout)
+						stats_->playerStatLayout->removeWidget(rr.row);
+					rr.row->setHidden(true);
+					rr.row->deleteLater();
+					break;
+				}
+			}
+		});
+	}
+
+	return r;
+}
+
+void FlyPlayerStatDialog::syncPlayerStatsUiFromState()
+{
+	for (auto &r : *(stats_->playerStatRows)) {
+		if (stats_->playerStatLayout && r.row)
+			stats_->playerStatLayout->removeWidget(r.row);
+		if (r.row) {
+			r.row->setHidden(true);
+			r.row->deleteLater();
 		}
 	}
+	stats_->playerStatRows->clear();
+
+	if (!stats_->playerStatRows)
+		return;
+
+	for (int i = 0; i < player_->stats.size(); ++i) {
+		const FlyScoreState::FlyPlayerStat &ps = player_->stats[i];
+		const bool canRemove = true;
+		addPlayerStatUI(ps, canRemove);
+	}
 }
 
-// FlyPlayerStatDialog::FlyPlayerUIRow FlyPlayerStatDialog::addPlayerUI(const FlyPlayersUI *playersUI,
-// 								     const FlyScoreState::FlyPlayer &fp, bool canRemove)
-// {
-// 	FlyPlayerUIRow r;
-// 	r.canRemove = canRemove;
-
-// 	auto *row = new QWidget();
-// 	auto *lay = new QHBoxLayout(row);
-// 	lay->setContentsMargins(0, 0, 0, 0);
-// 	lay->setSpacing(8);
-
-// 	auto *playerTshirtNumberSB = new QSpinBox(row);
-// 	playerTshirtNumberSB->setRange(1, 99);
-// 	playerTshirtNumberSB->setMinimumWidth(70);
-// 	playerTshirtNumberSB->setMaximumWidth(90);
-// 	playerTshirtNumberSB->setValue(fp.playerTshirtNumber);
-// 	if (fp.playerTshirtNumber == 0) {
-// 		playerTshirtNumberSB->setValue(playersUI->playersRows->size() + 1);
-// 	}
-
-// 	auto *playerTshirtNameEdit = new QLineEdit(row);
-// 	playerTshirtNameEdit->setPlaceholderText(fly_i18n("Players.PlayerNameLabelPlaceholder"));
-// 	playerTshirtNameEdit->setText(fp.playerTshirtName);
-// 	playerTshirtNameEdit->setMinimumWidth(180);
-// 	playerTshirtNameEdit->setMaximumWidth(260);
-// 	if (fp.playerTshirtName == nullptr || fp.playerTshirtName == "") {
-// 		playerTshirtNameEdit->setText(fly_i18n("Players.PlayerTshirtName") + " # " +
-// 					      QString::number(playersUI->playersRows->size() + 1));
-// 	}
-
-// 	auto *playerNameEdit = new QLineEdit(row);
-// 	playerNameEdit->setPlaceholderText(fly_i18n("Players.PlayerNameLabelPlaceholder"));
-// 	playerNameEdit->setText(fp.playerName);
-// 	playerNameEdit->setMinimumWidth(180);
-// 	playerNameEdit->setMaximumWidth(260);
-// 	if (fp.playerName == nullptr || fp.playerName == "") {
-// 		playerNameEdit->setText(fly_i18n("Players.PlayerName") + " # " +
-// 					QString::number(playersUI->playersRows->size() + 1));
-// 	}
-
-// 	auto *removeBtn = new QPushButton(row);
-// 	removeBtn->setText(fly_i18n("Players.PlayerRemove"));
-// 	removeBtn->setToolTip(canRemove ? fly_i18n("Stats.RemoveStat") : fly_i18n("Stats.StatCannotBeRemoved"));
-// 	removeBtn->setCursor(canRemove ? Qt::PointingHandCursor : Qt::ArrowCursor);
-
-// 	const int btnSize = playerNameEdit->sizeHint().height();
-// 	removeBtn->setFixedSize(btnSize, btnSize);
-// 	removeBtn->setDisabled(!canRemove);
-// 	removeBtn->setStyleSheet("QPushButton {"
-// 				 "  font-size:18px;"
-// 				 "  padding:0;"
-// 				 "  min-width:60px;"
-// 				 "  max-width:65px;"
-// 				 "}");
-
-// 	lay->addWidget(playerTshirtNumberSB, 1, Qt::AlignVCenter | Qt::AlignLeft);
-// 	lay->addWidget(playerTshirtNameEdit, 2, Qt::AlignCenter);
-// 	lay->addWidget(playerNameEdit, 2, Qt::AlignCenter);
-// 	lay->addWidget(removeBtn, 1, Qt::AlignVCenter | Qt::AlignRight);
-
-// 	row->setLayout(lay);
-// 	playersUI->playersLayout->addWidget(row, Qt::AlignTop | Qt::AlignCenter);
-
-// 	r.row = row;
-// 	r.playerTshirtNumberSB = playerTshirtNumberSB;
-// 	r.playerTshirtNameEdit = playerTshirtNameEdit;
-// 	r.playerNameEdit = playerNameEdit;
-// 	r.remove = removeBtn;
-// 	playersUI->playersRows->push_back(r);
-
-// 	if (canRemove) {
-// 		connect(removeBtn, &QPushButton::clicked, this, [this, playersUI, row]() {
-// 			if (playersUI->playersRows->size() <= 10) {
-// 				QMessageBox::warning(this, fly_i18n("Common.CannotRemove"),
-// 						     fly_i18n("Stats.OneTeamStatRequired"));
-// 				return;
-// 			}
-
-// 			for (int i = 0; i < playersUI->playersRows->size(); ++i) {
-// 				if (playersUI->playersRows->at(i).row == row) {
-// 					auto rr = playersUI->playersRows->at(i);
-// 					playersUI->playersRows->removeAt(i);
-// 					if (playersUI->playersLayout)
-// 						playersUI->playersLayout->removeWidget(rr.row);
-// 					rr.row->setHidden(true);
-// 					rr.row->deleteLater();
-// 					break;
-// 				}
-// 			}
-
-// 			playersUI->addPlayersBtn->setDisabled(playersUI->playersRows->size() > 15);
-// 			refreshRemoveButtons(playersUI->playersRows);
-// 		});
-// 	}
-
-// 	return r;
-// }
-
-// void FlyPlayerStatDialog::syncTeamUiFromState(FlyPlayerStatUIRow *playersUI, FlyScoreState::FlyTeam *team)
-// {
-// 	for (auto &r : *(playersUI->playersRows)) {
-// 		if (playersUI->playersLayout && r.row)
-// 			playersUI->playersLayout->removeWidget(r.row);
-// 		if (r.row) {
-// 			r.row->setHidden(true);
-// 			r.row->deleteLater();
-// 		}
-// 	}
-// 	playersUI->playersRows->clear();
-
-// 	if (!playersUI->playersLayout)
-// 		return;
-
-// 	for (int i = 0; i < team->players.size(); ++i) {
-// 		const FlyScoreState::FlyPlayer &fp = team->players[i];
-// 		const bool canRemove = team->players.size() > 10;
-// 		addPlayerUI(playersUI, fp, canRemove);
-// 		playersUI->addPlayersBtn->setDisabled(playersUI->playersRows->size() > 15);
-// 	}
-
-// 	refreshRemoveButtons(playersUI->playersRows);
-// }
-
-// void FlyPlayerStatDialog::syncStateFromTeamUi(FlyPlayersUI *playersUI, FlyScoreState::FlyTeam *team)
-// {
-// 	team->players.clear();
-// 	for (int i = 0; i < playersUI->playersRows->size(); ++i) {
-// 		const FlyPlayerUIRow &opr = playersUI->playersRows->at(i);
-// 		FlyScoreState::FlyPlayer fp = FlyScoreState::FlyPlayer{};
-// 		fp.playerTshirtNumber = opr.playerTshirtNumberSB->value();
-// 		fp.playerTshirtName = opr.playerTshirtNameEdit->text();
-// 		fp.playerName = opr.playerNameEdit->text();
-// 		team->players.push_back(fp);
-// 	}
-
-// 	refreshRemoveButtons(playersUI->playersRows);
-// }
+void FlyPlayerStatDialog::syncStateFromPlayerStatsUi()
+{
+	player_->stats.clear();
+	for (int i = 0; i < stats_->playerStatRows->size(); ++i) {
+		const FlyPlayerStatUIRow &opr = stats_->playerStatRows->at(i);
+		FlyScoreState::FlyPlayerStat ps = FlyScoreState::FlyPlayerStat{};
+		ps.moment_ms = FlyQtHelper::fly_parse_mmss_to_ms(opr.moment->text());
+		ps.success = opr.statRes->isChecked();
+		ps.statType = opr.plStatType->text();
+		ps.goalPosition = opr.goalPos->text().toInt();
+		ps.pitchPosition = opr.pitchPos->text().toInt();
+		ps.assistPlayerNumber = opr.assistPlTSnum->text().toInt();
+		ps.blockPlayerNumber = opr.blockPlTSnum->text().toInt();
+		player_->stats.push_back(ps);
+	}
+}
 
 void FlyPlayerStatDialog::syncUiFromState()
 {
-	// syncTeamUiFromState(home_, &state_.home);
-	// syncTeamUiFromState(guest_, &state_.guest);
+	syncPlayerStatsUiFromState();
 }
 
 void FlyPlayerStatDialog::syncStateFromUi()
 {
-	// syncStateFromTeamUi(home_, &state_.home);
-	// syncStateFromTeamUi(guest_, &state_.guest);
+	syncStateFromPlayerStatsUi();
+	player_->stats.push_back(*nStat_);
+}
+
+void FlyPlayerStatDialog::setPropPlStatType(QWidget *w, bool val)
+{
+	setProp(w, "plStatType", val);
+}
+
+void FlyPlayerStatDialog::setProp(QWidget *w, const char *prop, QVariant &&val)
+{
+	w->setProperty(prop, val);
+	w->style()->unpolish(w);
+	w->style()->polish(w);
+	w->update();
 }
