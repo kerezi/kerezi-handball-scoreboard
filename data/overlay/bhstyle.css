@@ -36,7 +36,10 @@
     gap: 5px;
 
     span {
-      justify-content: center;
+    align-content: center;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
       display: flex;
       flex-direction: row;
       gap: 10px;

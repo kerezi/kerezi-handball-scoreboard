@@ -38,7 +38,7 @@ async function fetchState() {
 function normalizeIncomingState(payload) {
   if (!payload) return null;
   if (payload.type === "state" && payload.state) return payload.state;
-  if (payload.home || payload.guest || payload.custom_fields) return payload;
+  if (payload.home || payload.guest || payload.teamsStats) return payload;
   return null;
 }
 
@@ -489,24 +489,61 @@ function renderFrame() {
   const team_x = swap ? baseGuest : baseHome; // left side
   const team_y = swap ? baseHome : baseGuest; // right side
 
+  const fields_xy = Array.isArray(st.teamsStats)
+    ? st.teamsStats.map((cf, index) => {
+      const leftVal = swap ? cf.guest : cf.home;
+      const rightVal = swap ? cf.home : cf.guest;
+      return {
+        ...cf,
+        key: fieldKey(cf.label, index),
+        x: leftVal,
+        y: rightVal,
+      };
+    })
+    : [];
+  const fields_by_key = {};
+  fields_xy.forEach((field) => {
+    fields_by_key[field.key] = field;
+  });
+
   // --------------- Time, Result Overlay --- start
   for (let tmrs of ["home_2minSusp", "guest_2minSusp"]) {
     st.timers[tmrs] = [];
+    let isHome = tmrs.split("_")[0].startsWith("h");
     let timerID = 0;
     let team = st[tmrs.split("_")[0]];
     let teamGoalsCount = 0;
     let goals = {};
+    let goalShots = { 1: { s: 0, g: 0 }, 2: { s: 0, g: 0 }, 3: { s: 0, g: 0 }, 4: { s: 0, g: 0 }, 5: { s: 0, g: 0 }, 6: { s: 0, g: 0 }, };
     // const elements = document.querySelectorAll('.goal-item');
     // elements.forEach(element => element.remove());
 
     for (let pl of team.players.concat(team.officials)) {
-      if (!!pl["goals"]) {
-        for (let g of pl["goals"]) {
-          teamGoalsCount++;
-          let id = (g.moment_ms - (g.moment_ms % 1000)) / 1000;
-          id = (id - (id % 60)) / 60;
-          goals[id] = !goals[id] ? [] : goals[id];
-          goals[id].push(g.goalType);
+      if (!!pl["stats"]) {
+        for (let g of pl["stats"]) {
+          if (g.success && g.statType.startsWith("shoot")) {
+            teamGoalsCount++;
+            if ((fields_by_key.score.x > 0 && isHome) || (fields_by_key.score.y > 0 && !isHome)) {
+              if ((fields_by_key.score.x == pl["playerTshirtNumber"]) || (fields_by_key.score.y == pl["playerTshirtNumber"])) {
+                let id = (g.moment_ms - (g.moment_ms % 1000)) / 1000;
+                id = (id - (id % 60)) / 60;
+                goals[id] = !goals[id] ? [] : goals[id];
+                goals[id].push(g.statType);
+
+                goalShots[g.goalPosition].g++;
+                goalShots[g.goalPosition].s++;
+              }
+            } else {
+              let id = (g.moment_ms - (g.moment_ms % 1000)) / 1000;
+              id = (id - (id % 60)) / 60;
+              goals[id] = !goals[id] ? [] : goals[id];
+              goals[id].push(g.statType);
+              goalShots[g.goalPosition].g++;
+              goalShots[g.goalPosition].s++;
+            }
+          } else if (g.statType.startsWith("shoot")) {
+            goalShots[g.goalPosition].s++;
+          }
         }
 
         for (let i in goals) {
@@ -532,6 +569,26 @@ function renderFrame() {
             }
           }
         }
+
+        const elementGK = document.querySelector(".goal-place-1");
+        if (!!elementGK) {
+          for (var i = 1; i < 7; i++) {
+            const sp = document.querySelector(".goal.place-2-" + (isHome ? "1" : "2") + " .goal-place-" + i);
+            if (!!sp) {
+              sp.textContent = "" + goalShots[i].g + " / " + goalShots[i].s;
+            }
+          }
+          if ((fields_by_key.score.x > 0 && isHome) || (fields_by_key.score.y > 0 && !isHome)) {
+            if ((fields_by_key.score.x == pl["playerTshirtNumber"]) || (fields_by_key.score.y == pl["playerTshirtNumber"])) {
+              const sp = document.querySelector(".goal.place-2-3 .goal-place-" + (isHome ? "1" : "2"));
+              if (!!sp) {
+                sp.textContent = "" + pl.playerTshirtNumber + ". " + pl.playerTshirtName;
+              }
+
+            }
+          }
+        }
+
       }
 
       for (let pl2minSusp of ["fst2minSusp_ms", "snd2minSusp_ms", "trd2minSusp_ms", "disqualification_ms", "blueCard_ms"]) {
@@ -632,23 +689,8 @@ function renderFrame() {
   if (team_x.color) team_x.color = intToHex(team_x.color);
   if (team_y.color) team_y.color = intToHex(team_y.color);
 
-  const fields_xy = Array.isArray(st.custom_fields)
-    ? st.custom_fields.map((cf, index) => {
-      const leftVal = swap ? cf.guest : cf.home;
-      const rightVal = swap ? cf.home : cf.guest;
-      return {
-        ...cf,
-        key: fieldKey(cf.label, index),
-        x: leftVal,
-        y: rightVal,
-      };
-    })
-    : [];
 
-  const fields_by_key = {};
-  fields_xy.forEach((field) => {
-    fields_by_key[field.key] = field;
-  });
+
 
   const view = {
     ...st,
