@@ -538,11 +538,20 @@ function renderFrame() {
               id = (id - (id % 60)) / 60;
               goals[id] = !goals[id] ? [] : goals[id];
               goals[id].push(g.statType);
-              goalShots[g.goalPosition].g++;
-              goalShots[g.goalPosition].s++;
+              if (!!g.goalPosition) {
+                goalShots[g.goalPosition].g++;
+                goalShots[g.goalPosition].s++;
+              } else {
+                goalShots[g.goalPosition].g++;
+                goalShots[g.goalPosition].s++;
+              }
             }
           } else if (g.statType.startsWith("shoot")) {
-            goalShots[g.goalPosition].s++;
+            if (!!g.goalPosition && parseInt(g.goalPosition) > 0) {
+              goalShots[g.goalPosition].s++;
+            } else {
+              goalShots[1].s++;
+            }
           }
         }
 
